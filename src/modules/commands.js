@@ -4,7 +4,9 @@ class CommandsModule {
      * @param command the command to add
     */
     async addCommand(command) {
+        /* ensure that the command has a name */
         if (command.name) {
+            /* add the command */
             this.commands[command.name] = command;
         }
     }
@@ -15,8 +17,10 @@ class CommandsModule {
      * @returns the command found (if any)
      */
     async findCommand(call) {
+        /* make call lower-case so we don't have to every time */
         call = call.toLowerCase();
 
+        /* go through commands */
         for (var [name, command] in Object.entries(this.commands)) {
             /* check command's name */
             if (command.name.toLowerCase() == call) {
@@ -24,7 +28,9 @@ class CommandsModule {
 
             /* check command's aliases */
             } else if (command.aliases) {
+                /* go through aliases */
                 for (var i = 0; i < command.aliases.length; i++) {
+                    /* check aliase */
                     if (command.aliases[i].toLowerCase() == call) {
                         return command;
                     }
@@ -123,7 +129,7 @@ class CommandsModule {
      * sets up the commands
      */
     async setupCommands() {
-        this.catalyst.setupDirectory("../commands", this.commands, [".js", ".mjs"]);
+        return await this.catalyst.setupDirectory("../commands", this.commands, [".js", ".mjs"]);
     }
 
     /**
@@ -138,7 +144,6 @@ class CommandsModule {
         this.catalyst = catalyst;
         this.commands = {};
 
-        catalyst.log("Commands", "Loading");
         catalyst.commands = this.commands;
     }
 };

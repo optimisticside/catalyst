@@ -5,7 +5,11 @@ class EventsModule {
      * @param listener the function to be executed upon event fire
      */
     async addListener(name, listener) {
+        /* make sure the client exists */
         if (!this.catalyst.client) return;
+
+        /* connect a wrapper function that executes the listener
+           with the parameters and the catalyst framework as parameters */
         return this.catalyst.client.on(name, (...params) => {
             return listener(this.catalyst, params);
         });
@@ -16,7 +20,10 @@ class EventsModule {
      * @param folder the directory to set up event liteners in
      */
     async setupListeners(path) {
+        /* add listeners */
         this.catalyst.setupDirectory(path || "../events", this.listeners, [".js", ".mjs"]);
+
+        /* actually connect the listeners */
         for (const [event, listener] of Object.entries(this.listeners)) {
             this.addListener(event, listener)
         }
@@ -33,7 +40,5 @@ class EventsModule {
     constructor(catalyst) {
         this.catalyst = catalyst;
         this.listeners = {};
-
-        catalyst.log("Events", "Loading");
     }
 };

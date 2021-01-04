@@ -39,7 +39,6 @@ class ErrorsModule {
     }
 
     constructor(catalyst) {
-        catalyst.log("Errors", "Loading");
         this.catalyst = catalyst;
     }
 };
