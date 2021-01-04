@@ -38,7 +38,7 @@ class MemeCommand {
             /* create embed */
             const embed = new MessageEmbed()
                 .setTitle("Meme")
-                .setDescription("Unable to retrieve random meme from Reddit")
+                .setDescription("❗ Unable to retrieve random meme from Reddit")
                 .setColor(this.catalyst.config.FAIL_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
 

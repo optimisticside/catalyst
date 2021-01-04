@@ -39,7 +39,7 @@ class BanCommand {
         }
 
         /* ban the user */
-        await target.ban(reason).then(() => {
+        await target.ban({ reason: reason }).then(() => {
             /* create embed */
             var embed = new MessageEmbed()
                 .setTitle("Ban")
