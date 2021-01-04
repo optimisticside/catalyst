@@ -41,10 +41,13 @@ class CommandsModule {
      * @returns whether or not the execution was a success, along with the result / error-message
      */
     async runCommand(command, message, args) {
+        /* run command */
         return command.run(this, message, args).then((...result) => {
+            /* execution was a success */
             return true, result;
-
+        
         }).catch(err => {
+            /* execution was a failure */
             return false, err;
         });
     }
@@ -56,9 +59,11 @@ class CommandsModule {
      * @returns whether or not the user has the permissions
      */
     async checkPerms(member, perms) {
+        /* assume permissions to be valid (in-case there are no permissions) */
         var hasPerms = true;
 
-        for (var i = 0; i < perms; i++) {
+        /* go through permissions */
+        for (var i = 0; i < perms.length; i++) {
             var perm = perms[i];
 
             /* check permission */
@@ -75,11 +80,12 @@ class CommandsModule {
      * @param message the message sent
      */
     async handleMessage(message) {
+        /* return if message was not part of a guild or was a bot */
         if (!message.guild) return;
         if (message.author.bot) return;
 
         // var userData, guildData = this.catalyst.dataBase.getData(message);
-        var prefixes = [`<@${this.catalyst.client.user.id}>`, `<@!${this.catalyst.client.user.id}>`]//.concat(guildData.prefix);
+        var prefixes = [`<@${this.catalyst.client.user.id}>`]//.concat(guildData.prefix);
         var prefix = null;
 
         /* validate prefix */

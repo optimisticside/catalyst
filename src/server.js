@@ -29,6 +29,7 @@ class Catalyst {
         var result = require(path.join("..", file));
         var type = typeof result;
 
+        /* if it's a function, it's probably a class */
         if (type == "function") {
             type = new result(this, file);
         }
@@ -43,9 +44,12 @@ class Catalyst {
      * @param fileTypes the types of files allowed
      */
     async setupDirectory(dirPath, destination, fileTypes) {
+        /* read the directory */
         return fs.readdir(dirPath, (err, files) => {
+            /* handle any errors accordingly */
             if (err) return this.error("Framework", `Unable to read directory ${dirPath}: ${err}`);
 
+            /* go through the files */
             return files.forEach(file => {
                 /* get the file's name and path */
                 var fileName = destination[path.basename(file, path.extname(file))];
@@ -75,8 +79,11 @@ class Catalyst {
      * initializes catalyst modules
      */
     async initModules() {
+        /* go through modules */
         for (var [name, module] of Object.entries(this.modules)) {
-            if (typeof module == "object") {
+            /* check if module has init function */
+            if (typeof module == "object" && module.init) {
+                /* initialize module and handle errors accordingly */
                 module.init(this).catch(err => {
                     this.log("Framework", `Unable to load module ${name}: ${err}`);
                 });
@@ -97,12 +104,16 @@ class Catalyst {
 
         this.client = client || new Client();
 
+        /* load modules */
         this.log("Framework", "Loading modules");
         this.setupModules().then(() => {
+            /* initialize modules */
             this.log("Framework", "Initializing modules");
 
             this.initModules().then(() => {
+                /* log into client */
                 this.log("Framework", "Logging in client");
+
                 this.client.login(this.config.TOKEN);
             });
         });
