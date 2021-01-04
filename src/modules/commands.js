@@ -4,7 +4,9 @@ class CommandsModule {
      * @param command the command to add
     */
     async addCommand(command) {
+        /* ensure that the command has a name */
         if (command.name) {
+            /* add the command */
             this.commands[command.name] = command;
         }
     }
@@ -15,8 +17,10 @@ class CommandsModule {
      * @returns the command found (if any)
      */
     async findCommand(call) {
+        /* make call lower-case so we don't have to every time */
         call = call.toLowerCase();
 
+        /* go through commands */
         for (var [name, command] in Object.entries(this.commands)) {
             /* check command's name */
             if (command.name.toLowerCase() == call) {
@@ -24,7 +28,9 @@ class CommandsModule {
 
             /* check command's aliases */
             } else if (command.aliases) {
+                /* go through aliases */
                 for (var i = 0; i < command.aliases.length; i++) {
+                    /* check aliase */
                     if (command.aliases[i].toLowerCase() == call) {
                         return command;
                     }
@@ -85,37 +91,49 @@ class CommandsModule {
         if (message.author.bot) return;
 
         // var userData, guildData = this.catalyst.dataBase.getData(message);
-        var prefixes = [`<@${this.catalyst.client.user.id}>`]//.concat(guildData.prefix);
+        var messageText = message.content.trim();
+        var prefixes = [`<@${this.catalyst.client.user.id}>`, `<@!${this.catalyst.client.user.id}>`, this.catalyst.config.PREFIX]//.concat(guildData.prefix);
         var prefix = null;
 
         /* validate prefix */
-        for (var prefix of prefixes) {
-            if (message.content.startsWith(prefix)) {
-                prefix = prefix;
+        prefixes.forEach(p => {
+            if (messageText.startsWith(p)) {
+                messageText = messageText.slice(p.length)
+                prefix = p;
             }
-        }
+        });
 
         /* return if not a command */
         if (!prefix) return;
 
         /* parse message and get args and command call */
-        var args = message.content.trim().split(this.catalyst.config.splitKey);
+        var args = messageText.split(this.catalyst.config.SPLIT_KEY);
         var call = args.shift().toLowerCase();
 
-        /* get command and validte user's permissions */
+        /* get commad */
         var command = await this.findCommand(call);
+        console.log(call)
+        console.log(call)
+
+        /* throw error if invalid command */
+        if (!command) {
+            this.catalyst.modules.errors.invalidCommand(message, call);
+            return;
+        }
+
+        /* validate user's permissions */
         var hasPerms = await this.checkPerms(message.member, command.perms || {});
 
         /* throw error if user doesn't have permissions */
         if (!hasPerms) {
-            this.catalyst.errors.runPerms(message, command);
+            this.catalyst.modules.errors.runPerms(message, command);
             return;
         }
 
         /* execute command and throw error if execution fails */
         var ran, result = this.runCommand(user, message, args);
         if (!ran) {
-            this.catalyst.errors.runFail(user, command);
+            this.catalyst.modules.errors.runFail(user, command);
         }
     }
 
@@ -123,22 +141,38 @@ class CommandsModule {
      * sets up the commands
      */
     async setupCommands() {
-        this.catalyst.setupDirectory("../commands", this.commands, [".js", ".mjs"]);
+        await this.catalyst.setupDirectory("./src/commands", this.commandsTree, [".js", ".mjs"]);
+
+        /* create functions to handle nested tables recursively */
+        function setupTable(table, handler) {
+            for (const [name, command] of Object.entries(table)) {
+                if (command.name) {
+                    handler(name, command);
+                } else {
+                    setupTable(command, handler);
+                }
+            }
+        }
+
+        /* actually connect the listeners */
+        return setupTable(this.commandsTree, (...params) => {
+            return this.addCommand(...params);
+        });
     }
 
     /**
      * module initialization process
      */
     async init() {
-        this.setupCommands();
+        await this.setupCommands();
         this.catalyst.log("Events", "Loaded");
     }
 
     constructor(catalyst) {
         this.catalyst = catalyst;
+        this.commandsTree = {};
         this.commands = {};
 
-        catalyst.log("Commands", "Loading");
         catalyst.commands = this.commands;
     }
 };

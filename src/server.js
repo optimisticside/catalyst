@@ -3,6 +3,18 @@ const { config } = require("dotenv");
 const path = require("path");
 const fs = require("fs");
 
+/**
+ * utility function that determines if something is a class or function
+ * @see https://stackoverflow.com/questions/526559/testing-if-something-is-a-class-in-javascript
+ * @param classOrFunc the thing to determine the type of
+ * @returns whether or not it's a function
+ */
+function isFunction(classOrFunc) {
+    const propertyNames = Object.getOwnPropertyNames(classOrFunc);
+    return (!propertyNames.includes("prototype") || propertyNames.includes("arguments"));
+}
+
+
 class Catalyst {
     /**
      * outputs a message to the console
@@ -29,9 +41,15 @@ class Catalyst {
         var result = require(path.join("..", file));
         var type = typeof result;
 
-        /* if it's a function, it's probably a class */
-        if (type == "function") {
-            type = new result(this, file);
+        /* if it's a class or function */
+        if (result && type == "function") {
+            if (isFunction(result)) {
+                /* it's just a function */
+                result = result(this, file);
+            } else {
+                /* it's a class */
+                result = new result(this, file);
+            }
         }
 
         return result;
@@ -45,34 +63,36 @@ class Catalyst {
      */
     async setupDirectory(dirPath, destination, fileTypes) {
         /* read the directory */
-        return fs.readdir(dirPath, (err, files) => {
-            /* handle any errors accordingly */
-            if (err) return this.error("Framework", `Unable to read directory ${dirPath}: ${err}`);
+        const files = fs.readdirSync(dirPath);
 
-            /* go through the files */
-            return files.forEach(file => {
-                /* get the file's name and path */
-                var fileName = destination[path.basename(file, path.extname(file))];
-                var filePath = path.join(dirPath, file);
+        /* go through the files */
+        const promises = files.map(async file => {
+            /* get the file's name and path */
+            var fileName = path.basename(file, path.extname(file));
+            var filePath = path.join(dirPath, file);
 
-                /* make sure entry is a file and has a correct file-type */
-                if (fs.statSync(filePath).isFile() && (!fileTypes || fileTypes.indexOf(path.extname(file)) != -1)) {
-                    /* require the file and add it to the destination accordingly */
-                    this.executeFile(filePath).then(data => {
-                        destination[fileName] = data;
+            /* make sure entry is a file and has a correct file-type */
+            if (fs.statSync(filePath).isFile() && (!fileTypes || fileTypes.indexOf(path.extname(file)) != -1)) {
+                /* require the file and add it to the destination accordingly */
+                this.log("Core", `Requiring ${filePath}`);
+                await this.executeFile(filePath).then(data => {
+                    this.log("Core", `Successfully required ${fileName} (${filePath})`);
+                    destination[fileName] = data;
 
-                    /* handle any errors */
-                    }).catch(err => {
-                        this.log("Framework", `Unable to require ${filePath}: ${err}`);
-                    });
+                /* handle any errors */
+                }).catch(err => {
+                    this.log("Core", `Unable to require ${fileName} (${filePath}): ${err}`);
+                });
 
-                /* recursively set-up directory if the entry is one */
-                } else if (fs.statSync(filePath).isDirectory()) {
-                    destination[fileName] = {};
-                    this.setupDirectory(filePath, destination[fileName]);
-                }
-            });
+            /* recursively set-up directory if the entry is one */
+            } else if (fs.statSync(filePath).isDirectory()) {
+                destination[fileName] = {};
+                await this.setupDirectory(filePath, destination[fileName]);
+            }
         });
+
+        /* yield until finished */
+        await Promise.all(promises);
     }
 
     /**
@@ -80,13 +100,17 @@ class Catalyst {
      */
     async initModules() {
         /* go through modules */
-        for (var [name, module] of Object.entries(this.modules)) {
+        for (const [name, module] of Object.entries(this.modules)) {
             /* check if module has init function */
             if (typeof module == "object" && module.init) {
                 /* initialize module and handle errors accordingly */
-                module.init(this).catch(err => {
-                    this.log("Framework", `Unable to load module ${name}: ${err}`);
+                this.log("Core", `Initializing ${name} module`);
+
+                await module.init(this).catch(err => {
+                    this.log("Core", `Unable to load module ${name}: ${err}`);
                 });
+            } else {
+                this.log("Core", `No initialization function found in ${name} module`);
             }
         }
     }
@@ -98,25 +122,31 @@ class Catalyst {
         return this.setupDirectory("./src/modules", this.modules, [".js", ".mjs"]);
     }
 
+    /**
+     * initializes framework
+     */
+    async init() {
+        /* load modules */
+        this.log("Core", "Loading modules");
+        await this.setupModules();
+
+        /* initialize modules */
+        this.log("Core", "Initializing modules");
+        await this.initModules();
+
+        /* log into client */
+        this.log("Core", "Logging in client");
+        this.client.login(this.config.TOKEN);
+    }
+
     constructor(client, env) {
         this.modules = {};
         this.config = env || process.env;
 
         this.client = client || new Client();
 
-        /* load modules */
-        this.log("Framework", "Loading modules");
-        this.setupModules().then(() => {
-            /* initialize modules */
-            this.log("Framework", "Initializing modules");
-
-            this.initModules().then(() => {
-                /* log into client */
-                this.log("Framework", "Logging in client");
-
-                this.client.login(this.config.TOKEN);
-            });
-        });
+        /* initialize */
+        this.init();
     }
 };
 

@@ -5,10 +5,20 @@ class EventsModule {
      * @param listener the function to be executed upon event fire
      */
     async addListener(name, listener) {
+        /* make sure the client exists */
         if (!this.catalyst.client) return;
-        return this.catalyst.client.on(name, (...params) => {
-            return listener(this.catalyst, params);
+
+        /* connect a wrapper function that executes the listener
+           with the parameters and the catalyst framework as parameters */
+        this.catalyst.log("Events", `Adding listener to ${name} event`);
+        this.catalyst.client.on(name, (...params) => {
+            return listener.execute(...params);
         });
+
+        /* run connection function if exists */
+        if (listener && listener.onConnect) {
+            listener.onConnect();
+        }
     }
 
     /**
@@ -16,24 +26,38 @@ class EventsModule {
      * @param folder the directory to set up event liteners in
      */
     async setupListeners(path) {
-        this.catalyst.setupDirectory(path || "../events", this.listeners, [".js", ".mjs"]);
-        for (const [event, listener] of Object.entries(this.listeners)) {
-            this.addListener(event, listener)
+        /* add listeners */
+        await this.catalyst.setupDirectory(path || "./src/events", this.listeners, [".js", ".mjs"]);
+
+        /* create functions to handle nested tables recursively */
+        function setupTable(table, handler) {
+            for (const [name, listener] of Object.entries(table)) {
+                if (listener.execute) {
+                    handler(name, listener);
+                } else {
+                    setupTable(listener, handler);
+                }
+            }
         }
-    };
+
+        /* actually connect the listeners */
+        return setupTable(this.listeners, (...params) => {
+            return this.addListener(...params);
+        });
+    }
 
     /**
      * module initialization process
      */
     async init() {
-        this.setupListeners();
+        await this.setupListeners();
         this.catalyst.log("Events", "Loaded");
     }
 
     constructor(catalyst) {
         this.catalyst = catalyst;
         this.listeners = {};
-
-        catalyst.log("Events", "Loading");
     }
 };
+
+module.exports = EventsModule;
