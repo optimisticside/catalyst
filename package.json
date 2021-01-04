@@ -1,0 +1,23 @@
+{
+  "name": "catalyst",
+  "version": "1.0.0",
+  "description": "A versatile Discord bot",
+  "main": "src/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/optimisticside/catalyst.git"
+  },
+  "author": "http://github.com/optimisticside",
+  "license": "Unlicence",
+  "bugs": {
+    "url": "https://github.com/optimisticside/catalyst/issues"
+  },
+  "homepage": "https://github.com/optimisticside/catalyst#readme",
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "dotenv": "^8.2.0"
+  }
+}

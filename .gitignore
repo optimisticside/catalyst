@@ -1,0 +1,8 @@
+# node modules
+node_modules/
+
+# npm cache
+.npm
+
+# environment files
+.env
