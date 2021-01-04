@@ -18,6 +18,7 @@ class PingCommand {
         this.catalyst = catalyst;
 
         this.name = "ping";
+        this.description = "Pings the bot's connection with the Discord API";
         this.aliases = ["pingTest", "getPing"];
         this.argFormat = null;
     }

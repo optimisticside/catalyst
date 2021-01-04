@@ -14,6 +14,7 @@ class TestCommand {
         this.catalyst = catalyst;
 
         this.name = "test";
+        this.description = "Responds with hello world";
     }
 };
 

@@ -91,25 +91,29 @@ class CommandsModule {
         if (message.author.bot) return;
 
         // var userData, guildData = this.catalyst.dataBase.getData(message);
-        var prefixes = [`<@${this.catalyst.client.user.id}>`, this.catalyst.config.PREFIX]//.concat(guildData.prefix);
+        var messageText = message.content.trim();
+        var prefixes = [`<@${this.catalyst.client.user.id}>`, `<@!${this.catalyst.client.user.id}>`, this.catalyst.config.PREFIX]//.concat(guildData.prefix);
         var prefix = null;
 
         /* validate prefix */
-        for (var prefix of prefixes) {
-            if (message.content.startsWith(prefix)) {
-                prefix = prefix;
+        prefixes.forEach(p => {
+            if (messageText.startsWith(p)) {
+                messageText = messageText.slice(p.length)
+                prefix = p;
             }
-        }
+        });
 
         /* return if not a command */
         if (!prefix) return;
 
         /* parse message and get args and command call */
-        var args = message.content.trim().split(this.catalyst.config.SPLIT_KEY);
+        var args = messageText.split(this.catalyst.config.SPLIT_KEY);
         var call = args.shift().toLowerCase();
 
         /* get commad */
         var command = await this.findCommand(call);
+        console.log(call)
+        console.log(call)
 
         /* throw error if invalid command */
         if (!command) {

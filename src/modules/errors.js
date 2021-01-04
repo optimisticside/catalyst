@@ -10,7 +10,7 @@ class ErrorsModule {
         const embed = new MessageEmbed()
             .setTitle("Lacking permissions")
             .setColor(this.catalyst.config.FAIL_COLOR)
-            .setDesciption(`⚠️ You do not have permissions to use the ${command.name} command!`)
+            .setDescription(`⚠️ You do not have permissions to use the ${command.name} command!`)
             .setFooter(message.author.tag, message.author.displayAvatarUrl);
 
         return message.channel.send(embed);
@@ -25,7 +25,7 @@ class ErrorsModule {
         const embed = new MessageEmbed()
             .setTitle("Execution fail")
             .setColor(this.catalyst.config.FAIL_COLOR)
-            .setDesciption(`❗ I was unable to execute the ${command.name} command!`)
+            .setDescription(`❗ Unable to execute the ${command.name} command`)
             .setFooter(message.author.tag, message.author.displayAvatarUrl);
 
         return message.channel.send(embed);
@@ -40,7 +40,7 @@ class ErrorsModule {
         const embed = new MessageEmbed()
             .setTitle("Invalid command")
             .setColor(this.catalyst.config.FAIL_COLOR)
-            .setDesciption(`❗ I was unable to find the command "${call}"!`)
+            .setDescription(`❗ Invalid command provided`)
             .setFooter(message.author.tag, message.author.displayAvatarUrl);
 
         return message.channel.send(embed);
