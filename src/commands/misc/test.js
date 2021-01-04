@@ -7,10 +7,10 @@
 async function run(catalyst, message, args) {
     /* send a message */
     message.channel.send("Hello World!");
-};
+}
 
 module.exports = {
     name: "test",
     permissions: ["SEND_MESSAGES"],
-    run = run
-};
+    run: run
+}

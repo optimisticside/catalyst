@@ -10,6 +10,7 @@ class EventsModule {
 
         /* connect a wrapper function that executes the listener
            with the parameters and the catalyst framework as parameters */
+        this.catalyst.log("Events", `Adding listener to ${name} event`);
         return this.catalyst.client.on(name, (...params) => {
             return listener(this.catalyst, params);
         });
@@ -21,19 +22,19 @@ class EventsModule {
      */
     async setupListeners(path) {
         /* add listeners */
-        this.catalyst.setupDirectory(path || "../events", this.listeners, [".js", ".mjs"]);
+        this.catalyst.setupDirectory(path || "./src/events", this.listeners, [".js", ".mjs"]);
 
         /* actually connect the listeners */
         for (const [event, listener] of Object.entries(this.listeners)) {
-            this.addListener(event, listener)
+            await this.addListener(event, listener);
         }
-    };
+    }
 
     /**
      * module initialization process
      */
     async init() {
-        this.setupListeners();
+        await this.setupListeners();
         this.catalyst.log("Events", "Loaded");
     }
 

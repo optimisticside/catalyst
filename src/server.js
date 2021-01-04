@@ -31,7 +31,7 @@ class Catalyst {
 
         /* if it's a function, it's probably a class */
         if (type == "function") {
-            type = new result(this, file);
+            result = new result(this, file);
         }
 
         return result;

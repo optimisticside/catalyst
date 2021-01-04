@@ -129,7 +129,7 @@ class CommandsModule {
      * sets up the commands
      */
     async setupCommands() {
-        return await this.catalyst.setupDirectory("../commands", this.commands, [".js", ".mjs"]);
+        return await this.catalyst.setupDirectory("./src/commands", this.commands, [".js", ".mjs"]);
     }
 
     /**

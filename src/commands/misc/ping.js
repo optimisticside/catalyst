@@ -17,5 +17,5 @@ module.exports = {
     name: "ping",
     aliases: ["pingTest", "getPing"],
     permissions: ["SEND_MESSAGES"],
-    run = run
+    run: run
 };
