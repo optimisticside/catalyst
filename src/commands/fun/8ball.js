@@ -25,11 +25,13 @@ class EightBallCommand {
     constructor(catalyst) {
         this.catalyst = catalyst;
 
+        /* command info */
         this.name = "8ball";
         this.description = "Asks the 8ball a question";
         this.aliases = ["eightBall"];
         this.argFormat = ["message"];
 
+        /* constants */
         this.options = ["yes", "no", "maybe", "perhaps", "obviously", "what do you think?"];
     }
 };

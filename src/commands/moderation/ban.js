@@ -14,44 +14,55 @@ class BanCommand {
 
         /* throw error if no target provided */
         if (!target) {
+            /* create embed */
             var embed = new MessageEmbed()
                 .setTitle("Ban")
                 .setDescription("❗ No user provided.")
                 .setColor(catalyst.config.FAIL_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
             
+            /* send embed and return */
             return message.channel.send(embed);
         }
 
         /* thrrow error if lacking permissions */
         if (!target.bannable) {
+            /* create embed */
             var embed = new MessageEmbed()
                 .setTitle("Ban")
                 .setDescription(`❗ Lacking permissions to ban ${target.user.tag}`)
                 .setColor(catalyst.config.FAIL_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
 
+            /* send embed and return */
             return message.channel.send(embed);
         }
 
         /* ban the user */
         await target.ban(reason).then(() => {
+            /* create embed */
             var embed = new MessageEmbed()
                 .setTitle("Ban")
                 .setDescription(`✅ Successfully banned ${target.user.tag}`)
                 .setColor(catalyst.config.DEFAULT_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
 
+            /* send embed and return */
             return message.channel.send(embed);
 
         /* handle any errors */
         }).catch(err => {
+            /* log to console */
+            catalyst.log("Kick command", `Unable to kick ${target.user.tag}: ${err}`);
+
+            /* create embed */
             var embed = new MessageEmbed()
                 .setTitle("Ban")
                 .setDescription(`❗ An error occured when banning ${target.user.tag}`)
                 .setColor(catalyst.config.FAIL_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
 
+            /* send embed and return */
             return message.channel.send(embed);
         });
     };
@@ -59,6 +70,7 @@ class BanCommand {
     constructor(catalyst) {
         this.catalyst = catalyst;
 
+        /* command info */
         this.name = "ban";
         this.description = "Bans a user";
         this.perms = ["BAN_MEMBERS"];

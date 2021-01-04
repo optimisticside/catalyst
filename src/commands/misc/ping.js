@@ -17,6 +17,7 @@ class PingCommand {
     constructor(catalyst) {
         this.catalyst = catalyst;
 
+        /* command info */
         this.name = "ping";
         this.description = "Pings the bot's connection with the Discord API";
         this.aliases = ["pingTest", "getPing"];
