@@ -46,21 +46,23 @@ class Catalyst {
         return fs.readdir(dirPath, (err, files) => {
             if (err) return this.error("Framework", `Unable to read directory ${dirPath}: ${err}`);
 
-            return files.filter((file) => {
-                return fileTypes.indexOf(path.extname(file)) != -1;
-
-            }).forEach(file => {
+            return files.forEach(file => {
+                /* get the file's name and path */
                 var fileName = destination[path.basename(file, path.extname(file))];
                 var filePath = path.join(dirPath, file);
 
-                if (fs.statSync(filePath).isFile() && fileTypes.indexOf(path.extname(file)) != -1) {
+                /* make sure entry is a file and has a correct file-type */
+                if (fs.statSync(filePath).isFile() && (!fileTypes || fileTypes.indexOf(path.extname(file)) != -1)) {
+                    /* require the file and add it to the destination accordingly */
                     this.executeFile(filePath).then(data => {
                         destination[fileName] = data;
 
+                    /* handle any errors */
                     }).catch(err => {
                         this.log("Framework", `Unable to require ${filePath}: ${err}`);
                     });
 
+                /* recursively set-up directory if the entry is one */
                 } else if (fs.statSync(filePath).isDirectory()) {
                     destination[fileName] = {};
                     this.setupDirectory(filePath, destination[fileName]);

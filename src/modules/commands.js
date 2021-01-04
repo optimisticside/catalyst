@@ -18,9 +18,11 @@ class CommandsModule {
         call = call.toLowerCase();
 
         for (var [name, command] in Object.entries(this.commands)) {
+            /* check command's name */
             if (command.name.toLowerCase() == call) {
                 return command;
 
+            /* check command's aliases */
             } else if (command.aliases) {
                 for (var i = 0; i < command.aliases.length; i++) {
                     if (command.aliases[i].toLowerCase() == call) {
@@ -58,6 +60,8 @@ class CommandsModule {
 
         for (var i = 0; i < perms; i++) {
             var perm = perms[i];
+
+            /* check permission */
             if (perm && !member.permissions.find(perm)) {
                 hasPerms = false;
             }
@@ -78,25 +82,31 @@ class CommandsModule {
         var prefixes = [`<@${this.catalyst.client.user.id}>`, `<@!${this.catalyst.client.user.id}>`]//.concat(guildData.prefix);
         var prefix = null;
 
+        /* validate prefix */
         for (var prefix of prefixes) {
             if (message.content.startsWith(prefix)) {
                 prefix = prefix;
             }
         }
 
+        /* return if not a command */
         if (!prefix) return;
 
+        /* parse message and get args and command call */
         var args = message.content.trim().split(this.catalyst.config.splitKey);
         var call = args.shift().toLowerCase();
 
+        /* get command and validte user's permissions */
         var command = await this.findCommand(call);
         var hasPerms = await this.checkPerms(message.member, command.perms || {});
 
+        /* throw error if user doesn't have permissions */
         if (!hasPerms) {
             this.catalyst.errors.runPerms(message, command);
             return;
         }
 
+        /* execute command and throw error if execution fails */
         var ran, result = this.runCommand(user, message, args);
         if (!ran) {
             this.catalyst.errors.runFail(user, command);
