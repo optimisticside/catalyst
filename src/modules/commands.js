@@ -143,7 +143,9 @@ class CommandsModule {
         }
 
         /* actually connect the listeners */
-        return setupTable(this.commandsTree, this.addCommand);
+        return setupTable(this.commandsTree, (...params) => {
+            return this.addCommand(...params);
+        });
     }
 
     /**

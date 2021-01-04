@@ -11,9 +11,14 @@ class EventsModule {
         /* connect a wrapper function that executes the listener
            with the parameters and the catalyst framework as parameters */
         this.catalyst.log("Events", `Adding listener to ${name} event`);
-        return this.catalyst.client.on(name, (...params) => {
-            return listener(this.catalyst, params);
+        this.catalyst.client.on(name, (...params) => {
+            return listener.execute(...params);
         });
+
+        /* run connection function if exists */
+        if (listener && listener.onConnect) {
+            listener.onConnect();
+        }
     }
 
     /**
@@ -27,7 +32,7 @@ class EventsModule {
         /* create functions to handle nested tables recursively */
         function setupTable(table, handler) {
             for (const [name, listener] of Object.entries(table)) {
-                if (typeof listener == "function") {
+                if (listener.execute) {
                     handler(name, listener);
                 } else {
                     setupTable(listener, handler);
@@ -36,7 +41,9 @@ class EventsModule {
         }
 
         /* actually connect the listeners */
-        return setupTable(this.listeners, this.addListener);
+        return setupTable(this.listeners, (...params) => {
+            return this.addListener(...params);
+        });
     }
 
     /**

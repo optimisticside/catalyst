@@ -3,6 +3,18 @@ const { config } = require("dotenv");
 const path = require("path");
 const fs = require("fs");
 
+/**
+ * utility function that determines if something is a class or function
+ * @see https://stackoverflow.com/questions/526559/testing-if-something-is-a-class-in-javascript
+ * @param classOrFunc the thing to determine the type of
+ * @returns whether or not it's a function
+ */
+function isFunction(classOrFunc) {
+    const propertyNames = Object.getOwnPropertyNames(classOrFunc);
+    return (!propertyNames.includes("prototype") || propertyNames.includes("arguments"));
+}
+
+
 class Catalyst {
     /**
      * outputs a message to the console
@@ -29,9 +41,15 @@ class Catalyst {
         var result = require(path.join("..", file));
         var type = typeof result;
 
-        /* if it's a function, it's probably a class */
-        if (type == "function") {
-            result = new result(this, file);
+        /* if it's a class or function */
+        if (result && type == "function") {
+            if (isFunction(result)) {
+                /* it's just a function */
+                result = result(this, file);
+            } else {
+                /* it's a class */
+                result = new result(this, file);
+            }
         }
 
         return result;
@@ -50,7 +68,7 @@ class Catalyst {
         /* go through the files */
         const promises = files.map(async file => {
             /* get the file's name and path */
-            var fileName = path.basename(file);
+            var fileName = path.basename(file, path.extname(file));
             var filePath = path.join(dirPath, file);
 
             /* make sure entry is a file and has a correct file-type */
@@ -58,12 +76,12 @@ class Catalyst {
                 /* require the file and add it to the destination accordingly */
                 this.log("Core", `Requiring ${filePath}`);
                 await this.executeFile(filePath).then(data => {
-                    this.log("Core", `Successfully required ${filePath}`);
+                    this.log("Core", `Successfully required ${fileName} (${filePath})`);
                     destination[fileName] = data;
 
                 /* handle any errors */
                 }).catch(err => {
-                    this.log("Core", `Unable to require ${filePath}: ${err}`);
+                    this.log("Core", `Unable to require ${fileName} (${filePath}): ${err}`);
                 });
 
             /* recursively set-up directory if the entry is one */
@@ -82,7 +100,7 @@ class Catalyst {
      */
     async initModules() {
         /* go through modules */
-        for (var [name, module] of Object.entries(this.modules)) {
+        for (const [name, module] of Object.entries(this.modules)) {
             /* check if module has init function */
             if (typeof module == "object" && module.init) {
                 /* initialize module and handle errors accordingly */
