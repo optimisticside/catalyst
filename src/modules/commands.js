@@ -108,20 +108,28 @@ class CommandsModule {
         var args = message.content.trim().split(this.catalyst.config.SPLIT_KEY);
         var call = args.shift().toLowerCase();
 
-        /* get command and validte user's permissions */
+        /* get commad */
         var command = await this.findCommand(call);
+
+        /* throw error if invalid command */
+        if (!command) {
+            this.catalyst.modules.errors.invalidCommand(message, call);
+            return;
+        }
+
+        /* validate user's permissions */
         var hasPerms = await this.checkPerms(message.member, command.perms || {});
 
         /* throw error if user doesn't have permissions */
         if (!hasPerms) {
-            this.catalyst.errors.runPerms(message, command);
+            this.catalyst.modules.errors.runPerms(message, command);
             return;
         }
 
         /* execute command and throw error if execution fails */
         var ran, result = this.runCommand(user, message, args);
         if (!ran) {
-            this.catalyst.errors.runFail(user, command);
+            this.catalyst.modules.errors.runFail(user, command);
         }
     }
 

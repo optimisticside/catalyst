@@ -1,4 +1,4 @@
-const { RichEmbed } = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 
 class ErrorsModule {
     /**
@@ -7,7 +7,7 @@ class ErrorsModule {
      * @param command the command that the user lacked permissions to execute
      */
     async runPerms(message, command) {
-        var embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle("Lacking permissions")
             .setColor(this.catalyst.config.FAIL_COLOR)
             .setDesciption(`⚠️ You do not have permissions to use the ${command.name} command!`)
@@ -19,13 +19,28 @@ class ErrorsModule {
     /**
      * command execution fail message
      * @param message the message tha caused the issue
-     * @Param command teh command that failed to execute
+     * @param command teh command that failed to execute
      */
     async runFail(message, command) {
-        var embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle("Execution fail")
             .setColor(this.catalyst.config.FAIL_COLOR)
             .setDesciption(`❗ I was unable to execute the ${command.name} command!`)
+            .setFooter(message.author.tag, message.author.displayAvatarUrl);
+
+        return message.channel.send(embed);
+    }
+
+    /**
+     * invalid command message
+     * @param message the message tha caused the issue
+     * @param call the command call for the command that wasn't found
+     */
+    async invalidCommand(message, call) {
+        const embed = new MessageEmbed()
+            .setTitle("Invalid command")
+            .setColor(this.catalyst.config.FAIL_COLOR)
+            .setDesciption(`❗ I was unable to find the command "${call}"!`)
             .setFooter(message.author.tag, message.author.displayAvatarUrl);
 
         return message.channel.send(embed);
