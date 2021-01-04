@@ -38,7 +38,7 @@ class KickCommand {
         await target.kick(reason).then(() => {
             var embed = new MessageEmbed()
                 .setTitle("Kick")
-                .setDescription(`✔️ Successfully kicked ${target.user.tag}`)
+                .setDescription(`✅ Successfully kicked ${target.user.tag}`)
                 .setColor(catalyst.config.DEFAULT_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
 

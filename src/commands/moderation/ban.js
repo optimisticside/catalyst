@@ -38,7 +38,7 @@ class BanCommand {
         await target.ban(reason).then(() => {
             var embed = new MessageEmbed()
                 .setTitle("Ban")
-                .setDescription(`✔️ Successfully banned ${target.user.tag}`)
+                .setDescription(`✅ Successfully banned ${target.user.tag}`)
                 .setColor(catalyst.config.DEFAULT_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
 

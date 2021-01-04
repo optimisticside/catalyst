@@ -16,7 +16,7 @@ class EightBallCommand {
             .setTitle("8Ball")
             .setDescription(`🎱 ${response}`)
             .setColor(this.catalyst.config.DEFAULT_COLOR)
-            setFooter(message.author.tag, message.author.displayAvatarURL);
+            .setFooter(message.author.tag, message.author.displayAvatarURL);
         
         /* actually send message */
         message.channel.send(embed);

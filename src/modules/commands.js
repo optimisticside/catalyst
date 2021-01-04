@@ -52,7 +52,7 @@ class CommandsModule {
      */
     async runCommand(command, message, args) {
         /* run command */
-        await command.run(this, message, args)
+        await command.run(this.catalyst, message, args)
     }
 
     /**
@@ -70,7 +70,7 @@ class CommandsModule {
             var perm = perms[i];
 
             /* check permission */
-            if (perm && !member.permissions.find(perm)) {
+            if (perm && !member.permissions.has(perm)) {
                 hasPerms = false;
             }
         }
@@ -127,6 +127,7 @@ class CommandsModule {
 
         /* execute command and throw error if execution fails */
         this.runCommand(command, message, args).catch(err => {
+            this.catalyst.log("Commands", `Unable to execute ${command.name} command: ${err}`)
             this.catalyst.modules.errors.runFail(message, command);
         });
     }
