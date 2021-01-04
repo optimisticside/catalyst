@@ -7,7 +7,8 @@ class CommandsModule {
         /* ensure that the command has a name */
         if (command.name) {
             /* add the command */
-            this.commands[command.name] = command;
+            this.catalyst.log("Commands", `Adding ${command.name} command`);
+            this.commands[this.commands.length] = command;
         }
     }
 
@@ -21,9 +22,12 @@ class CommandsModule {
         call = call.toLowerCase();
 
         /* go through commands */
-        for (var [name, command] in Object.entries(this.commands)) {
+        for (var i = 0; i < this.commands.length; i++) {
+            /* get command */
+            var command = this.commands[i];
+
             /* check command's name */
-            if (command.name.toLowerCase() == call) {
+            if (command.name && command.name.toLowerCase() == call) {
                 return command;
 
             /* check command's aliases */
@@ -51,7 +55,7 @@ class CommandsModule {
         return command.run(this, message, args).then((...result) => {
             /* execution was a success */
             return true, result;
-        
+
         }).catch(err => {
             /* execution was a failure */
             return false, err;
@@ -107,13 +111,11 @@ class CommandsModule {
         if (!prefix) return;
 
         /* parse message and get args and command call */
-        var args = messageText.split(this.catalyst.config.SPLIT_KEY);
+        var args = messageText.trim().split(this.catalyst.config.SPLIT_KEY);
         var call = args.shift().toLowerCase();
 
-        /* get commad */
+        /* get command */
         var command = await this.findCommand(call);
-        console.log(call)
-        console.log(call)
 
         /* throw error if invalid command */
         if (!command) {
@@ -133,7 +135,7 @@ class CommandsModule {
         /* execute command and throw error if execution fails */
         var ran, result = this.runCommand(user, message, args);
         if (!ran) {
-            this.catalyst.modules.errors.runFail(user, command);
+            this.catalyst.modules.errors.runFail(message, command);
         }
     }
 
@@ -147,7 +149,7 @@ class CommandsModule {
         function setupTable(table, handler) {
             for (const [name, command] of Object.entries(table)) {
                 if (command.name) {
-                    handler(name, command);
+                    handler(command);
                 } else {
                     setupTable(command, handler);
                 }
@@ -171,7 +173,7 @@ class CommandsModule {
     constructor(catalyst) {
         this.catalyst = catalyst;
         this.commandsTree = {};
-        this.commands = {};
+        this.commands = [];
 
         catalyst.commands = this.commands;
     }
