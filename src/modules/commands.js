@@ -31,11 +31,11 @@ class CommandsModule {
                 return command;
 
             /* check command's aliases */
-            } else if (command.aliases) {
+            } else if (command.aliases && command.aliases != []) {
                 /* go through aliases */
-                for (var i = 0; i < command.aliases.length; i++) {
+                for (var j = 0; j < command.aliases.length; j++) {
                     /* check aliase */
-                    if (command.aliases[i].toLowerCase() == call) {
+                    if (command.aliases[j].toLowerCase() == call) {
                         return command;
                     }
                 }
@@ -45,21 +45,14 @@ class CommandsModule {
 
     /**
      * runs a command
-     * @param the command to run
+     * @param command the command to run
      * @param message the message sent to run the command
      * @param args the arguments to be passed to the command
      * @returns whether or not the execution was a success, along with the result / error-message
      */
     async runCommand(command, message, args) {
         /* run command */
-        return command.run(this, message, args).then((...result) => {
-            /* execution was a success */
-            return true, result;
-
-        }).catch(err => {
-            /* execution was a failure */
-            return false, err;
-        });
+        await command.run(this, message, args)
     }
 
     /**
@@ -133,10 +126,9 @@ class CommandsModule {
         }
 
         /* execute command and throw error if execution fails */
-        var ran, result = this.runCommand(user, message, args);
-        if (!ran) {
+        this.runCommand(command, message, args).catch(err => {
             this.catalyst.modules.errors.runFail(message, command);
-        }
+        });
     }
 
     /**
