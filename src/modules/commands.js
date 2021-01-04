@@ -91,7 +91,7 @@ class CommandsModule {
         if (message.author.bot) return;
 
         // var userData, guildData = this.catalyst.dataBase.getData(message);
-        var prefixes = [`<@${this.catalyst.client.user.id}>`]//.concat(guildData.prefix);
+        var prefixes = [`<@${this.catalyst.client.user.id}>`, this.catalyst.config.PREFIX]//.concat(guildData.prefix);
         var prefix = null;
 
         /* validate prefix */
@@ -105,7 +105,7 @@ class CommandsModule {
         if (!prefix) return;
 
         /* parse message and get args and command call */
-        var args = message.content.trim().split(this.catalyst.config.splitKey);
+        var args = message.content.trim().split(this.catalyst.config.SPLIT_KEY);
         var call = args.shift().toLowerCase();
 
         /* get command and validte user's permissions */
@@ -129,19 +129,34 @@ class CommandsModule {
      * sets up the commands
      */
     async setupCommands() {
-        return await this.catalyst.setupDirectory("./src/commands", this.commands, [".js", ".mjs"]);
+        await this.catalyst.setupDirectory("./src/commands", this.commandsTree, [".js", ".mjs"]);
+
+        /* create functions to handle nested tables recursively */
+        function setupTable(table, handler) {
+            for (const [name, command] of Object.entries(table)) {
+                if (command.name) {
+                    handler(name, command);
+                } else {
+                    setupTable(command, handler);
+                }
+            }
+        }
+
+        /* actually connect the listeners */
+        return setupTable(this.commandsTree, this.addCommand);
     }
 
     /**
      * module initialization process
      */
     async init() {
-        this.setupCommands();
+        await this.setupCommands();
         this.catalyst.log("Events", "Loaded");
     }
 
     constructor(catalyst) {
         this.catalyst = catalyst;
+        this.commandsTree = {};
         this.commands = {};
 
         catalyst.commands = this.commands;

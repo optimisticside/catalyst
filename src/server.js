@@ -86,11 +86,13 @@ class Catalyst {
             /* check if module has init function */
             if (typeof module == "object" && module.init) {
                 /* initialize module and handle errors accordingly */
-                this.log("Core", `Initializing ${name} module`)
+                this.log("Core", `Initializing ${name} module`);
 
                 await module.init(this).catch(err => {
                     this.log("Core", `Unable to load module ${name}: ${err}`);
                 });
+            } else {
+                this.log("Core", `No initialization function found in ${name} module`);
             }
         }
     }

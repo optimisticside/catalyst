@@ -22,12 +22,21 @@ class EventsModule {
      */
     async setupListeners(path) {
         /* add listeners */
-        this.catalyst.setupDirectory(path || "./src/events", this.listeners, [".js", ".mjs"]);
+        await this.catalyst.setupDirectory(path || "./src/events", this.listeners, [".js", ".mjs"]);
+
+        /* create functions to handle nested tables recursively */
+        function setupTable(table, handler) {
+            for (const [name, listener] of Object.entries(table)) {
+                if (typeof listener == "function") {
+                    handler(name, listener);
+                } else {
+                    setupTable(listener, handler);
+                }
+            }
+        }
 
         /* actually connect the listeners */
-        for (const [event, listener] of Object.entries(this.listeners)) {
-            await this.addListener(event, listener);
-        }
+        return setupTable(this.listeners, this.addListener);
     }
 
     /**
@@ -43,3 +52,5 @@ class EventsModule {
         this.listeners = {};
     }
 };
+
+module.exports = EventsModule;
