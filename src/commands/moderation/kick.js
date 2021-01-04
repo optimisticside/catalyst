@@ -43,7 +43,7 @@ class KickCommand {
             /* create embed */
             var embed = new MessageEmbed()
                 .setTitle("Kick")
-                .setDescription(`✅ Successfully de ${target.user.tag}`)
+                .setDescription(`✅ Successfully kicked ${target.user.tag}`)
                 .setColor(catalyst.config.DEFAULT_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
 
