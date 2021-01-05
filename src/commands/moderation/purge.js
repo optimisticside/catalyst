@@ -50,19 +50,6 @@ class PurgeCommand {
             return message.channel.send(embed);
         }
 
-        /* thrrow error if lacking permissions */
-        if (!message.guild.me.hasPermission("MANAGE_MESSAGES")) {
-            /* create embed */
-            var embed = new MessageEmbed()
-                .setTitle("Purge")
-                .setDescription(`❗ Lacking permissions to purge ${number} messages`)
-                .setColor(catalyst.config.FAIL_COLOR)
-                .setFooter(message.author.tag, message.author.displayAvatarURL);
-
-            /* send embed and return */
-            return message.channel.send(embed);
-        }
-
         /* fetch the messages to delete */
         const toDelete = await message.channel.messages.fetch({ limit: number });
 
