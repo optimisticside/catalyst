@@ -84,7 +84,7 @@ class CommandsModule {
 
         /* get cooldown */
         var cooldown = this.cooldowns[member.user.id][command.name];
-        return (!cooldown ? false : Date.now() - cooldown <= command.cooldown);
+        return (!cooldown ? false : Date.now() - cooldown <= (command.cooldown || this.catalyst.config.COOLDOWN));
     }
 
     /**
@@ -101,7 +101,7 @@ class CommandsModule {
 
         /* get cooldown */
         var cooldown = this.cooldowns[member.user.id][command.name];
-        var timeLeft = command.cooldown - (Date.now() - cooldown);
+        var timeLeft = (command.cooldown || this.catalyst.config.COOLDOWN) - (Date.now() - cooldown);
         return timeLeft;
     }
 
@@ -133,7 +133,6 @@ class CommandsModule {
      * @param message the message sent
      */
     async handleMessage(message) {
-        console.log(this.cooldowns)
         /* return if message was not part of a guild or was a bot */
         if (!message.guild) return;
         if (message.author.bot) return;
@@ -184,21 +183,17 @@ class CommandsModule {
         }
 
         /* throw error if user is on cooldown */
-        if (command.cooldown) {
-            var onCooldown = await this.onCooldown(message.member, command);
+        var onCooldown = await this.onCooldown(message.member, command);
 
-            if (onCooldown) {
-                this.catalyst.modules.errors.cooldown(message, command, await this.getCooldown(message.member, command));
-                return;
-            }
+        if (onCooldown) {
+            this.catalyst.modules.errors.cooldown(message, command, await this.getCooldown(message.member, command));
+            return;
         }
 
         /* execute command */
         this.runCommand(command, message, args).then(() => {
             /* update cooldown if command has one */
-            if (command.cooldown) {
-                this.saveCooldown(message.member, command);
-            }
+            this.saveCooldown(message.member, command);
 
         /* handle errors accordingly */
         }).catch(err => {
