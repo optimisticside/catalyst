@@ -10,7 +10,7 @@ class PingCommand {
         message.channel.send(`Pinging...`).then(reply => {
             /* calculate delta time, and edit message accordingly */
             var deltaTime = reply.createdAt - message.createdAt;
-            reply.edit(`🏓 Pong! Took ${deltaTime} ms.`);
+            reply.edit(`🏓 Pong! Took ${deltaTime} ms (API latency: ${catalyst.client.ws.ping} ms).`);
         });
     };
 
