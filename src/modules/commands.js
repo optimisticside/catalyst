@@ -70,7 +70,7 @@ class CommandsModule {
             var perm = perms[i];
 
             /* check permission */
-            if (perm && !member.permissions.has(perm)) {
+            if (perm && !member.hasPermission(perm)) {
                 hasPerms = false;
             }
         }
