@@ -72,7 +72,7 @@ class MusicModule {
             this.catalyst.log("Music", `Unable to play URL ${toPlay.url}: ${err}`);
 
             /* throw error */
-            this.catalyst.module.errors.musicPlay(guildData.channel, toPlay.url);
+            this.catalyst.modules.errors.musicPlay(musicData.textChannel, toPlay.url);
         });
     }
 

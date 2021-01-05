@@ -16,7 +16,7 @@ class SkipCommand {
         if (!vc || !vc.channel) {
             /* create embed */
             const embed = new MessageEmbed()
-                .setTitle("Music")
+                .setTitle("Skip")
                 .setDescription("❗ Not in a voice-channel")
                 .setColor(catalyst.config.FAIL_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
@@ -32,7 +32,7 @@ class SkipCommand {
         if (!musicData || !musicData.running || !musicData.dispatcher) {
             /* create embed */
             const embed = new MessageEmbed()
-                .setTitle("Music")
+                .setTitle("Skip")
                 .setDescription("❗ Nothing is currently playing")
                 .setColor(catalyst.config.FAIL_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);

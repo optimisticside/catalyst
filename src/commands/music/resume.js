@@ -52,7 +52,7 @@ class ResumeCommand {
         this.name = "resume";
         this.description = "Resumes the paused song";
         this.perms = ["CONNECT", "SPEAK"];
-        this.aliases = ["resumeMusic"];
+        this.aliases = ["unPause", "resumeMusic"];
     }
 };
 
