@@ -1,5 +1,4 @@
 const { MessageEmbed } = require("discord.js");
-const mathjs = require("mathjs");
 
 class HelpCommand {
     /**
@@ -88,7 +87,7 @@ class HelpCommand {
         this.name = "help";
         this.description = "Displays helpful information";
         this.aliases = ["getHelp", "helpMe"];
-        this.argFormat = ["equation"];
+        this.argFormat = ["command"];
     }
 };
 
