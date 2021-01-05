@@ -18,7 +18,7 @@ class PlayCommand {
             /* create embed */
             const embed = new MessageEmbed()
                 .setTitle("Music")
-                .setDescription("Please provide a valid URL to play a song")
+                .setDescription("❗ Please provide a valid URL to play a song")
                 .setColor(catalyst.config.FAIL_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
 
@@ -31,7 +31,7 @@ class PlayCommand {
             /* create embed */
             const embed = new MessageEmbed()
                 .setTitle("Music")
-                .setDescription("Not in a voice-channel")
+                .setDescription("❗ Not in a voice-channel")
                 .setColor(catalyst.config.FAIL_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
 
@@ -53,7 +53,7 @@ class PlayCommand {
             /* create embed */
             const embed = new MessageEmbed()
                 .setTitle("Music")
-                .setDescription("Unable to join voice-channel")
+                .setDescription("❗ Unable to join voice-channel")
                 .setColor(catalyst.config.FAIL_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
 

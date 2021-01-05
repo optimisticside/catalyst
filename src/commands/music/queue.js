@@ -16,7 +16,7 @@ class QueueCommand {
             /* create embed */
             const embed = new MessageEmbed()
                 .setTitle("Music")
-                .setDescription("There is no queue for music right now")
+                .setDescription("❗ There is no queue for music right now")
                 .setColor(catalyst.config.FAIL_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
 
