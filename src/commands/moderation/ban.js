@@ -17,7 +17,7 @@ class BanCommand {
             /* create embed */
             var embed = new MessageEmbed()
                 .setTitle("Ban")
-                .setDescription("❗ No user provided.")
+                .setDescription("❗ No user provided")
                 .setColor(catalyst.config.FAIL_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
             
