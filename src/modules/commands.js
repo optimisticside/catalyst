@@ -117,12 +117,18 @@ class CommandsModule {
         }
 
         /* validate user's permissions */
-        var hasPerms = await this.checkPerms(message.member, command.perms || {});
+        var userHasPerms = await this.checkPerms(message.member, command.perms || []);
+        var botHasPerms = await this.checkPerms(message.guild.me, command.perms || []);
 
         /* throw error if user doesn't have permissions */
-        if (!hasPerms) {
-            this.catalyst.modules.errors.runPerms(message, command);
+        if (!userHasPerms) {
+            this.catalyst.modules.errors.userPerms(message, command);
             return;
+        }
+
+        /* throw error if bot doesn't have permissions */
+        if (!botHasPerms) {
+            this.catalyst.modules.errors.botPerms(message, command);
         }
 
         /* execute command and throw error if execution fails */

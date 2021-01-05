@@ -6,11 +6,26 @@ class ErrorsModule {
      * @param message the message that called the command
      * @param command the command that the user lacked permissions to execute
      */
-    async runPerms(message, command) {
+    async userPerms(message, command) {
         const embed = new MessageEmbed()
             .setTitle("Lacking permissions")
             .setColor(this.catalyst.config.FAIL_COLOR)
             .setDescription(`⚠️ You do not have permissions to use the ${command.name} command!`)
+            .setFooter(message.author.tag, message.author.displayAvatarUrl);
+
+        return message.channel.send(embed);
+    }
+
+    /**
+     * invalid bot permissions messaage
+     * @param message the message that called the command
+     * @param command the command that the user lacked permissions to execute
+     */
+    async botPerms(message, command) {
+        const embed = new MessageEmbed()
+            .setTitle("Lacking permissions")
+            .setColor(this.catalyst.config.FAIL_COLOR)
+            .setDescription(`⚠️ I do not have permissions to use the ${command.name} command!`)
             .setFooter(message.author.tag, message.author.displayAvatarUrl);
 
         return message.channel.send(embed);
