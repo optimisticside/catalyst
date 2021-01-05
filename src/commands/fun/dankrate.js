@@ -34,7 +34,7 @@ class DankrateCommand {
         }
 
         /* do calculation */
-        var danrate = await this.calculateate(message.member);
+        var dankrate = await this.calculateDankrate(message.member);
 
         /* create embed */
         var embed = new MessageEmbed()
