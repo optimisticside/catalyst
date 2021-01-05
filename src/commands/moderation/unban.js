@@ -11,7 +11,6 @@ class UnbanCommand {
         /* format arguments */
         var target = message.mentions.members.first() || await catalyst.client.users.fetch(args[0]);
         var reason = args.slice(1).join(catalyst.config.SPLIT_KEY) || "Not provided";
-        console.log(target, args[0]);
 
         /* throw error if no target provided */
         if (!target) {
@@ -26,21 +25,8 @@ class UnbanCommand {
             return message.channel.send(embed);
         }
 
-        /* thrrow error if lacking permissions */
-        if (!target.bannable) {
-            /* create embed */
-            var embed = new MessageEmbed()
-                .setTitle("Unban")
-                .setDescription(`❗ Lacking permissions to unban ${target.tag}`)
-                .setColor(catalyst.config.FAIL_COLOR)
-                .setFooter(message.author.tag, message.author.displayAvatarURL);
-
-            /* send embed and return */
-            return message.channel.send(embed);
-        }
-
-        /* ban the user */
-        await message.guild.members.unban(user, reason).then(() => {
+        /* unban the user */
+        await message.guild.members.unban(target, reason).then(() => {
             /* create embed */
             var embed = new MessageEmbed()
                 .setTitle("Unbanned")
