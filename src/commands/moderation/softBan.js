@@ -1,6 +1,6 @@
 const { MessageEmbed } = require("discord.js");
 
-class BanCommand {
+class SoftBanCommand {
     /**
      * ban command
      * @param catalyst the framework
@@ -16,7 +16,7 @@ class BanCommand {
         if (!target) {
             /* create embed */
             var embed = new MessageEmbed()
-                .setTitle("Ban")
+                .setTitle("Soft ban")
                 .setDescription("❗ No user provided")
                 .setColor(catalyst.config.FAIL_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
@@ -29,8 +29,8 @@ class BanCommand {
         if (!target.bannable) {
             /* create embed */
             var embed = new MessageEmbed()
-                .setTitle("Ban")
-                .setDescription(`❗ Lacking permissions to ban ${target.user.tag}`)
+                .setTitle("Soft ban")
+                .setDescription(`❗ Lacking permissions to soft-ban ${target.user.tag}`)
                 .setColor(catalyst.config.FAIL_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
 
@@ -40,24 +40,41 @@ class BanCommand {
 
         /* ban the user */
         await target.ban({ reason: reason }).then(() => {
-            /* create embed */
-            var embed = new MessageEmbed()
-                .setTitle("Ban")
-                .setDescription(`✅ Successfully banned ${target.user.tag}`)
-                .setColor(catalyst.config.DEFAULT_COLOR)
-                .setFooter(message.author.tag, message.author.displayAvatarURL);
+            message.guild.members.unban(message.author).then(() => {
+                /* create embed */
+                var embed = new MessageEmbed()
+                    .setTitle("Ban")
+                    .setDescription(`✅ Successfully soft-banned ${target.user.tag}`)
+                    .setColor(catalyst.config.DEFAULT_COLOR)
+                    .setFooter(message.author.tag, message.author.displayAvatarURL);
 
-            /* send embed and return */
-            return message.channel.send(embed);
+                /* send embed and return */
+                return message.channel.send(embed);
+
+            /* handle any errors */
+            }).catch(err => {
+                /* log to console */
+                catalyst.log("SoftBan command", `Unable to unban ${target.user.tag}: ${err}`);
+
+                /* create embed */
+                var embed = new MessageEmbed()
+                    .setTitle("Soft ban")
+                    .setDescription(`❗ An error occured when unbanning ${target.user.tag}`)
+                    .setColor(catalyst.config.FAIL_COLOR)
+                    .setFooter(message.author.tag, message.author.displayAvatarURL);
+
+                /* send embed and return */
+                return message.channel.send(embed);
+            });
 
         /* handle any errors */
         }).catch(err => {
             /* log to console */
-            catalyst.log("Ban command", `Unable to ban ${target.user.tag}: ${err}`);
+            catalyst.log("SoftBan command", `Unable to ban ${target.user.tag}: ${err}`);
 
             /* create embed */
             var embed = new MessageEmbed()
-                .setTitle("Ban")
+                .setTitle("Soft ban")
                 .setDescription(`❗ An error occured when banning ${target.user.tag}`)
                 .setColor(catalyst.config.FAIL_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
@@ -71,12 +88,12 @@ class BanCommand {
         this.catalyst = catalyst;
 
         /* command info */
-        this.name = "ban";
-        this.description = "Bans a user";
+        this.name = "softBan";
+        this.description = "Bans a user, and then unbans them to clear their messages";
         this.perms = ["BAN_MEMBERS"];
-        this.aliases = ["banHammer", "abolish"];
+        this.aliases = ["sb"];
         this.argFormat = ["user", "reason"];
     }
 };
 
-module.exports = BanCommand;
+module.exports = SoftBanCommand;

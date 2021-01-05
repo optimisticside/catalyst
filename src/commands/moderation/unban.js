@@ -1,6 +1,6 @@
 const { MessageEmbed } = require("discord.js");
 
-class BanCommand {
+class UnbanCommand {
     /**
      * ban command
      * @param catalyst the framework
@@ -9,14 +9,15 @@ class BanCommand {
      */
     async run(catalyst, message, args) {
         /* format arguments */
-        var target = message.mentions.members.first();
+        var target = message.mentions.members.first() || await catalyst.client.users.fetch(args[0]);
         var reason = args.slice(1).join(catalyst.config.SPLIT_KEY) || "Not provided";
+        console.log(target, args[0]);
 
         /* throw error if no target provided */
         if (!target) {
             /* create embed */
             var embed = new MessageEmbed()
-                .setTitle("Ban")
+                .setTitle("Unban")
                 .setDescription("❗ No user provided")
                 .setColor(catalyst.config.FAIL_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
@@ -29,8 +30,8 @@ class BanCommand {
         if (!target.bannable) {
             /* create embed */
             var embed = new MessageEmbed()
-                .setTitle("Ban")
-                .setDescription(`❗ Lacking permissions to ban ${target.user.tag}`)
+                .setTitle("Unban")
+                .setDescription(`❗ Lacking permissions to unban ${target.tag}`)
                 .setColor(catalyst.config.FAIL_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
 
@@ -39,11 +40,11 @@ class BanCommand {
         }
 
         /* ban the user */
-        await target.ban({ reason: reason }).then(() => {
+        await message.guild.members.unban(user, reason).then(() => {
             /* create embed */
             var embed = new MessageEmbed()
-                .setTitle("Ban")
-                .setDescription(`✅ Successfully banned ${target.user.tag}`)
+                .setTitle("Unbanned")
+                .setDescription(`✅ Successfully unbanned ${target.tag}`)
                 .setColor(catalyst.config.DEFAULT_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
 
@@ -53,12 +54,12 @@ class BanCommand {
         /* handle any errors */
         }).catch(err => {
             /* log to console */
-            catalyst.log("Ban command", `Unable to ban ${target.user.tag}: ${err}`);
+            catalyst.log("Unban command", `Unable to unban ${target.tag}: ${err}`);
 
             /* create embed */
             var embed = new MessageEmbed()
-                .setTitle("Ban")
-                .setDescription(`❗ An error occured when banning ${target.user.tag}`)
+                .setTitle("Unban")
+                .setDescription(`❗ An error occured when unbanning ${target.tag}`)
                 .setColor(catalyst.config.FAIL_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
 
@@ -71,12 +72,11 @@ class BanCommand {
         this.catalyst = catalyst;
 
         /* command info */
-        this.name = "ban";
-        this.description = "Bans a user";
+        this.name = "unban";
+        this.description = "Unbans a user";
         this.perms = ["BAN_MEMBERS"];
-        this.aliases = ["banHammer", "abolish"];
         this.argFormat = ["user", "reason"];
     }
 };
 
-module.exports = BanCommand;
+module.exports = UnbanCommand;
