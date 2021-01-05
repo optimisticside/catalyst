@@ -56,6 +56,56 @@ class CommandsModule {
     }
 
     /**
+     * saves a member's cooldown for a command
+     * @param member the guild member to add a cooldown for
+     * @param command the command that the member ran
+     */
+    async saveCooldown(member, command) {
+        /* create a cooldown table if one does not exist */
+        if (!this.cooldowns[member.user.id]) {
+            this.cooldowns[member.user.id] = {}
+        }
+
+        /* add cooldown */
+        this.cooldowns[member.user.id][command.name] = Date.now();
+    }
+
+    /**
+     * determines whether or not a member is on cooldown for a command
+     * @param member the guild member to get the cooldown for
+     * @param command the command that the member ran
+     * @returns whether or not the member is still on cooldown
+     */
+    async onCooldown(member, command) {
+        /* create a cooldown table if one does not exist */
+        if (!this.cooldowns[member.user.id]) {
+            this.cooldowns[member.user.id] = {}
+        }
+
+        /* get cooldown */
+        var cooldown = this.cooldowns[member.user.id][command.name];
+        return (!cooldown ? false : Date.now() - cooldown <= command.cooldown);
+    }
+
+    /**
+     * determines whether or not a member is on cooldown for a command
+     * @param member the guild member to get the cooldown for
+     * @param command the command that the member ran
+     * @returns the ms left in the member's cooldown
+     */
+    async getCooldown(member, command) {
+        /* create a cooldown table if one does not exist */
+        if (!this.cooldowns[member.user.id]) {
+            this.cooldowns[member.user.id] = {}
+        }
+
+        /* get cooldown */
+        var cooldown = this.cooldowns[member.user.id][command.name];
+        var timeLeft = command.cooldown - (Date.now() - cooldown);
+        return timeLeft;
+    }
+
+    /**
      * checks a guild member's permissions
      * @param member the guild member to check the permissions of
      * @param perms the permissions to check the user for
@@ -83,6 +133,7 @@ class CommandsModule {
      * @param message the message sent
      */
     async handleMessage(message) {
+        console.log(this.cooldowns)
         /* return if message was not part of a guild or was a bot */
         if (!message.guild) return;
         if (message.author.bot) return;
@@ -129,10 +180,28 @@ class CommandsModule {
         /* throw error if bot doesn't have permissions */
         if (!botHasPerms) {
             this.catalyst.modules.errors.botPerms(message, command);
+            return;
         }
 
-        /* execute command and throw error if execution fails */
-        this.runCommand(command, message, args).catch(err => {
+        /* throw error if user is on cooldown */
+        if (command.cooldown) {
+            var onCooldown = await this.onCooldown(message.member, command);
+
+            if (onCooldown) {
+                this.catalyst.modules.errors.cooldown(message, command, await this.getCooldown(message.member, command));
+                return;
+            }
+        }
+
+        /* execute command */
+        this.runCommand(command, message, args).then(() => {
+            /* update cooldown if command has one */
+            if (command.cooldown) {
+                this.saveCooldown(message.member, command);
+            }
+
+        /* handle errors accordingly */
+        }).catch(err => {
             this.catalyst.log("Commands", `Unable to execute ${command.name} command: ${err}`)
             this.catalyst.modules.errors.runFail(message, command);
         });
@@ -172,6 +241,7 @@ class CommandsModule {
     constructor(catalyst) {
         this.catalyst = catalyst;
         this.commandsTree = {};
+        this.cooldowns = {};
         this.commands = [];
 
         catalyst.commands = this.commands;
