@@ -1,12 +1,12 @@
 const { MessageEmbed } = require("discord.js");
 
-class DankrateCommand {
+class DumbrateCommand {
     /**
      * calculates a user's dank rate
      * @param member the member to calcuate the dank rate of
      * @returns the calculated result
      */
-    async calculateDankrate(member) {
+    async calculateDumbrate(member) {
         return Math.floor(Math.random() * 100);
     }
 
@@ -34,12 +34,12 @@ class DankrateCommand {
         }
 
         /* do calculation */
-        var dankrate = await this.calculateDankrate(message.member);
+        var dumbrate = await this.calculateDumbrate(message.member);
 
         /* create embed */
         var embed = new MessageEmbed()
-            .setTitle("Dankrate")
-            .setDescription(`🅱️ ${target.user.tag} is ${dankrate}% dank`)
+            .setTitle("Dumbrate")
+            .setDescription(`🐵 ${target.user.tag} is ${dumbrate}% dumb`)
             .setColor(catalyst.config.DEFAULT_COLOR)
             .setFooter(message.author.tag, message.author.displayAvatarURL);
 
@@ -51,11 +51,11 @@ class DankrateCommand {
         this.catalyst = catalyst;
 
         /* command info */
-        this.name = "dankrate";
-        this.description = "Determines how dank a user is (totally accurate)";
-        this.aliases = ["howDank"];
+        this.name = "dumbrate";
+        this.description = "Determines how dumb a user is (totally accurate)";
+        this.aliases = ["howDumb"];
         this.argFormat = ["user"];
     }
 };
 
-module.exports = DankrateCommand;
+module.exports = DumbrateCommand;

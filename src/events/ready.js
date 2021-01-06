@@ -6,7 +6,7 @@ class ReadyHandler {
         this.catalyst.log("Client", "Ready");
 
         this.catalyst.log("Client", `Logged in as ${this.catalyst.client.user.tag}`);
-	    this.catalyst.client.user.setActivity("Being a bot", { type: "WATCHING" });
+	    this.catalyst.client.user.setActivity("Beep boop", { type: "PLAYING" });
     }
 
     /**
