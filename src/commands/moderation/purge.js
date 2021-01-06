@@ -87,7 +87,7 @@ class PurgeCommand {
         /* command info */
         this.name = "purge";
         this.description = "Deletes a certain amount of messages from a channel";
-        this.aliases = ["bulkDelete"];
+        this.aliases = ["prune", "p", "bulkDelete"];
         this.perms = ["DELETE_MESSAGES"];
     }
 };

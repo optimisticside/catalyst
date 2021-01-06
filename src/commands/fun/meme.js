@@ -53,7 +53,7 @@ class MemeCommand {
         /* command info */
         this.name = "meme";
         this.description = "Gets a meme from r/DankMemes";
-        this.aliases = ["getMeme"];
+        this.aliases = ["m", "getMeme"];
     }
 };
 

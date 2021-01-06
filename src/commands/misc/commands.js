@@ -54,7 +54,7 @@ class CommandsCommand {
         /* command info */
         this.name = "commands";
         this.description = "Displays a list of commands";
-        this.aliases = ["cmds", "viewCmds"];
+        this.aliases = ["c", "cmds", "viewCmds"];
     }
 };
 

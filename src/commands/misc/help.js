@@ -86,7 +86,7 @@ class HelpCommand {
         /* command info */
         this.name = "help";
         this.description = "Displays helpful information";
-        this.aliases = ["getHelp", "helpMe"];
+        this.aliases = ["h", "getHelp", "helpMe"];
         this.argFormat = ["command"];
     }
 };

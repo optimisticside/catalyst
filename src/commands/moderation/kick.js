@@ -74,7 +74,7 @@ class KickCommand {
         this.name = "kick";
         this.description = "Kicks a user";
         this.perms = ["KICK_MEMBERS"];
-        this.aliases = ["yeet"];
+        this.aliases = ["k", "yeet"];
         this.argFormat = ["user", "reason"];
     }
 };

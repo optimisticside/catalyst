@@ -53,7 +53,7 @@ class DumbrateCommand {
         /* command info */
         this.name = "dumbrate";
         this.description = "Determines how dumb a user is (totally accurate)";
-        this.aliases = ["howDumb"];
+        this.aliases = ["howDumb", "howStupid", "howStoopid"];
         this.argFormat = ["user"];
     }
 };

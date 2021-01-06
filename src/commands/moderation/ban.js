@@ -74,7 +74,7 @@ class BanCommand {
         this.name = "ban";
         this.description = "Bans a user";
         this.perms = ["BAN_MEMBERS"];
-        this.aliases = ["banHammer", "abolish"];
+        this.aliases = ["b", "banHammer", "abolish"];
         this.argFormat = ["user", "reason"];
     }
 };
