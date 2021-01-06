@@ -61,7 +61,7 @@ class MusicModule {
         }
 
         /* start playing music */
-        musicData.dispatcher = musicData.connection.play(ytdl(toPlay.url), { quality: "highestaudio" }).on("end", () => {
+        musicData.dispatcher = musicData.connection.play(ytdl(toPlay.url), { quality: "highestaudio", bitrate: "auto" }).on("end", () => {
             /* recursively call function to play next song */
             this.runQueue(guildId, musicData);
 
