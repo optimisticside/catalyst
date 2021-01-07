@@ -24,7 +24,7 @@ class DumbrateCommand {
         if (!target) {
             /* create embed */
             var embed = new MessageEmbed()
-                .setTitle("Dankrate")
+                .setTitle("Dumbrate")
                 .setDescription("❗ No user provided")
                 .setColor(catalyst.config.FAIL_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
