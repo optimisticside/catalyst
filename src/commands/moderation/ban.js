@@ -43,7 +43,7 @@ class BanCommand {
             /* create embed */
             var embed = new MessageEmbed()
                 .setTitle("Ban")
-                .setDescription(`✅ Successfully banned ${target.user.tag}`)
+                .setDescription(`✅ Successfully banned ${target.user.tag} https://tenor.com/view/trump-donaldtrump-interview-banned-cnn-gif-7677105`)
                 .setColor(catalyst.config.DEFAULT_COLOR)
                 .setFooter(message.author.tag, message.author.displayAvatarURL);
 
