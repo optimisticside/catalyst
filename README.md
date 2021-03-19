@@ -70,6 +70,70 @@ class MyCommand {
 | cooldown | Integer | Amount of milliseconds in the cooldown for executing the command |
 | argFormat | Array\<String\> | List of the format of arguments |
 
+### Case study: Ping command
+In this case study we'll go over the ping command and how it works. This command just gets the latency of the bot and displays it. Let's take a look at the code altogether to see what we're working with:
+```js
+class PingCommand {
+	/**
+	* ping command
+	* @param catalyst the framework
+	* @param message the message that called the command
+	* @param args any arguments provided in the message
+	*/
+	async run(catalyst, message, args) {
+		/* send a message */
+		message.channel.send(`Pinging...`).then(reply => {
+			/* calculate delta time, and edit message accordingly */
+			var deltaTime = reply.createdAt - message.createdAt;
+			reply.edit(`🏓 Pong! Took ${deltaTime} ms (API latency: ${catalyst.client.ws.ping} ms).`);
+		});
+	};
+
+	constructor(catalyst) {
+		this.catalyst = catalyst;
+
+		/* command info */
+		this.name = "ping";
+		this.description = "Pings the bot's connection with the Discord API";
+		this.aliases = ["pingTest", "getPing"];
+		this.argFormat = null;
+	}
+};
+```
+This may seem overwhelming at first, but let's go over it step by step. Let's first take a look at the run function.
+```js
+	/**
+	* ping command
+	* @param catalyst the framework
+	* @param message the message that called the command
+	* @param args any arguments provided in the message
+	*/
+	async run(catalyst, message, args) {
+		/* send a message */
+		message.channel.send(`Pinging...`).then(reply => {
+			/* calculate delta time, and edit message accordingly */
+			var deltaTime = reply.createdAt - message.createdAt;
+			reply.edit(`🏓 Pong! Took ${deltaTime} ms (API latency: ${catalyst.client.ws.ping} ms).`);
+		});
+	};
+```
+From the comments, we can see what's going on here. The bot sends a message, and finds out the latency by getting the difference between the time the message was created and the time the reply was created. It then edits that message and displays this information.
+
+We send the message using the `message.channel.send` function, which returns the message object that was created:
+```js
+/* send a message */
+message.channel.send(`Pinging...`).then(reply => {```
+```
+We then add a function to be executed after the command is complete (since it's a [promise]([https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)), which is run with the message that was created.
+
+Let's now look at what happens inside this function:
+```js
+/* calculate delta time, and edit message accordingly */
+var deltaTime = reply.createdAt - message.createdAt;
+reply.edit(`🏓 Pong! Took ${deltaTime} ms (API latency: ${catalyst.client.ws.ping} ms).`);
+```
+We can see that `deltaTime` stores the difference in the reply's creation time and the message's creation time. We also get `catalyst.client.ws.ping`, which is the field that shows the api latency.
+
 ## Modules
 Catalyst's source-tree is split by category. Most of the driver code is in the `modules` folder. Each module is essentially a part of the bot. Upon startup, the main program will go through the modules are execute them one by one. Modules are used mainly for organizing code so it can easily be passed around. For example, If I made the module `myModule` and wanted to access it from anoter script, I could do `catalyst.modules.myModule`. Additionally, if I wanted to just do `catalyst.myModule`, then I could place that statement in the constructor. This is what's done for most of the modules such as the `Commands` module (you can just do `catalyst.commands` to access it instead of `catalyst.modules.commands`)
 ```js
