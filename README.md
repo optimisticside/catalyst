@@ -1,3 +1,4 @@
+
 <div align="center">
 <img src="https://cdn.discordapp.com/avatars/679060088002052118/ef61b0dcdbfb530accbedd5b343da8e5.png?size=256">
 </div>
@@ -20,6 +21,15 @@ Commands have the ability to be called through aliases. These are alternative na
 
 ## Cooldowns
 Commands also have cooldowns. These are used to prevent spam of them. Each command can have a different cooldown manually set by the developer, or it can follow a default cooldown (by default, 2 seconds) which can also be set by the developer. If I tried to run the `meme` command (which gets a meme from Reddit, and diplays it in the chat) twice very fast, I'd get a warning telling me to slow down. 
+
+## Installation
+One major plus about Catalyst is that it's fully open-source. This means that anyone can take it and use it for themselves. The installation process is fairly simple, and should work provided you have [Node.js](https://nodejs.org) installed already.
+
+You'll first want to download the repository. This can be done through the site or through `git install <repo-url>`. Next you have to install the packages, which can be done by running `npm install`.
+
+You'll also want to set up your `.env` file. This stores private information about your bot such as its token, along with other configuration things such as colors. You can use the `template.env` file as a template, and clone it and rename the clone to `.env`. Then proceed to fill out the entries accordingly (instructions provided in template).
+
+Now you're ready to actually run the bot. You can do this by doing `node src/server.js`, which will start executing the `server.js` file in the `src` directory. That's all there is to running Catalyst!
 
 # Development
 Development is very easy on Catalyst, thanks to it's modularity.
