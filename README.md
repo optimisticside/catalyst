@@ -32,7 +32,7 @@ You'll also want to set up your `.env` file. This stores private information abo
 Now you're ready to actually run the bot. You can do this by doing `node src/server.js`, which will start executing the `server.js` file in the `src` directory. That's all there is to running Catalyst!
 
 # Development
-Development is very easy on Catalyst, thanks to it's modularity.
+Development is very easy on Catalyst, thanks to it's modularity. A majority of the code is in commands, which are split into inividual files in the `commands` directory. Additional sub-directories are used to indicate command categories.
 
 ## Commands
 Making a command can be done by just creating a JavaScript file in the `commands` sub-directory. All commands are classes, since Catalyst follows an object-oriented design. The class is constructed upon startup, and placed as a field in the main object (often called `catalyst` in code). This is passed as a parameter to the constuctor. Here's a way you could structure a command class:
