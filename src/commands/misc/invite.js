@@ -26,7 +26,7 @@ class InviteCommand {
         /* command info */
         this.name = "invite";
         this.description = `Gets the link to invite ${catalyst.config.NAME} to your server`;
-        this.aliases = ["getInviet"];
+        this.aliases = ["getInvite"];
     }
 };
 
