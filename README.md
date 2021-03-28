@@ -145,7 +145,7 @@ reply.edit(`🏓 Pong! Took ${deltaTime} ms (API latency: ${catalyst.client.ws.p
 We can see that `deltaTime` stores the difference in the reply's creation time and the message's creation time. We also get `catalyst.client.ws.ping`, which is the field that shows the api latency.
 
 ## Modules
-Catalyst's source-tree is split by category. Most of the driver code is in the `modules` folder. Each module is essentially a part of the bot. Upon startup, the main program will go through the modules are execute them one by one. Modules are used mainly for organizing code so it can easily be passed around. For example, If I made the module `myModule` and wanted to access it from anoter script, I could do `catalyst.modules.myModule`. Additionally, if I wanted to just do `catalyst.myModule`, then I could place that statement in the constructor. This is what's done for most of the modules such as the `Commands` module (you can just do `catalyst.commands` to access it instead of `catalyst.modules.commands`)
+Catalyst's source-tree is split by category. Most of the driver code is in the `modules` folder. Each module is essentially a part of the bot. Upon startup, the main program will go through the modules are execute them one by one. Modules are used mainly for organizing code so it can easily be passed around. For example, If I made the module `myModule` and wanted to access it from anoter script, I could do `catalyst.modules.myModule`.
 ```js
 class MyModule {
 	constructor(catalyst) {
