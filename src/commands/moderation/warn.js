@@ -39,7 +39,7 @@ class WarnCommand {
         }
 
         /* actually warn the user */
-        message.channel.send("https://media.tenor.co/videos/eceb7080cd43aac3c6ba00c0c518ad7e/mp4");
+        message.channel.send("https://tenor.com/view/discord-meme-spooked-scared-mod-gif-18361254");
     };
 
     constructor(catalyst) {
