@@ -29,7 +29,7 @@ You'll first want to download the repository. This can be done through the site 
 
 You'll also want to set up your `.env` file. This stores private information about your bot such as its token, along with other configuration things such as colors. You can use the `template.env` file as a template, and clone it and rename the clone to `.env`. Then proceed to fill out the entries accordingly (instructions provided in template).
 
-Now you're ready to actually run the bot. You can do this by doing `node src/server.js`, which will start executing the `server.js` file in the `src` directory. That's all there is to running Catalyst!
+Now you're ready to actually run the bot. You can do this by doing `npm run catalyst`, which will run `node src/server.js` and start executing the `server.js` file in the `src` directory. That's all there is to running Catalyst!
 
 # Development
 Development is very easy on Catalyst, thanks to it's modularity. A majority of the code is in commands, which are split into inividual files in the `commands` directory. Additional sub-directories are used to indicate command categories.
