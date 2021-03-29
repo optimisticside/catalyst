@@ -151,7 +151,7 @@ class CommandsModule {
         });
 
         /* return if not a command */
-        if (!prefix) return;
+        if (!prefix || messageText == prefix) return;
 
         /* parse message and get args and command call */
         var args = messageText.trim().split(this.catalyst.config.SPLIT_KEY);
