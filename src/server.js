@@ -123,6 +123,14 @@ class Catalyst {
     }
 
     /**
+     * validates the config
+     * fixes some wierd bugs
+     */
+    async ensureConfig() {
+        this.config.NAME = this.config.NAME || this.client.user.username;
+    }
+
+    /**
      * initializes framework
      */
     async init() {
@@ -136,7 +144,9 @@ class Catalyst {
 
         /* log into client */
         this.log("Core", "Logging in client");
-        this.client.login(this.config.TOKEN);
+        this.client.login(this.config.TOKEN).then(() => {
+            this.ensureConfig();
+        });
     }
 
     constructor(client, env) {
