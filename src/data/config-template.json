@@ -1,0 +1,15 @@
+{
+	"prefix": "?",
+	"splitKey": " ",
+
+	"clientId": "YOUR_CLIENT_ID_HERE",
+	"token": "YOUR_TOKEN_HERE",	
+	"apiKeys": [ "API_KEY_1", "API_KEY_2" ],
+
+	"perms": "2134207679",
+	
+	"defaultColor": "#3383ec",
+	"successColor": "#009451",
+	"warningColor": "#dfec0c",
+	"failureColor": "#e74c3c"
+}
