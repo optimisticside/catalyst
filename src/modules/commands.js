@@ -38,6 +38,10 @@ class CommandManager {
 		return new CommandManager(manager);
 	}
 
+	/**
+	 * Creates an instance of CommandManager.
+	 * @param {Manager} manager The module-manager loading the module.
+	 */
 	constructor(manager) {
 		this._manager = manager;
 		this.bot = manager && manager.bot;
@@ -85,6 +89,13 @@ class CommandManager {
 		return true;
 	}
 
+	/**
+	 * Executes a command's execution function with
+	 * the provided parameters.
+	 * @param {Command} command The command to run.
+	 * @param {tuple<any>} params The parameters to provide to the command.
+	 * @returns {Promise<any>} The execution result.
+	 */
 	executeCommand(command, ...params) {
 		return command.run(this.bot, ...params);
 	}
