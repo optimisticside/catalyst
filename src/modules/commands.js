@@ -65,7 +65,7 @@ class CommandManager {
 			if (command.name && command.name.toLowerCase() == call) {
 				return command;
 			}
-			for (var aliase in command.aliases || []) {
+			for (var aliase of command.aliases || []) {
 				if (aliase.toLowerCase() == call) {
 					return command;
 				}
@@ -80,8 +80,7 @@ class CommandManager {
 	 * @returns {boolean} Whether the member meets the permission requirements.
 	 */
 	checkPerms(member, perms) {
-		for (var i = 0; i < perms.length; i++) {
-			const perm = perms[i];
+		for (var perm of perms || []) {
 			if (perm && !member.hasPermission(perm)) {
 				return false;
 			}
