@@ -11,6 +11,11 @@ const CommandType = createEnum([ 'REGULAR', 'SLASH', 'BOTH' ]);
  * of every commmand.
  */
 class Command {
+	/**
+	 * Creates a generic command.
+	 * Called by commands as a convenient way of setting things up.
+	 * @param {Object} options The command's details.
+	 */
 	constructor(options) {
 		this.name = options.name;
 		this.description = options.description;
@@ -20,7 +25,13 @@ class Command {
 		this.args = options.args || [];
 	}
 
-	async run(bot, message, args) {
+	/**
+	 * Placeholder for command execution functions.
+	 * @param {DiscordBot} bot The bot executing this command.
+	 * @param {Session} session The current session.
+	 * @param {Object} args The dictionary contining the arguments.
+	 */
+	async run(bot, session, args) {
 		console.error(`Function for ${this.name} command not provided`);
 	}
 }
