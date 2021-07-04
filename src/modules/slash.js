@@ -26,6 +26,10 @@ class SlashHandler {
 		return new SlashHandler(manager);
 	}
 
+	/**
+	 * Creates a SlashHandler.
+	 * @param {Manager} manager The manager that loaded this module.
+	 */
 	constructor(manager) {
 		this._manager = manager;
 		this.bot = manager && manager.bot;
@@ -40,6 +44,11 @@ class SlashHandler {
 		});
 	}
 
+	/**
+	 * Formats a command's argument to be a slash command option.
+	 * @param {Object} arg The command's argument.
+	 * @returns {Object} The created slash command option.
+	 */
 	getOptionData(arg) {
 		const data = {
 			type: typeof arg.type === 'undefined' ? null : arg.type,
@@ -50,6 +59,11 @@ class SlashHandler {
 		return data;
 	}
 
+	/**
+	 * Formats a command's data to be used for slash commands.
+	 * @param {Command} command The command to format.
+	 * @returns {Object} the formatted data.
+	 */
 	getCommandData(command) {
 		const data = {
 			name: typeof command.name === 'undefined' ? null : command.name,
@@ -62,6 +76,10 @@ class SlashHandler {
 		return data;
 	}
 
+	/**
+	 * Sets up a guild's slash commands.
+	 * @param {Discord.Guild} guild The guild to set up.
+	 */
 	addGuild(guild) {
 		const app = this.getApp(guild.id);
 		this.clearCommands(guild);
@@ -71,15 +89,25 @@ class SlashHandler {
 		}
 	}
 
+	/**
+	 * Clears a guild's slash commands.
+	 * @param {Discord.Guild} guild The guild to clear the commands of.
+	 */
 	clearCommands(guild) {
 		const app = this.getApp(guild.id);
 		app.commands.get().then(commands => {
-			commands.map(command => {
+			for (var command of commands) {
+				console.log(command.id)
 				app.commands(command.id).delete();
-			});
+			};
 		});
 	}
 
+	/**
+	 * Gets the client's application.
+	 * @param {Snowflake} guildId The guild-ID the application manages.
+	 * @returns {Discord.Application} The retrieved OAuth2 application.
+	 */
 	getApp(guildId) {
 		const app = this.client.api.applications(this.client.user.id);
 		if (guildId) {
