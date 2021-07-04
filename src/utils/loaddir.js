@@ -2,12 +2,6 @@ const path = require('path');
 const fs = require('fs');
 const executeFile = require('../utils/exec.js');
 
-/**
- * Loads a directory into a dictionary.
- * @param {string} dirPath The path to the directory.
- * @param {object} dest The object to load the directory entries into.
- * @param {boolean} isRecursive Wehther sub-directories should be loaded.
-*/
 async function loadDir(dirPath, dest, isRecursive) {
 	const files = fs.readdirSync(dirPath);
 	const promises = files.map(async file => {
@@ -29,6 +23,12 @@ async function loadDir(dirPath, dest, isRecursive) {
 	await Promise.all(promises);
 }
 
+/**
+ * Loads a directory into a dictionary.
+ * @param {string} dirPath The path to the directory.
+ * @param {object} dest The object to load the directory entries into.
+ * @param {boolean} isRecursive Wehther sub-directories should be loaded.
+*/
 module.exports = (dirPath, ...rest) => {
 	return loadDir(path.join(module.parent.path, dirPath), ...rest);
 };
