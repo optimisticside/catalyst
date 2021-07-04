@@ -20,6 +20,8 @@ const OptionType = createEnum([
  * The slash handler manages slash commands.
  */
 class SlashHandler {
+	static OptionType = OptionType;
+
 	static load(manager) {
 		return new SlashHandler(manager);
 	}
