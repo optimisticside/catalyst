@@ -1,3 +1,7 @@
+// Catalyst
+// Copyright 2021 Catalyst contributors
+// See LICENSE for details
+
 const Redis = require('ioredis');
 const Module = require('../structs/module.js');
 const { REDIS_HOST, REDIS_PORT, KEY_DELIM } = require('../config.json');

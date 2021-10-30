@@ -1,3 +1,7 @@
+// Catalyst
+// Copyright 2021 Catalyst contributors
+// See LICENSE for details
+
 const Module = require('../structs/module.js');
 const { promisify } = require('util');
 const path = require('path');

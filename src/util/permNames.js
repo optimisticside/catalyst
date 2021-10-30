@@ -1,3 +1,7 @@
+// Catalyst
+// Copyright 2021 Catalyst contributors
+// See LICENSE for details
+
 const { Permissions } = require('discord.js');
 
 module.exports = (perm) => {

@@ -1,3 +1,7 @@
+// Catalyst
+// Copyright 2021 Catalyst contributors
+// See LICENSE for details
+
 const { MessageEmbed, Permissions } = require('discord.js');
 const Command = require('../../structs/command.js');
 const OptionParser = require('../../util/optionParser.js');
