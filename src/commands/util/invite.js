@@ -1,3 +1,7 @@
+// Catalyst
+// Copyright 2021 Catalyst contributors
+// See LICENSE for details
+
 const Command = require('../../structs/command.js');
 const { neutral } = require('../../util/formatter.js')('Invite Command');
 const { CLIENT_ID } = require('../../config.json');

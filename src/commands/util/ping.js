@@ -1,3 +1,7 @@
+// Catalyst
+// Copyright 2021 Catalyst contributors
+// See LICENSE for details
+
 const Command = require('../../structs/command.js');
 
 module.exports = class PingCommand extends Command {

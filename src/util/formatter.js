@@ -1,3 +1,7 @@
+// Catalyst
+// Copyright 2021 Catalyst contributors
+// See LICENSE for details
+
 module.exports = (title) => {
   return {
     warning: message => `:warning: ${message}`,

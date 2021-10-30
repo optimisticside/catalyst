@@ -1,3 +1,7 @@
+// Catalyst
+// Copyright 2021 Catalyst contributors
+// See LICENSE for details
+
 const { Interaction, Message } = require('discord.js');
 
 module.exports = class OptionParser {

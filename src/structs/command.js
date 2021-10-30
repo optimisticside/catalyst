@@ -1,3 +1,7 @@
+// Catalyst
+// Copyright 2021 Catalyst contributors
+// See LICENSE for details
+
 module.exports = class Command {
   async run() {
     throw new Error(`${this.name} doesn't have a run() method.`);

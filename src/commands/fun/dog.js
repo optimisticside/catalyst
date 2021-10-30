@@ -1,3 +1,7 @@
+// Catalyst
+// Copyright 2021 Catalyst contributors
+// See LICENSE for details
+
 const { Permissions, MessageEmbed } = require('discord.js');
 const { alert, success } = require('../../util/formatter.js')('Purge Command');
 const Command = require('../../structs/command.js');

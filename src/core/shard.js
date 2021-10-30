@@ -1,3 +1,7 @@
+// Catalyst
+// Copyright 2021 Catalyst contributors
+// See LICENSE for details
+
 const { TOKEN, SHARD_LIFETIME } = require('../config.json');
 const { Client, Intents } = require('discord.js');
 const glob = require('glob');
@@ -39,7 +43,7 @@ async function initModules() {
 }
 
 let moduleFiles = glob.sync(path.join(__dirname + '/../modules/*.js'))
-  .concat(glob.sync(path.join(__dirname + '../modules/**/init.js')));
+  .concat(glob.sync(path.join(__dirname + '../modules/*/init.js')));
 
 (async () => {
   await loadModules(moduleFiles);

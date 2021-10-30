@@ -1,3 +1,7 @@
+// Catalyst
+// Copyright 2021 Catalyst contributors
+// See LICENSE for details
+
 const { Permissions } = require('discord.js');
 const { alert } = require('../../util/formatter.js')('AvatarPrune Command');
 const Command = require('../../structs/command.js');
