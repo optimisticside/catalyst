@@ -1,1 +1,4 @@
 site_name: Catalyst
+site_url: https://optimisticside.github.io/catalyst/
+theme:
+  name: material
