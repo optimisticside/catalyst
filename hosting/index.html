@@ -16,7 +16,7 @@
     
     
       
-        <title>Hosting - Catalyst</title>
+        <title>Self Hosting - Catalyst</title>
       
     
     
@@ -62,6 +62,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#self-hosting" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -90,7 +95,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Hosting
+              Self Hosting
             
           </span>
         </div>
@@ -228,9 +233,11 @@
       <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
       
       
+        
+      
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Hosting
+        Self Hosting
       </a>
       
     </li>
@@ -320,15 +327,53 @@
               </div>
             
             
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
           
           <div class="md-content" data-md-component="content">
             <article class="md-content__inner md-typeset">
               
                 
                 
-                  <h1>Hosting</h1>
-                
-                
+                <h1 id="self-hosting">Self Hosting</h1>
+<p>Because Catalyst is open source, it can be self-hosted. This means that it will run on your server and you have full control over the bot. To load the bot, you must first clone the git repository. This can be done by downlading the <code>zip</code> file through the GitHub page, or by cloning the repository through git by doing <code>git clone https://github.com/optimisticside/catalyst.git</code>.</p>
+<p>Once the reposity is loaded (and unzipped if downloaded through the GitHub website), you will want to download all the npm packages. This can be done by doing <code>npm install</code>.</p>
+<p>Once all packages are installed, you will need to install Redis. Redis is the database that Catalyst uses to store data about servers and users. For more information about installing Redis, visit https://redis.io/topics/quickstart.</p>
+<p>Once Redis is installed, it is time to create the configuration file. Go to the <code>src</code> directory and clone the <code>config.template.json</code> file and call it <code>config.json</code>. This is where the bot's configuration will be stored. See the Configuration section below.</p>
+<p>Once configured, the last thing left to do is to run the bot. You will have to start your redis server first, though. To run the bot, you can type <code>npm start</code>. This should start the bot, and the console will start printing logs coming from the bot's code. Congratulations, you've self-hosted Catalyst!</p>
+<h1 id="configuration">Configuration</h1>
+<p>The configuration file tells Catalyst information about how to run the bot. This includes information such as how to access the database, and the bot's token.</p>
+<ul>
+<li><code>NAME</code> is the name of the bot, and can change (if you wnat a different name).</li>
+<li><code>CLIENT_ID</code> is the client-ID of the client that Catalyst will run on. It is used to generate invite links. You can find it in the OAuth2 page of the bot in the Discord developer portal.</li>
+<li><code>TOKEN</code> is the token to log onto the client. You can find it in the <code>Bot</code> page of the bot in the Discord developer portal. If you cannot find it there, then you will have to create the bot (there should be instructions on that page).</li>
+<li><code>CREATOR_ID</code> is the user-ID of the bot's creator. This gives the creator debugging-permissions, if enabled.</li>
+<li>
+<p><code>PREFIX</code> is the prefix that all messages contianing commands must start with.</p>
+</li>
+<li>
+<p><code>REDIS_HOST</code> is the IP Address/hostname that the Redis server is on.</p>
+</li>
+<li><code>REDIS_PORT</code> is the port that the Redis server is on.</li>
+<li><code>KEY_DELIM</code> is how information will be joined into keys. For example, if the key-delimiter is <code>:</code> and the bot is trying to access <code>foo.bar</code>, then it will check the <code>foo:bar</code> key of the database.</li>
+</ul>
                 
               
               
