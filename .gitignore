@@ -1,0 +1,8 @@
+node_modules/
+redis-stable/
+redis.conf
+redis-stable.tar.gz
+dump.rdb
+src/config.json
+.npm
+.env
