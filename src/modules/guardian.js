@@ -29,17 +29,21 @@ module.exports = class Guardian extends Module {
   }
 
   async handleMessage(message) {
+    if (!message.guild) return;
+
     const content = message.content;
     const config = {
-      whitelist: [],
-      blacklistedWords: ['amongus', 'amogus', 'among us', 'dolt'],
+      whitelist: JSON.parse(await this.database.getGuild(message.guild.id, 'guardianWhitelist')) || [],
+      blacklistedWords: JSON.parse(await this.database.getGuild(message.guild.id, 'blacklistedWords')) || [],
+      antiSpam: JSON.parse(await this.database.getGuild(message.guild.id, 'antiSpam')),
       spamLimit: 5,
-      imageLimit: 5,
-      blockZalgo: true,
-      blockLinks: true,
-      blockInvites: true,
-      blockIps: true,
+      imageLimit: JSON.parse(await this.database.getGuild(message.guild.id, 'imageLimit')),
+      blockZalgo: JSON.parse(await this.database.getGuild(message.guild.id, 'blockZalgo')),
+      blockLinks: JSON.parse(await this.database.getGuild(message.guild.id, 'blockLinks')),
+      blockInvites: JSON.parse(await this.database.getGuild(message.guild.id, 'blockInvites')),
+      blockIps: JSON.parse(await this.database.getGuild(message.guild.id, 'blockIps'))
     };
+    console.log(config)
     const images = message.attachments.filter(a => a.type === 'image');
 
     const hasDuplicates = (/^(.+)(?: +\1){3}/).test(content);
@@ -52,16 +56,16 @@ module.exports = class Guardian extends Module {
     const messages = await message.channel.messages?.fetch({ limit: 10 }) ?? new Collection();
     const recentMessages = messages.filter(m => m.author.id === message.author.id && message.createdAt - m.createdAt <= 5000);
 
+    //if (message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) return;
     if (config.whitelist?.find(id => message.author.id === id)) return;
-    if (config.ignored?.find(c => message.channel.name === c)) return;
+    if (config.ignoredChannels?.find(c => message.channel.name === c)) return;
   
     // recentMessages is a Collection, so `size` is used instead of `length`
-    if (config.spamLimit && recentMessages.size > config.spamLimit) {
+    if (config.antiSpam && config.spamLimit && recentMessages.size > config.spamLimit) {
       await this.notify(message, 'spam');
       recentMessages.map(m => m.delete());
     }
   
-    if (message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) return;
     if (config.blockDuplicates && hasDuplicates) await this.delete(message, 'duplicate');
     if (config.blockZalgo && hasZalgo) await this.delete(message, 'zalgo');
     if (config.blockInvites && hasInvite) await this.delete(message, 'invite');
