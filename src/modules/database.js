@@ -19,12 +19,14 @@ module.exports = class Database extends Module {
 
   async get(...given) {
     const key = [ ...given ];
+    //console.log(...given);
     return await this.redis.get(key.join(KEY_DELIM));
   }
 
   async set(...given) {
     const key = [ ...given ];
     const value = key.pop();
+    console.log(key, value);
     return await this.redis.set(key.join(KEY_DELIM), value);
   }
 
