@@ -6,7 +6,7 @@ const { MessageEmbed, Permissions } = require('discord.js');
 const Command = require('../../structs/command.js');
 const OptionParser = require('../../util/optionParser.js');
 const { warning } = require('../../util/formatter.js')('Invite Command');
-const { NAME, PREFIX } = require('../../config.json');
+const { NAME, PREFIX, DEFAULT_COLOR } = require('../../config.json');
 
 module.exports = class HelpCommand extends Command {
   async argumentHelp(client, given, parser, command, argumentName) {
@@ -17,6 +17,7 @@ module.exports = class HelpCommand extends Command {
 
     const embed = new MessageEmbed()
       .setTitle(`${command.name} <${option.name}>`)
+      .setColor(DEFAULT_COLOR)
       .setDescription(option.desc)
       .addField('Type', option.type ?? 'string')
       .addField('Required', (option.required ? 'yes' : 'no'));
@@ -43,6 +44,7 @@ module.exports = class HelpCommand extends Command {
 
     const embed = new MessageEmbed()
       .setTitle(`${command.name} command`)
+      .setColor(DEFAULT_COLOR)
       .setDescription(command.desc)
       .addField('Usage', usage)
       .addField('Aliases', (command.aliases?.length > 0 ? command.aliases.join(', ') : 'None'))
@@ -65,6 +67,7 @@ module.exports = class HelpCommand extends Command {
 
     const embed = new MessageEmbed()
       .setTitle(`${NAME}`)
+      .setColor(DEFAULT_COLOR)
       .setDescription(`Hello! I'm ${NAME}. You can use me to run commands, as long as they start with the prefix \`${PREFIX}\`. For a list of commands, use the \`commands\` command, by doing \`${PREFIX}commands\`.`)
     given.reply({ embeds: [ embed ] });
   }
