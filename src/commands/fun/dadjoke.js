@@ -6,14 +6,14 @@ const { Permissions, MessageEmbed } = require('discord.js');
 const { neutral } = require('../../util/formatter.js')('Purge Command');
 const Command = require('../../structs/command.js');
 const OptionParser = require('../../util/optionParser.js');
-const axios = require('axios');
+const got = require('got');
 
 module.exports = class DogCommand extends Command {
   async run(client, given, args) {
-    const res = await axios.get('https://icanhazdadjoke.com', { headers: { Accept: 'application/json' } });
-    const joke = res.data?.joke;
+    const res = await got('https://icanhazdadjoke.com/', { headers: { 'Accept': 'application/json' } });
+    console.log(res.body);
+    const joke = JSON.parse(res.body)?.joke;
     
-    console.log(res.data?.joke);
     given.reply(neutral(joke));
   }
 

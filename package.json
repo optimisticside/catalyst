@@ -18,10 +18,10 @@
   "homepage": "https://github.com/optimisticside/catalyst#readme",
   "dependencies": {
     "@discordjs/rest": "^0.1.0-canary.0",
-    "axios": "^0.22.0",
     "discord-api-types": "^0.23.1",
     "discord.js": "^13.1.0",
     "glob": "^7.1.7",
+    "got": "^11.8.2",
     "ioredis": "^4.28.0",
     "node": "16.6.1"
   }
