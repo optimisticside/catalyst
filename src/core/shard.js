@@ -2,17 +2,20 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const { TOKEN, SHARD_LIFETIME } = require('../config.json');
+const { TOKEN, REST_TIME_OFFSET, SHARD_LIFETIME } = require('../config.json');
 const { Client, Intents } = require('discord.js');
 const glob = require('glob');
 const path = require('path');
 const { promisify } = require('util');
 const requireAsync = async f => require(f); //promisify(require.bind(this));
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES] });
 const modules = {};
+const client = new Client({
+  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS ],
+  restTimeOffset: REST_TIME_OFFSET ?? 500
+});
 
-async function loadModule(file) {
+const loadModule = async file => {
   const module = await requireAsync(file).catch(err => {
     const fileName = path.basename(file, path.extname(file));
     console.error(`Unable to load ${fileName} module: ${err}`);
@@ -33,7 +36,7 @@ async function loadModule(file) {
   */
 }
 
-async function initModules() {
+const initModules = async () => {
   await Promise.all(Object.entries(modules).map(async ([ name, module ]) => {
     if (!module.load) return;
     module.load(modules, client);
