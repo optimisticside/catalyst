@@ -128,7 +128,9 @@ module.exports = class SlashModule extends Module {
   }
 
   async setupGuild(guild) {
-    await this.refreshCommands(guild, await this.buildCommands());
+    await this.refreshCommands(guild, await this.buildCommands()).catch(err => {
+      console.error(`Unable to load slash commands to guild ${guild.id}: ${err}`);
+    });
   }
 
   async findCommand(interaction) {
