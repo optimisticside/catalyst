@@ -46,7 +46,7 @@ module.exports = class ConfigCommand extends Command {
       }
 
       if (reaction.emoji.name === '❌') {
-        await client.database.setGuild(given.guild.id, ...key, true)
+        await client.database.setGuild(given.guild.id, ...key, false)
           .finally(() => reply.reactions.removeAll())
           .then(() => reply.edit(success(`Successfully disabled ${name}`, 'embed')))
           .catch(err => {
@@ -159,6 +159,12 @@ module.exports = class ConfigCommand extends Command {
         menuDesc: 'React with the corresponding emoji to configure Guardian.',
         emoji: '🔒',
         menu: [
+          {
+            name: 'Toggle',
+            desc: 'Enable or disable Guardian.',
+            emoji: '🔧',
+            handler: this.boolSetting('Guardian', 'Guardian will automate moderation.', 'guardian')
+          },
           {
             name: 'Blacklist',
             desc: 'Automatically deletes messages that contain blacklisted words.',
