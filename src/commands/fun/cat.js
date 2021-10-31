@@ -11,7 +11,6 @@ const got = require('got');
 module.exports = class DogCommand extends Command {
   async run(client, given, args) {
     const res = await got('https://aws.random.cat/meow');
-    console.log(res.body)
     const url = JSON.parse(res.body)?.file;
 
     const embed = new MessageEmbed()

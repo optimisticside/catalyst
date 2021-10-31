@@ -11,7 +11,6 @@ const got = require('got');
 module.exports = class DogCommand extends Command {
   async run(client, given, args) {
     const res = await got('https://dog.ceo/api/breeds/image/random/');
-    console.log(res.body)
     const url = JSON.parse(res.body)?.message;
 
     const embed = new MessageEmbed()

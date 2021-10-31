@@ -11,7 +11,6 @@ const got = require('got');
 module.exports = class DogCommand extends Command {
   async run(client, given, args) {
     const res = await got('https://icanhazdadjoke.com/', { headers: { 'Accept': 'application/json' } });
-    console.log(res.body);
     const joke = JSON.parse(res.body)?.joke;
     
     given.reply(neutral(joke));
