@@ -36,6 +36,10 @@ const loadModule = async file => {
   */
 }
 
+const updateStatus = () => {
+  client.user.setActivity(`${client.guilds.cache.size} servers`, { type: 'WATCHING' });
+}
+
 const initModules = async () => {
   await Promise.all(Object.entries(modules).map(async ([ name, module ]) => {
     if (!module.load) return;
@@ -52,7 +56,8 @@ let moduleFiles = glob.sync(path.join(__dirname + '/../modules/*.js'))
   await client.login(TOKEN);
 
   console.log('Ready');
-  client.user.setActivity('with other bots', { type: 'PLAYING' });
+  updateStatus();
+  setInterval(updateStatus, 5000);
 })();
 
 if (SHARD_LIFETIME) {
