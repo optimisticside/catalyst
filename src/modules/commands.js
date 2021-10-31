@@ -67,37 +67,36 @@ module.exports = class Commands extends Module {
         return result;
       case 'integer':
         if (option.choices) return this.handleArgChoices(option, given);
-        return parseInt(given);
+        const int = parseInt(given);
+        if (isNaN(int)) throw 'Invalid integer';
+        return int;
       case 'number':
-        return parseFloat(given);
+        const num = parseFloat(given);
+        if (isNaN(num)) throw 'Invalid number';
+        return num;
       case 'boolean':
         return (given === 'yes' || given === 'true' || given === 'on');
       case 'user': {
         const matches = given.match(/^<@!?(\d+)>$/);
-        const id = matches ? matches[1] : null;
-        return id ? this.client.users.cache.get(id) : null;
+        return message.guild.users.cache.get(matches[1]);
       }
       // The 'member' argument-type is for when
       // the user MUST be in the guild
       case 'member': {
         const matches = given.match(/^<@!?(\d+)>$/);
-        const id = matches ? matches[1] : null;
-        return id ? message.guild.members.cache.get(id) : null;
+        return message.guild.members.cache.get(matches[1]);
       }
       case 'channel': {
         const matches = given.match(/^<@!?(\d+)>$/);
-        const id = matches ? matches[1] : null;
-        return id ? message.guild.channels.cache.get(id) : null;
+        return message.guild.channels.cache.get(matches[1]);
       }
       case 'role': {
         const matches = given.match(/^<@!?(\d+)>$/);
-        const id = matches ? matches[1] : null;
-        return id ? message.guild.roles.cache.get(id) : null;
+        return message.guild.roles.cache.get(matches[1]);
       }
       case 'mentionable': {
         const matches = given.match(/^@?(\s+)$/);
-        const id = matches ? matches[1] : null;
-        return id ? message.guild.roles.cache.get(id) : null;
+        return message.guild.roles.cache.get(matches[1]);
       }
     }
   }
@@ -129,7 +128,8 @@ module.exports = class Commands extends Module {
       await this.parseArg(message, option, given).then(final => {
         result[option.name] = final;
       }).catch(err => {
-        return message.channel.send(warning(`Expected ${option.type}, got \`${given}\``));
+        message.channel.send(warning(`\`${given}\` is not a valid ${option.type}`));
+        throw err;
       });
     });
 
@@ -178,11 +178,15 @@ module.exports = class Commands extends Module {
        return message.channel.send(denial('Command validation failed.'));
     }
 
-    this.handleArgs(message, command, args).then(finalArgs => {
+    await this.handleArgs(message, command, args).then(finalArgs => {
       this.executeCommand(command, this.client, message, finalArgs).catch(err => {
         console.error(`Unable to run ${command.name} command: ${err}`);
         message.channel.send(warning('An error occured during command execution.'));
       });
+    }).catch(err => {
+      // TODO: Fix this bad error handling.
+      // We don't have to do anything here.
+      // This is just to mute errors from handling arguments.
     });
   }
 
