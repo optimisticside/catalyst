@@ -30,6 +30,8 @@ module.exports = class Guardian extends Module {
 
   async handleMessage(message) {
     if (!message.guild) return;
+    const enabled = await this.database.getGuild(message.guild.id, 'guardian');
+    if (!enabled) return;
 
     const content = message.content;
     const config = {
@@ -43,9 +45,8 @@ module.exports = class Guardian extends Module {
       blockInvites: JSON.parse(await this.database.getGuild(message.guild.id, 'blockInvites')),
       blockIps: JSON.parse(await this.database.getGuild(message.guild.id, 'blockIps'))
     };
-    console.log(config)
-    const images = message.attachments.filter(a => a.type === 'image');
 
+    const images = message.attachments.filter(a => a.type === 'image');
     const hasDuplicates = (/^(.+)(?: +\1){3}/).test(content);
     const hasZalgo = (/%CC%/g).test(encodeURIComponent(content));
     const hasInvite = content.includes('discord.gg/' || 'discordapp.com/invite/');
