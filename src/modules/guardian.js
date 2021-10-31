@@ -16,6 +16,7 @@ module.exports = class Guardian extends Module {
       link: 'Links are not allowed.',
       image: 'Your message had too many images.',
       blacklist: 'Your message had a blacklisted word.',
+      ip: 'Your message contained an IP address.',
       spam: 'You reached the message spam limit.'
     }
 
@@ -31,12 +32,13 @@ module.exports = class Guardian extends Module {
     const content = message.content;
     const config = {
       whitelist: [],
-      blacklistedWords: ['amongus', 'amogus', 'among us'],
+      blacklistedWords: ['amongus', 'amogus', 'among us', 'ard'],
       spamLimit: 5,
       imageLimit: 5,
       blockZalgo: true,
       blockLink: true,
-      blockInvite: true
+      blockInvite: true,
+      blockIps: true,
     };
     const images = message.attachments.filter(a => a.type === 'image');
 
@@ -44,6 +46,7 @@ module.exports = class Guardian extends Module {
     const hasZalgo = (/%CC%/g).test(encodeURIComponent(content));
     const hasInvite = content.includes('discord.gg/' || 'discordapp.com/invite/');
     const hasLink = (/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/).test(content);
+    const hasIp = (/^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$/).test(content);
     const isBlacklisted = config.blacklistedWords?.find(w => content.includes(w));
 
     const messages = await message.channel.messages?.fetch({ limit: 10 }) ?? new Collection();
@@ -62,6 +65,7 @@ module.exports = class Guardian extends Module {
     if (config.blockZalgo && hasZalgo) await this.delete(message, 'zalgo');
     if (config.blockInvites && hasInvite) await this.delete(message, 'invite');
     if (config.blockLinks && hasLink) await this.delete(message, 'link');
+    if (config.blockIps && hasIp) await this.delete(message, 'ip');
     if (config.imageLimit && images.length < config.imageLimit) await this.delete(message, 'image');
     if (isBlacklisted) await this.delete(message, 'blacklist');
   }
