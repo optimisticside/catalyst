@@ -4,15 +4,21 @@
 
 const { Permissions, MessageEmbed } = require('discord.js');
 const { alert, success } = require('../../util/formatter.js')('Ban Command');
+const { DEFAULT_COLOR } = require('../../config.json');
 const Command = require('../../structs/command.js');
 const OptionParser = require('../../util/optionParser.js');
 
 module.exports = class CommandsCommand extends Command {
   async run(client, given, args) {
+    const parser = new OptionParser(this, given, args);
+    const tag = await parser.getOption('tag');
+    const commands = client.commandHandler.commands
+      .filter(c => !c.hidden && (!tag || c.tags.find(t => t === tag)));
+
     const embed = new MessageEmbed()
       .setTitle('Commands')
-      .setDescription(client.commandHandler.commands
-        .filter(c => !c.hidden).map(c => c.name).join('\n'));
+      .setColor(DEFAULT_COLOR)
+      .setDescription(commands.map(c => c.name).join('\n'));
     given.reply({ embeds: [ embed ] });
   }
 
@@ -22,7 +28,16 @@ module.exports = class CommandsCommand extends Command {
       desc: 'Lists all commands provided.',
       perms: [ Permissions.FLAGS.SEND_MESSAGES ],
       tags: [ 'utilities' ],
-      aliases: [ 'cmds' ]
+      aliases: [ 'cmds' ],
+      options: [
+        {
+          name: 'tag',
+          type: 'string',
+          desc: 'The tag to filter commands by',
+          prompt: 'What tag do you want to filter by?',
+          required: false
+        }
+      ]
     })
   }
 };
