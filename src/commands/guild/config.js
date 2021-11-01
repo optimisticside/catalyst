@@ -269,6 +269,12 @@ module.exports = class ConfigCommand extends Command {
             emoji: '🗑️',
             handler: this.boolSetting('Zalgo Filter', 'Zalgo filter will remove messages that contain zalgo.', 'blockZalgo')
           },
+          {
+            name: 'Self-Bot Detector',
+            desc: 'Bans users who have self-bots.',
+            emoji: '🤖',
+            handler: this.boolSetting('Self-Bot Detector', 'Self-bot detector will ban users who use self-bots.', 'blockSelfBots')
+          }
         ]
       },
       {

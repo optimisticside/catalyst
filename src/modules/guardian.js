@@ -43,7 +43,8 @@ module.exports = class Guardian extends Module {
       blockZalgo: JSON.parse(await this.database.getGuild(message.guild.id, 'blockZalgo')),
       blockLinks: JSON.parse(await this.database.getGuild(message.guild.id, 'blockLinks')),
       blockInvites: JSON.parse(await this.database.getGuild(message.guild.id, 'blockInvites')),
-      blockIps: JSON.parse(await this.database.getGuild(message.guild.id, 'blockIps'))
+      blockIps: JSON.parse(await this.database.getGuild(message.guild.id, 'blockIps')),
+      blockSelfBots: JSON.parse(await this.database.getGuild(message.guild.id, 'blockSelfBots'))
     };
 
     const images = message.attachments.filter(a => a.type === 'image');
@@ -52,6 +53,7 @@ module.exports = class Guardian extends Module {
     const hasInvite = content.includes('discord.gg/' || 'discordapp.com/invite/');
     const hasLink = (/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/).test(content);
     const hasIp = (/^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$/).test(content);
+    const hasEmbeds = message.embeds.length > 0;
     const isBlacklisted = config.blacklistedWords?.find(w => content.includes(w));
 
     const messages = await message.channel.messages?.fetch({ limit: 10 }) ?? new Collection();
@@ -67,6 +69,8 @@ module.exports = class Guardian extends Module {
       recentMessages.map(m => m.delete());
     }
   
+    // TODO: Ban user instead of deleting when detecting self-bot.
+    if (config.blockSelfBots && hasEmbeds) await this.delete(message, 'selfBot');
     if (config.blockDuplicates && hasDuplicates) await this.delete(message, 'duplicate');
     if (config.blockZalgo && hasZalgo) await this.delete(message, 'zalgo');
     if (config.blockInvites && hasInvite) await this.delete(message, 'invite');
