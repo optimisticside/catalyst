@@ -95,12 +95,26 @@ module.exports = class Logs extends Module {
     channel.send({ embeds: [ embed ] });
   }
 
+  async onMemberUpdate(oldMember, newMember) {
+    if (!newMember.guild) return;
+    if (newMember.user.bot) return;
+    if (await this.database.getGuild(newMember.guild.id, 'logs')) return;
+    const logMessages = await this.database.getGuild(newMember.guild.id, 'logUpdate');
+    if (!logMessages) return;
+    const logChannelId = await this.database.getGuild(member.guild.id, 'logMemberUpdate');
+    const channel = member.guild.channels.cache.get(logChannelId);
+    if (!channel) return;
+
+    // TODO: Do this later...
+  }
+
   load({ commandHandler, eventHandler, slashHandler, database }) {
     this.database = database;
     eventHandler.on('messageDelete', this.onMessageDelete.bind(this));
     eventHandler.on('messageUpdate', this.onMessageEdit.bind(this));
     eventHandler.on('guildMemberAdd', this.onJoin.bind(this));
     eventHandler.on('guildMemberRemove', this.onLeave.bind(this));
+    eventHandler.on('guidMemberUpdate', this.onMemberUpdate.bind(this));
     //commandHandler.on('commandRun', this.onCommand.bind(this));
     //slashHandler.on('commandRun', this.onSlashCommand.bind(this));
   }
