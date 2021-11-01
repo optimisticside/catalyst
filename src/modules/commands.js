@@ -209,7 +209,7 @@ module.exports = class Commands extends Module {
 
   async handleMessage(message) {
     let content = message.content.trim();
-    const guildPrefix = await this.database.getGuild(message.guild.id, 'prefix');
+    const guildPrefix = message.guild && await this.database.getGuild(message.guild.id, 'prefix');
     const prefixes = [ `<@${this.client.user.id}>`, `<@!${this.client.user.id}>`, PREFIX ].concat(guildPrefix);
     const prefix = prefixes.find(p => content.startsWith(p));
     if (!prefix) return;
