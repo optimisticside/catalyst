@@ -305,7 +305,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The channel that new users will be greeted on.',
             emoji: '#️⃣',
             handler: this.stringSetting('Greeting Channel', 'The greeting channel is the channel users will be greeted on.',
-              (async channel => console.log(channel.match(/^<#(\d+)>$/)[1])||channel.match(/^<#(\d+)>$/)[1]), null, 'greetingChannel')
+              (async channel => channel.match(/^<#(\d+)>$/)[1]), null, 'greetingChannel')
           }
         ]
       },
