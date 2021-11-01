@@ -12,7 +12,7 @@ module.exports = class Logs extends Module {
     if (!message.guild) return;
     if (newMessage.author.bot) return;
     if (await this.database.getGuild(message.guild.id, 'logs')) return;
-    const logMessages = await this.database.getGuild(message.guild.id, 'logMessage');
+    const logMessages = await this.database.getGuild(message.guild.id, 'logDelete');
     if (!logMessages) return;
     const logChannelId = await this.database.getGuild(message.guild.id, 'logChannel');
     const channel = message.guild.channels.cache.get(logChannelId);
@@ -33,7 +33,7 @@ module.exports = class Logs extends Module {
     if (!newMessage.guild) return;
     if (newMessage.author.bot) return;
     if (await this.database.getGuild(newMessage.guild.id, 'logs')) return;
-    const logMessages = await this.database.getGuild(newMessage.guild.id, 'logMessage');
+    const logMessages = await this.database.getGuild(newMessage.guild.id, 'logEdit');
     if (!logMessages) return;
     const logChannelId = await this.database.getGuild(newMessage.guild.id, 'logChannel');
     const channel = newMessage.guild.channels.cache.get(logChannelId);
@@ -57,7 +57,7 @@ module.exports = class Logs extends Module {
     if (!member.guild) return;
     if (member.user.bot) return;
     if (await this.database.getGuild(member.guild.id, 'logs')) return;
-    const logMessages = await this.database.getGuild(newMessage.guild.id, 'logMessage');
+    const logMessages = await this.database.getGuild(newMessage.guild.id, 'logJoin');
     if (!logMessages) return;
     const logChannelId = await this.database.getGuild(newMessage.guild.id, 'logChannel');
     const channel = member.guild.channels.cache.get(logChannelId);
@@ -78,7 +78,7 @@ module.exports = class Logs extends Module {
     if (!member.guild) return;
     if (member.user.bot) return;
     if (await this.database.getGuild(member.guild.id, 'logs')) return;
-    const logMessages = await this.database.getGuild(member.guild.id, 'logMessage');
+    const logMessages = await this.database.getGuild(member.guild.id, 'logLeave');
     if (!logMessages) return;
     const logChannelId = await this.database.getGuild(member.guild.id, 'logChannel');
     const channel = member.guild.channels.cache.get(logChannelId);
