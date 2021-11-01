@@ -154,7 +154,9 @@ module.exports = class Commands extends Module {
     //   of the guild (must be in guild channel).
     // Command's independent validation test must pass.
     if (!command || !command.run) {
-      return message.channel.send(warning(`\`${commandCall}\` is not a valid command.`));
+      // After close consideration, I've decieded that
+      // it's probably better to not warn of invalid commands.
+      return// message.channel.send(warning(`\`${commandCall}\` is not a valid command.`));
     }
     if (command.guildOnly && !message.guild) {
       return message.channel.send(denial('Guild-only commands cannot be run outside of a guild.'));
