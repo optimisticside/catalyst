@@ -295,7 +295,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The channel that new users will be greeted on.',
             emoji: '#️⃣',
             handler: this.stringSetting('Greeting Channel', 'The greeting channel is the channel users will be greeted on.',
-              async (channel) => channel.match(/^<@!?(\d+)>$/), null, 'greetingChannel')
+              async channel => channel.match(/^<@!?(\d+)>$/), null, 'greetingChannel')
           }
         ]
       },
@@ -330,7 +330,8 @@ module.exports = class ConfigCommand extends Command {
             name: 'Channel',
             desc: 'The channel that new users will be said goodbye on.',
             emoji: '#️⃣',
-            handler: null,
+            handler: this.stringSetting('Greeting Channel', 'The greeting channel is the channel users will be greeted on.',
+              async channel => channel.match(/^<@!?(\d+)>$/), null, 'greetingChannel')
           }
         ]
       },
@@ -349,8 +350,23 @@ module.exports = class ConfigCommand extends Command {
       {
         name: 'Auto Role',
         desc: 'Automatically assign roles to people that join.',
+        menuDesc: 'Select the corresponding emoji to configure Auto Role.',
         emoji: '🤖',
-        handler: this.autoRole
+        menu: [
+          {
+            name: 'Toggle',
+            desc: 'Enable or disable Auto Role.',
+            emoji: '🔧',
+            handler: this.boolSetting('Auto Role', 'Auto Role will automate role assignment.', 'autoRole')
+          },
+          {
+            name: 'Role',
+            desc: 'The role that Auto Role will assign.',
+            emoji: '✏️',
+            handler: this.stringSetting('Auto Role', 'Auto Role will assign a role to users that join the server.',
+              async role => role.match(/^<@!?(\d+)>$/), 'autoRoleRole')
+          }
+        ]
       }
     ]
   }
