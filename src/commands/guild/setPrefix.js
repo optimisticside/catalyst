@@ -10,7 +10,7 @@ const OptionParser = require('../../util/optionParser.js');
 module.exports = class CommandsCommand extends Command {
   async run(client, given, args) {
     const parser = new OptionParser(this, given, args);
-    const prefix = parser.getOption('prefix');
+    const prefix = await parser.getOption('prefix');
 
     await client.database.setGuild(given.guild.id, 'prefix', prefix).then(() => {
       given.reply(success('Successfully changed guild prefix'));

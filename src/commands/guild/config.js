@@ -16,13 +16,12 @@ module.exports = class ConfigCommand extends Command {
     });
   }
 
-  boolSetting(name, desc, ...key) {
-    return async (client, given, reply) => {
-      const embed = new MessageEmbed()
-        .setTitle(name)
+  async promptBool(given, reply, title, desc, footer) {
+    const embed = new MessageEmbed()
+        .setTitle(title)
         .setColor(DEFAULT_COLOR)
         .setDescription(desc)
-        .setFooter('Would you like to enable it?');
+        .setFooter(footer);
       reply.reactions.removeAll();
       reply.edit({ embeds: [ embed ] });
 
@@ -35,7 +34,36 @@ module.exports = class ConfigCommand extends Command {
       });
 
       if (!reaction) return;
-      if (reaction.emoji.name === '✅') {
+      if (reaction.emoji.name === '✅') return true;
+      if (reaction.emoji.name === '❌') return false;
+  }
+
+  async promptString(given, reply, name, promptMessage, validator) {
+    reply.reactions.removeAll();
+    reply.edit(prompt(promptMessage ?? `What would you like to set the ${name.toLowerCase()} to`, 'embed'));
+
+    const filter = m => m.author === given.author;
+    const collector = reply.channel.createMessageCollector({ filter, time: 30000 });
+    const message = await this.awaitCollection(collector).catch(() => {
+      reply.reply(warning('Timed out.'));
+    });
+
+    if (!message) return;
+    if (validator && !await validator(message.content)) {
+      reply.reactions.removeAll();
+      reply.edit(alert(`Invalid ${name.toLowerCase()} provided`, 'embed'));
+      return;
+    }
+
+    return message;
+  }
+
+  boolSetting(name, desc, ...key) {
+    return async (client, given, reply) => {
+      const answer = await this.promptBool(given, reply, name, desc, 'Would you like to enable it?');
+      if (answer === null) return;
+
+      if (answer) {
         await client.database.setGuild(given.guild.id, ...key, true)
           .finally(() => reply.reactions.removeAll())
           .then(() => reply.edit(success(`Successfully enabled ${name}`, 'embed')))
@@ -43,9 +71,7 @@ module.exports = class ConfigCommand extends Command {
             console.log(`Unable to write to database: ${err}`);
             reply.edit(alert(`Unable to enable ${name}`, 'embed'));
           });
-      }
-
-      if (reaction.emoji.name === '❌') {
+      } else {
         await client.database.setGuild(given.guild.id, ...key, false)
           .finally(() => reply.reactions.removeAll())
           .then(() => reply.edit(success(`Successfully disabled ${name}`, 'embed')))
@@ -60,45 +86,18 @@ module.exports = class ConfigCommand extends Command {
   stringSetting(name, desc, validator, promptMessage, ...key) {
     return async (client, given, reply) => {
       const current = await client.database.getGuild(given.guild.id, ...key);
-      const embed = new MessageEmbed()
-        .setTitle(name)
-        .setColor(DEFAULT_COLOR)
-        .setDescription(`${desc}\nThe current ${name.toLowerCase()} is \`${current}\``)
-        .setFooter('Would you like change it?');
-      reply.reactions.removeAll();
-      reply.edit({ embeds: [ embed ] });
+      const answer = await this.promptBool(given, reply, name, `${desc}\nThe current ${name.toLowerCase()} is \`${current}\``,
+        'Would you like to change it?');
+      if (answer === null) return;
 
-      await reply.react('✅');
-      await reply.react('❌');
-      const filter = r => r.users.cache.find(u => u === given.author);
-      const collector = reply.createReactionCollector({ filter, time: 30000,  })
-      const reaction = await this.awaitCollection(collector).catch(() => {
-        reply.reply(warning('Timed out.'));
-      });
-
-      if (!reaction) return;
-      if (reaction.emoji.name === '❌') {
+      if (!answer) {
         reply.reactions.removeAll();
         reply.edit(neutral(`The ${name.toLowerCase()} has not been changed`, 'embed'));
-      };
+      } else {
+        const answer = await this.promptString(given, reply, name, promptMessage, validator);
+        if (!answer) return;
 
-      if (reaction.emoji.name === '✅') {
-        reply.reactions.removeAll();
-        reply.edit(prompt(promptMessage ?? `What would you like to set the ${name.toLowerCase()} to`, 'embed'));
-
-        const filter = m => m.author === given.author;
-        const collector = reply.channel.createMessageCollector({ filter, time: 30000 });
-        const message = await this.awaitCollection(collector).catch(() => {
-          reply.reply(warning('Timed out.'));
-        });
-
-        if (!message) return;
-        if (validator && !await validator(message.content)) {
-          reply.reactions.removeAll();
-          reply.edit(alert(`Invalid ${name.toLowerCase()} provided`, 'embed'));
-          return;
-        }
-        await client.database.setGuild(given.guild.id, ...key, message.content)
+        await client.database.setGuild(given.guild.id, ...key, answer.content)
           .finally(() => reply.reactions.removeAll())
           .then(() => reply.edit(success('Successfully updated database', 'embed')))
           .catch(err => reply.edit(alert('Unable to update database', 'embed')));
@@ -178,16 +177,10 @@ module.exports = class ConfigCommand extends Command {
                 handler: async (client, given, reply) => {
                   const raw = await client.database.getGuild(given.guild.id, 'blacklistedWords') || '[]';
                   const blacklisted = JSON.parse(raw);
-                  reply.reactions.removeAll();
-                  reply.edit(prompt('What word would you like to add', 'embed'));
+                  const answer = await this.promptString(given, reply, 'word', 'What word would you like to add', null);
+                  if (!answer) return;
 
-                  const filter = m => m.author === given.author;
-                  const collector = reply.channel.createMessageCollector({ filter, time: 30000 });
-                  const message = await this.awaitCollection(collector).catch(() => {
-                    reply.reply(warning('Timed out.'));
-                  });
-                  if (!message) return;
-                  const word = message.content.toLowerCase();
+                  const word = answer.content.toLowerCase();
                   if (blacklisted.find(w => w === word)) {
                     return reply.edit(warning('That word is already blacklisted', 'embed'))
                   }
@@ -207,16 +200,10 @@ module.exports = class ConfigCommand extends Command {
                 handler: async (client, given, reply) => {
                   const raw = await client.database.getGuild(given.guild.id, 'blacklistedWords') || '[]';
                   const blacklisted = JSON.parse(raw);
-                  reply.reactions.removeAll();
-                  reply.edit(prompt('What word would you like to remove', 'embed'));
+                  const answer = await this.promptString(given, reply, 'word', 'What word would you like to remove', null);
+                  if (!answer) return;
 
-                  const filter = m => m.author === given.author;
-                  const collector = reply.channel.createMessageCollector({ filter, time: 30000 });
-                  const message = await this.awaitCollection(collector).catch(() => {
-                    reply.reply(warning('Timed out.'));
-                  });
-                  if (!message) return;
-                  const word = message.content.toLowerCase();
+                  const word = answer.content.toLowerCase();
                   const index = blacklisted.findIndex(w => w === word);
                   if (!index) {
                     return reply.edit(warning('That word is not blacklisted', 'embed'))
@@ -329,17 +316,11 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The message that users will be said goodbye with.',
             emoji: '✉️',
             handler: async (client, given, reply) => {
-              reply.reactions.removeAll();
-              reply.edit(prompt('How would you like to say goodbye to people? You can access the user\'s name through `{user}` and guild name through `{guild}`', 'embed'));
+              const answer = await this.stringPrompt(given, reply, 'goodbye message',
+                'How would you like to say goodbye to people? You can access the user\'s name through `{user}` and guild name through `{guild}`', null);
+              if (!answer) return;
 
-              const filter = m => m.author === given.author;
-              const collector = reply.channel.createMessageCollector({ filter, time: 30000 });
-              const message = await this.awaitCollection(collector).catch(() => {
-                reply.reply(warning('Timed out.'));
-              });
-              if (!message) return;
-              
-              await client.database.setGuild(given.guild.id, 'goodbyeMessage', message.content)
+              await client.database.setGuild(given.guild.id, 'goodbyeMessage', answer.content)
                 .finally(() => reply.reactions.removeAll())
                 .then(() => reply.edit(success('Successfully updated database', 'embed')))
                 .catch(err => reply.edit(alert('Unable to update database', 'embed')));
