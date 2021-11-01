@@ -87,7 +87,7 @@ module.exports = class Commands extends Module {
         return message.guild.members.cache.get(matches[1]);
       }
       case 'channel': {
-        const matches = given.match(/^<@!?(\d+)>$/);
+        const matches = given.match(/^<#(\d+)>$/);
         return message.guild.channels.cache.get(matches[1]);
       }
       case 'role': {

@@ -295,7 +295,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The channel that new users will be greeted on.',
             emoji: '#️⃣',
             handler: this.stringSetting('Greeting Channel', 'The greeting channel is the channel users will be greeted on.',
-              async channel => channel.match(/^<@!?(\d+)>$/), null, 'greetingChannel')
+              async channel => channel.match(/^<#(\d+)>$/), null, 'greetingChannel')
           }
         ]
       },
@@ -331,7 +331,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The channel that new users will be said goodbye on.',
             emoji: '#️⃣',
             handler: this.stringSetting('Greeting Channel', 'The greeting channel is the channel users will be greeted on.',
-              async channel => channel.match(/^<@!?(\d+)>$/), null, 'greetingChannel')
+              async channel => channel.match(/^<#(\d+)>$/), null, 'greetingChannel')
           }
         ]
       },
@@ -352,7 +352,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The channel in which logs will be posted.',
             emoji: '#️⃣',
             handler: this.stringSetting('Log Channel', 'The log channel is the channel where logs will be posted.',
-              async channel => channel.match(/^<@!?(\d+)>$/), null, 'logsChannel')
+              async channel => channel.match(/^<#(\d+)>$/), null, 'logsChannel')
           },
           {
             name: 'Message Delete',
@@ -403,7 +403,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The role that Auto Role will assign.',
             emoji: '✏️',
             handler: this.stringSetting('Role', 'Auto Role will assign a role to users that join the server.',
-              async role => role.match(/^<@!?(\d+)>$/), null, 'autoRoleRole')
+              async role => role.match(/^<#(\d+)>$/), null, 'autoRoleRole')
           }
         ]
       }
