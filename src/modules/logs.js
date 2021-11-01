@@ -8,11 +8,6 @@ const { MessageEmbed } = require('discord.js');
 const Module = require('../structs/module.js');
 
 module.exports = class Logs extends Module {
-  async userLog(user, title, desc, footer) {
-    
-    return { embeds: [ embed ] };
-  }
-
   async onMessageDelete(message) {
     if (!message.guild) return;
     if (newMessage.author.bot) return;
