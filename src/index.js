@@ -4,6 +4,8 @@
 
 const { TOKEN, TOTAL_SHARDS, LIFETIME } = require('./config.json');
 const { ShardingManager } = require('discord.js');
+const requirePromise = async f => require(f);
+const glob = require('glob');
 const path = require('path');
 
 const shardingManager = new ShardingManager(path.join(__dirname, 'core/shard.js'), {
@@ -22,3 +24,16 @@ if (LIFETIME) {
     shardingManager.broadcastEval('process.exit()');
   }, LIFETIME * 1000);
 }
+
+const serviceFiles = glob.sync(path.join(__dirname, 'services/**/.js'));
+(async () => {
+  serviceFiles.map(async file => {
+    const result = await requirePromise(file).catch(err => {
+      const fileName = path.basename(file, path.extname(file));
+      console.error(`Unable to load ${fileName} service: ${err}`);
+    });
+
+    if (!result instanceof Function) return;
+    await result(shardingManager);
+  });
+})();
