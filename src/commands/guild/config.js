@@ -38,7 +38,7 @@ module.exports = class ConfigCommand extends Command {
       if (reaction.emoji.name === '❌') return false;
   }
 
-  async promptString(given, reply, name, promptMessage, validator) {
+  async promptString(given, reply, name, promptMessage, formatter) {
     reply.reactions.removeAll();
     reply.edit(prompt(promptMessage ?? `What would you like to set the ${name.toLowerCase()} to`, 'embed'));
 
@@ -49,13 +49,17 @@ module.exports = class ConfigCommand extends Command {
     });
 
     if (!message) return;
-    if (validator && !await validator(message.content)) {
+    const failed = false;
+    const result = formatter && await formatter(message.content).catch(err => {
+      failed = true;
+    });
+    if (failed) {
       reply.reactions.removeAll();
       reply.edit(alert(`Invalid ${name.toLowerCase()} provided`, 'embed'));
       return;
     }
 
-    return message;
+    return result;
   }
 
   boolSetting(name, desc, ...key) {
@@ -83,21 +87,21 @@ module.exports = class ConfigCommand extends Command {
     }
   }
 
-  stringSetting(name, desc, validator, promptMessage, ...key) {
+  stringSetting(name, desc, formatter, promptMessage, ...key) {
     return async (client, given, reply) => {
       const current = await client.database.getGuild(given.guild.id, ...key);
-      const answer = await this.promptBool(given, reply, name, `${desc}\nThe current ${name.toLowerCase()} is \`${current}\``,
+      const shouldContinue = await this.promptBool(given, reply, name, `${desc}\nThe current ${name.toLowerCase()} is \`${current}\``,
         'Would you like to change it?');
-      if (answer === null) return;
+      if (shouldContinue === null) return;
 
-      if (!answer) {
+      if (!shouldContinue) {
         reply.reactions.removeAll();
         reply.edit(neutral(`The ${name.toLowerCase()} has not been changed`, 'embed'));
       } else {
-        const answer = await this.promptString(given, reply, name, promptMessage, validator);
+        const answer = await this.promptString(given, reply, name, promptMessage, formatter);
         if (!answer) return;
 
-        await client.database.setGuild(given.guild.id, ...key, answer.content)
+        await client.database.setGuild(given.guild.id, ...key, answer)
           .finally(() => reply.reactions.removeAll())
           .then(() => reply.edit(success('Successfully updated database', 'embed')))
           .catch(err => reply.edit(alert('Unable to update database', 'embed')));
@@ -180,7 +184,7 @@ module.exports = class ConfigCommand extends Command {
                   const answer = await this.promptString(given, reply, 'word', 'What word would you like to add', null);
                   if (!answer) return;
 
-                  const word = answer.content.toLowerCase();
+                  const word = answer.toLowerCase();
                   if (blacklisted.find(w => w === word)) {
                     return reply.edit(warning('That word is already blacklisted', 'embed'))
                   }
@@ -203,7 +207,7 @@ module.exports = class ConfigCommand extends Command {
                   const answer = await this.promptString(given, reply, 'word', 'What word would you like to remove', null);
                   if (!answer) return;
 
-                  const word = answer.content.toLowerCase();
+                  const word = answer.toLowerCase();
                   const index = blacklisted.findIndex(w => w === word);
                   if (index === null) {
                     return reply.edit(warning('That word is not blacklisted', 'embed'))
@@ -301,7 +305,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The channel that new users will be greeted on.',
             emoji: '#️⃣',
             handler: this.stringSetting('Greeting Channel', 'The greeting channel is the channel users will be greeted on.',
-              async channel => channel.match(/^<#(\d+)>$/), null, 'greetingChannel')
+              (async channel => console.log(channel.match(/^<#(\d+)>$/)[1])||channel.match(/^<#(\d+)>$/)[1]), null, 'greetingChannel')
           }
         ]
       },
@@ -326,7 +330,7 @@ module.exports = class ConfigCommand extends Command {
                 'How would you like to say goodbye to people? You can access the user\'s name through `{user}` and guild name through `{guild}`', null);
               if (!answer) return;
 
-              await client.database.setGuild(given.guild.id, 'goodbyeMessage', answer.content)
+              await client.database.setGuild(given.guild.id, 'goodbyeMessage', answer)
                 .finally(() => reply.reactions.removeAll())
                 .then(() => reply.edit(success('Successfully updated database', 'embed')))
                 .catch(err => reply.edit(alert('Unable to update database', 'embed')));
@@ -337,7 +341,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The channel that new users will be said goodbye on.',
             emoji: '#️⃣',
             handler: this.stringSetting('Greeting Channel', 'The greeting channel is the channel users will be greeted on.',
-              async channel => channel.match(/^<#(\d+)>$/), null, 'greetingChannel')
+              (async channel => channel.match(/^<#(\d+)>$/)[1]), null, 'greetingChannel')
           }
         ]
       },
@@ -358,7 +362,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The channel in which logs will be posted.',
             emoji: '#️⃣',
             handler: this.stringSetting('Log Channel', 'The log channel is the channel where logs will be posted.',
-              async channel => channel.match(/^<#(\d+)>$/), null, 'logsChannel')
+              (async channel => channel.match(/^<#(\d+)>$/)[1]), null, 'logsChannel')
           },
           {
             name: 'Message Delete',
@@ -409,7 +413,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The role that Auto Role will assign.',
             emoji: '✏️',
             handler: this.stringSetting('Role', 'Auto Role will assign a role to users that join the server.',
-              async role => role.match(/^<@!?(\d+)>$/), null, 'autoRoleRole')
+              (async role => role.match(/^<@!?(\d+)>$/)[1]), null, 'autoRoleRole')
           }
         ]
       }
