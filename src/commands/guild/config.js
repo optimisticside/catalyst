@@ -403,7 +403,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The role that Auto Role will assign.',
             emoji: '✏️',
             handler: this.stringSetting('Role', 'Auto Role will assign a role to users that join the server.',
-              async role => role.match(/^<#(\d+)>$/), null, 'autoRoleRole')
+              async role => role.match(/^<@!?(\d+)>$/), null, 'autoRoleRole')
           }
         ]
       }
