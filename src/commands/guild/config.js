@@ -146,7 +146,7 @@ module.exports = class ConfigCommand extends Command {
     super({
       name: 'config',
       desc: 'Lets you manage the guild configuration.',
-      perms: [ Permissions.FLAGS.SEND_MESSAGES ],
+      perms: [ Permissions.FLAGS.MANAGE_GUILD ],
       guildOnly: true,
       tags: [ 'guild' ]
     })
@@ -363,8 +363,8 @@ module.exports = class ConfigCommand extends Command {
             name: 'Role',
             desc: 'The role that Auto Role will assign.',
             emoji: '✏️',
-            handler: this.stringSetting('Auto Role', 'Auto Role will assign a role to users that join the server.',
-              async role => role.match(/^<@!?(\d+)>$/), 'autoRoleRole')
+            handler: this.stringSetting('Role', 'Auto Role will assign a role to users that join the server.',
+              async role => role.match(/^<@!?(\d+)>$/), null, 'autoRoleRole')
           }
         ]
       }
