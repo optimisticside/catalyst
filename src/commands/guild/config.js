@@ -205,7 +205,7 @@ module.exports = class ConfigCommand extends Command {
 
                   const word = answer.content.toLowerCase();
                   const index = blacklisted.findIndex(w => w === word);
-                  if (!index) {
+                  if (index === null) {
                     return reply.edit(warning('That word is not blacklisted', 'embed'))
                   }
 
@@ -337,9 +337,48 @@ module.exports = class ConfigCommand extends Command {
       },
       {
         name: 'Logs',
-        desc: 'Decide executed commands are executed.',
+        desc: 'Keeps track of user activity.',
+        menuDesc: 'React with the corresponding emoji to configure logs',
         emoji: '🗒️',
-        handler: this.boolSetting('Logs', 'Logs will keep track of commands executed', 'commandLogs')
+        menu: [
+          {
+            name: 'Toggle',
+            desc: 'Whether logging will be enabled.',
+            emoji: '🔧',
+            handler: this.boolSetting('Logs', 'Logs will keep track of user activity.', 'logs')
+          },
+          {
+            name: 'Channel',
+            desc: 'The channel in which logs will be posted.',
+            emoji: '#️⃣',
+            handler: this.stringSetting('Log Channel', 'The log channel is the channel where logs will be posted.',
+              async channel => channel.match(/^<@!?(\d+)>$/), null, 'logsChannel')
+          },
+          {
+            name: 'Message Delete',
+            desc: 'Keeping track of when messages are deleted.',
+            emoji: '🗑️',
+            handler: this.boolSetting('Message Delete', 'Message deletes are whenever someone deletes a message.', 'logDelete')
+          },
+          {
+            name: 'Message Edit',
+            desc: 'Keeping track of when messages are edited.',
+            emoji: '✏️',
+            handler: this.boolSetting('Message Edit', 'Message edits are whenever someone edits a message.', 'logEdit')
+          },
+          {
+            name: 'User Join',
+            desc: 'Keeping track of when users join the server.',
+            emoji: '📥',
+            handler: this.boolSetting('User Join', 'User Joins are whenever someone joins the server.', 'logJoin')
+          },
+          {
+            name: 'User Leave',
+            desc: 'Keeping track of when users leave the server.',
+            emoji: '📤',
+            handler: this.boolSetting('User Leave', 'Message edits are whenever someone leaves the server.', 'logLeave')
+          }
+        ]
       },
       {
         name: 'Prefix',
