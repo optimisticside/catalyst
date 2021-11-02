@@ -46,6 +46,13 @@ module.exports = class BanCommand extends Command {
           desc: 'The user to ban.',
           prompt: 'Who do you want me to ban?',
           required: true
+        },
+        {
+          name: 'reason',
+          type: 'string',
+          desc: 'Why you want to ban that user',
+          prompt: 'Why do you want to ban that user?',
+          required: false
         }
       ]
     })
