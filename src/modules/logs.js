@@ -53,13 +53,13 @@ module.exports = class Logs extends Module {
     channel.send({ embeds: [ embed ] });
   }
 
-  async onJoin(member) {
+  async onGuildMemberAdd(member) {
     if (!member.guild) return;
     if (member.user.bot) return;
     if (await this.database.getGuild(member.guild.id, 'logs')) return;
-    const logMessages = await this.database.getGuild(newMessage.guild.id, 'logJoin');
+    const logMessages = await this.database.getGuild(message.guild.id, 'logJoin');
     if (!logMessages) return;
-    const logChannelId = await this.database.getGuild(newMessage.guild.id, 'logChannel');
+    const logChannelId = await this.database.getGuild(message.guild.id, 'logChannel');
     const channel = member.guild.channels.cache.get(logChannelId);
     if (!channel) return;
 
@@ -74,7 +74,7 @@ module.exports = class Logs extends Module {
     channel.send({ embeds: [ embed ] });
   }
 
-  async onLeave(member) {
+  async onGuildMemberRemove(member) {
     if (!member.guild) return;
     if (member.user.bot) return;
     if (await this.database.getGuild(member.guild.id, 'logs')) return;
@@ -89,13 +89,13 @@ module.exports = class Logs extends Module {
     const embed = new MessageEmbed()
       .setAuthor(username, member.user.displayAvatarURL())
       .setColor(DEFAULT_COLOR)
-      .setTitle(tiele)
+      .setTitle(title)
       .setFooter(`ID: ${member.user.id}`)
       .setTimestamp(Date.now());
     channel.send({ embeds: [ embed ] });
   }
 
-  async onMemberUpdate(oldMember, newMember) {
+  async onGuildMemberUpdate(oldMember, newMember) {
     if (!newMember.guild) return;
     if (newMember.user.bot) return;
     if (await this.database.getGuild(newMember.guild.id, 'logs')) return;
@@ -112,9 +112,9 @@ module.exports = class Logs extends Module {
     this.database = database;
     eventHandler.on('messageDelete', this.onMessageDelete.bind(this));
     eventHandler.on('messageUpdate', this.onMessageEdit.bind(this));
-    eventHandler.on('guildMemberAdd', this.onJoin.bind(this));
-    eventHandler.on('guildMemberRemove', this.onLeave.bind(this));
-    eventHandler.on('guidMemberUpdate', this.onMemberUpdate.bind(this));
+    eventHandler.on('guildMemberAdd', this.onGuildMemberAdd.bind(this));
+    eventHandler.on('guildMemberRemove', this.onGuildMemberRemove.bind(this));
+    eventHandler.on('guidMemberUpdate', this.onGuildMemberUpdate.bind(this));
     //commandHandler.on('commandRun', this.onCommand.bind(this));
     //slashHandler.on('commandRun', this.onSlashCommand.bind(this));
   }
