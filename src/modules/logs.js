@@ -54,7 +54,6 @@ module.exports = class Logs extends Module {
   }
 
   async onGuildMemberAdd(member) {
-    console.log('whyyyyyyyy')
     if (!member.guild) return;
     if (member.user.bot) return;
     if (await this.database.getGuild(member.guild.id, 'logs')) return;
@@ -76,7 +75,6 @@ module.exports = class Logs extends Module {
   }
 
   async onGuildMemberRemove(member) {
-    console.log('smh')
     if (!member.guild) return;
     if (member.user.bot) return;
     if (await this.database.getGuild(member.guild.id, 'logs')) return;
