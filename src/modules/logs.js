@@ -10,7 +10,7 @@ const Module = require('../structs/module.js');
 module.exports = class Logs extends Module {
   async onMessageDelete(message) {
     if (!message.guild) return;
-    if (newMessage.author.bot) return;
+    if (message.author.bot) return;
     if (await this.database.getGuild(message.guild.id, 'logs')) return;
     const logMessages = await this.database.getGuild(message.guild.id, 'logDelete');
     if (!logMessages) return;
