@@ -24,14 +24,14 @@ module.exports = class Guilds extends Module {
   async goodbyeMember(member) {
     // TODO: There's too much duplicate code in
     // goodbyeMember & greetMember. Is there a better way?
-    const enabled = await this.database.getGuild(member.guild.id, 'goodbye'); console.log('1')
+    const enabled = await this.database.getGuild(member.guild.id, 'goodbye');
     if (!enabled) return;
 
-    const channelId = await this.database.getGuild(member.guild.id, 'goodbyeChannel'); console.log('2')
+    const channelId = await this.database.getGuild(member.guild.id, 'goodbyeChannel');
     const channel = member.guild.channels.cache.get(channelId);
     if (!channel) return;
 
-    const message = await this.database.getGuild(member.guild.id, 'goodbyeMessage'); console.log('3')
+    const message = await this.database.getGuild(member.guild.id, 'goodbyeMessage');
     if (!message) return;
 
     const formatted = message.replace('{user}', `${member.user.username}#${member.user.dicriminator}`)
@@ -61,11 +61,9 @@ module.exports = class Guilds extends Module {
   }
 
   load({ eventHandler, database }) {
-    console.log('bruh')
     this.database = database;
     eventHandler.on('guildMemberAdd', this.onMemberAdd.bind(this));
     eventHandler.on('guildMemberRemove', this.onMemberRemove.bind(this));
-    console.log('mk')
   }
 
   constructor(client) {
