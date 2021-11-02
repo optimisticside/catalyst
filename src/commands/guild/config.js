@@ -69,6 +69,8 @@ module.exports = class ConfigCommand extends Command {
         desc = `${desc}\nIt is currently ${current ? 'on' : 'off'}`;
       }
 
+      // TODO: If it is already enabled, we should instead
+      // ask the user if they want to disable it.
       const answer = await this.promptBool(given, reply, name, desc, 'Would you like to enable it?');
       if (answer === null) return;
 
