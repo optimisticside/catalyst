@@ -11,7 +11,7 @@ module.exports = class Logs extends Module {
   async onMessageDelete(message) {
     if (!message.guild) return;
     if (message.author.bot) return;
-    if (await this.database.getGuild(message.guild.id, 'logs')) return;
+    if (await this.database.getGuild(message.guild.id, 'logsEnabled')) return;
     const enabled = await this.database.getGuild(message.guild.id, 'logDelete');
     if (!enabled) return;
     const logChannelId = await this.database.getGuild(message.guild.id, 'logChannel');
@@ -32,7 +32,7 @@ module.exports = class Logs extends Module {
   async onMessageEdit(oldMessage, newMessage) {
     if (!newMessage.guild) return;
     if (newMessage.author.bot) return;
-    if (await this.database.getGuild(newMessage.guild.id, 'logs')) return;
+    if (await this.database.getGuild(newMessage.guild.id, 'logsEnabled')) return;
     const enabled = await this.database.getGuild(newMessage.guild.id, 'logEdit');
     if (!enabled) return;
     const logChannelId = await this.database.getGuild(newMessage.guild.id, 'logChannel');
@@ -56,7 +56,7 @@ module.exports = class Logs extends Module {
   async onGuildMemberAdd(member) {
     if (!member.guild) return;
     if (member.user.bot) return;
-    if (await this.database.getGuild(member.guild.id, 'logs')) return;
+    if (await this.database.getGuild(member.guild.id, 'logsEnabled')) return;
     const enabled = await this.database.getGuild(member.guild.id, 'logJoin');
     if (!enabled) return;
     const logChannelId = await this.database.getGuild(member.guild.id, 'logChannel');
@@ -77,7 +77,7 @@ module.exports = class Logs extends Module {
   async onGuildMemberRemove(member) {
     if (!member.guild) return;
     if (member.user.bot) return;
-    if (await this.database.getGuild(member.guild.id, 'logs')) return;
+    if (await this.database.getGuild(member.guild.id, 'logsEnabled')) return;
     const enabled = await this.database.getGuild(member.guild.id, 'logLeave');
     if (!enabled) return;
     const logChannelId = await this.database.getGuild(member.guild.id, 'logChannel');
@@ -98,7 +98,7 @@ module.exports = class Logs extends Module {
   async onGuildMemberUpdate(oldMember, newMember) {
     if (!newMember.guild) return;
     if (newMember.user.bot) return;
-    if (await this.database.getGuild(newMember.guild.id, 'logs')) return;
+    if (await this.database.getGuild(newMember.guild.id, 'logsEnabled')) return;
     const enabled = await this.database.getGuild(newMember.guild.id, 'logUpdate');
     if (!enabled) return;
     const logChannelId = await this.database.getGuild(member.guild.id, 'logMemberUpdate');

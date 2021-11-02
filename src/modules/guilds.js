@@ -6,7 +6,7 @@ const Module = require('../structs/module.js');
 
 module.exports = class Guilds extends Module {
   async greetMember(member) {
-    const enabled = await this.database.getGuild(member.guild.id, 'greeting');
+    const enabled = await this.database.getGuild(member.guild.id, 'greetingEnabled');
     if (!enabled) return;
 
     const channelId = await this.database.getGuild(member.guild.id, 'greetingChannel');
@@ -16,15 +16,16 @@ module.exports = class Guilds extends Module {
     const message = await this.database.getGuild(member.guild.id, 'greetingMessage');
     if (!message) return;
 
-    const formatted = message.replace('{user}', `${member.user.username}#${member.user.dicriminator}`)
-      .replace('{guild}', member.guild.name);
+    const formatted = message.replace('{user}', `<@${member.user.id}>`) 
+      .replace('{guild}', member.guild.name)
+      .replace('{count}', member.guild.fetch().approximateMemberCount);
     channel.send(formatted);
   }
 
   async goodbyeMember(member) {
     // TODO: There's too much duplicate code in
     // goodbyeMember & greetMember. Is there a better way?
-    const enabled = await this.database.getGuild(member.guild.id, 'goodbye');
+    const enabled = await this.database.getGuild(member.guild.id, 'goodbyeEnabled');
     if (!enabled) return;
 
     const channelId = await this.database.getGuild(member.guild.id, 'goodbyeChannel');
@@ -34,8 +35,9 @@ module.exports = class Guilds extends Module {
     const message = await this.database.getGuild(member.guild.id, 'goodbyeMessage');
     if (!message) return;
 
-    const formatted = message.replace('{user}', `${member.user.username}#${member.user.dicriminator}`)
+    const formatted = message.replace('{user}', member.user.username)
       .replace('{guild}', member.guild.name); console.log('4')
+      .replace('{count}', member.guild.fetch().approximateMemberCount);
     channel.send(formatted); console.log('5')
   }
 
@@ -51,7 +53,6 @@ module.exports = class Guilds extends Module {
   }
 
   async onMemberAdd(member) {
-    console.log('BRUH')
     await this.greetMember(member);
     await this.autoRole(member);
   }

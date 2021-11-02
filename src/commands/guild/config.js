@@ -319,14 +319,14 @@ module.exports = class ConfigCommand extends Command {
             name: 'Toggle',
             desc: 'Whether goodbyes will be enabled.',
             emoji: '🔧',
-            handler: this.boolSetting('Goodbye', 'Goodbye will say goodbye to users that leave the server.', 'goodbye')
+            handler: this.boolSetting('Goodbye', 'Goodbye will say goodbye to users that leave the server.', 'goodbyeEnabled')
           },
           {
             name: 'Message',
             desc: 'The message that users will be said goodbye with.',
             emoji: '✉️',
             handler: async (client, given, reply) => {
-              const answer = await this.stringPrompt(given, reply, 'goodbye message',
+              const answer = await this.promptString(given, reply, 'goodbye message',
                 'How would you like to say goodbye to people? You can access the user\'s name through `{user}` and guild name through `{guild}`', null);
               if (!answer) return;
 
@@ -355,7 +355,7 @@ module.exports = class ConfigCommand extends Command {
             name: 'Toggle',
             desc: 'Whether logging will be enabled.',
             emoji: '🔧',
-            handler: this.boolSetting('Logs', 'Logs will keep track of user activity.', 'logs')
+            handler: this.boolSetting('Logs', 'Logs will keep track of user activity.', 'logsEnabled')
           },
           {
             name: 'Channel',
@@ -406,7 +406,7 @@ module.exports = class ConfigCommand extends Command {
             name: 'Toggle',
             desc: 'Enable or disable Auto Role.',
             emoji: '🔧',
-            handler: this.boolSetting('Auto Role', 'Auto Role will automate role assignment.', 'autoRole')
+            handler: this.boolSetting('Auto Role', 'Auto Role will automate role assignment.', 'autoRoleEnabled')
           },
           {
             name: 'Role',
