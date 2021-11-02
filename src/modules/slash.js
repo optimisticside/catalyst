@@ -112,8 +112,7 @@ module.exports = class SlashModule extends Module {
   
     // To avoid risk of duplicate commands (when altering command description),
     // all commands are cleared before new commands are added.
-    // Edit: Upon further though, I've come to realize how dumb this is.
-    // await rest.put(commandRoute, { body: [] });
+    await rest.put(commandRoute, { body: [] });
     const result = await rest.put(commandRoute, { body: commands });
 
     /*
