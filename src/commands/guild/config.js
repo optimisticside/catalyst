@@ -38,7 +38,7 @@ module.exports = class ConfigCommand extends Command {
       if (reaction.emoji.name === '❌') return false;
   }
 
-  async promptString(given, reply, name, promptMessage, formatter) {
+  async promptString(given, reply, name, promptMessage, encoder) {
     reply.reactions.removeAll();
     reply.edit(prompt(promptMessage ?? `What would you like to set the ${name.toLowerCase()} to`, 'embed'));
 
@@ -50,7 +50,7 @@ module.exports = class ConfigCommand extends Command {
 
     if (!message) return;
     let failed = false;
-    const result = !formatter ? message.content : await formatter(message.content).catch(err => {
+    const result = !encoder ? message.content : await encoder(message.content).catch(err => {
       failed = true;
     });
     if (failed) {
@@ -64,6 +64,11 @@ module.exports = class ConfigCommand extends Command {
 
   boolSetting(name, desc, ...key) {
     return async (client, given, reply) => {
+      const current = await client.database.getGuild(given.guild.id, ...key);
+      if (current !== null) {
+        desc = `${desc}\nIt is currently ${current ? 'on' : 'off'}`;
+      }
+
       const answer = await this.promptBool(given, reply, name, desc, 'Would you like to enable it?');
       if (answer === null) return;
 
@@ -87,10 +92,11 @@ module.exports = class ConfigCommand extends Command {
     }
   }
 
-  stringSetting(name, desc, formatter, promptMessage, ...key) {
+  stringSetting(name, desc, encoder, decoder, promptMessage, ...key) {
     return async (client, given, reply) => {
-      const current = await client.database.getGuild(given.guild.id, ...key);
-      const shouldContinue = await this.promptBool(given, reply, name, `${desc}\nThe current ${name.toLowerCase()} is \`${current}\``,
+      let current = await client.database.getGuild(given.guild.id, ...key);
+      if (current && decoder) current = await decoder(current);
+      const shouldContinue = await this.promptBool(given, reply, name, `${desc}\nThe current ${name.toLowerCase()} is ${current}`,
         'Would you like to change it?');
       if (shouldContinue === null) return;
 
@@ -98,7 +104,7 @@ module.exports = class ConfigCommand extends Command {
         reply.reactions.removeAll();
         reply.edit(neutral(`The ${name.toLowerCase()} has not been changed`, 'embed'));
       } else {
-        const answer = await this.promptString(given, reply, name, promptMessage, formatter);
+        const answer = await this.promptString(given, reply, name, promptMessage, encoder);
         if (!answer) return;
 
         await client.database.setGuild(given.guild.id, ...key, answer)
@@ -297,15 +303,15 @@ module.exports = class ConfigCommand extends Command {
             name: 'Message',
             desc: 'The message that users will be greeted with.',
             emoji: '✉️',
-            handler: this.stringSetting('Greeting Message', 'The greeting channel is the message users will be greeted with.',
-              null, 'How would you like to greet messages. You can access the user\'s name through `{user}` and guild name through `{guild}`', 'greetingMessage')
+            handler: this.stringSetting('Greeting Message', 'The greeting channel is the message users will be greeted with.', null, null,
+              'How would you like to greet messages. You can access the user\'s name through `{user}` and guild name through `{guild}`', 'greetingMessage')
           },
           {
             name: 'Channel',
             desc: 'The channel that new users will be greeted on.',
             emoji: '#️⃣',
             handler: this.stringSetting('Greeting Channel', 'The greeting channel is the channel users will be greeted on.',
-              (async channel => channel.match(/^<#(\d+)>$/)[1]), null, 'greetingChannel')
+              (async channel => channel.match(/^<#(\d+)>$/)[1]), (async channelId => `<#${channelId}>`), null, 'greetingChannel')
           }
         ]
       },
@@ -341,7 +347,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The channel that new users will be said goodbye on.',
             emoji: '#️⃣',
             handler: this.stringSetting('Greeting Channel', 'The greeting channel is the channel users will be greeted on.',
-              (async channel => channel.match(/^<#(\d+)>$/)[1]), null, 'greetingChannel')
+              (async channel => channel.match(/^<#(\d+)>$/)[1]), (async channelId => `<#${channelId}>`), null, 'greetingChannel')
           }
         ]
       },
@@ -362,7 +368,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The channel in which logs will be posted.',
             emoji: '#️⃣',
             handler: this.stringSetting('Log Channel', 'The log channel is the channel where logs will be posted.',
-              (async channel => channel.match(/^<#(\d+)>$/)[1]), null, 'logsChannel')
+              (async channel => channel.match(/^<#(\d+)>$/)[1]), (async channelId => `<#${channelId}>`), null, 'logsChannel')
           },
           {
             name: 'Message Delete',
@@ -394,7 +400,7 @@ module.exports = class ConfigCommand extends Command {
         name: 'Prefix',
         desc: 'Set a custom prefix.',
         emoji: '✨',
-        handler: this.stringSetting('Prefix', 'You can set a custom prefix for this guild', null, null, 'prefix')
+        handler: this.stringSetting('Prefix', 'You can set a custom prefix for this guild', null, null, null, 'prefix')
       },
       {
         name: 'Auto Role',
@@ -413,7 +419,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The role that Auto Role will assign.',
             emoji: '✏️',
             handler: this.stringSetting('Role', 'Auto Role will assign a role to users that join the server.',
-              (async role => role.match(/^<@!?(\d+)>$/)[1]), null, 'autoRoleRole')
+              (async role => role.match(/^<@!?(\d+)>$/)[1]), (async roleId => `<@${roleId}>`), null, 'autoRoleRole')
           }
         ]
       }
