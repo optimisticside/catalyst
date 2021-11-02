@@ -99,13 +99,70 @@ module.exports = class Logs extends Module {
     if (!newMember.guild) return;
     if (newMember.user.bot) return;
     if (await this.database.getGuild(newMember.guild.id, 'logsEnabled')) return;
-    const enabled = await this.database.getGuild(newMember.guild.id, 'logUpdate');
+    const enabled = await this.database.getGuild(newMember.guild.id, 'logMemberUpdate');
     if (!enabled) return;
-    const logChannelId = await this.database.getGuild(member.guild.id, 'logMemberUpdate');
+    const logChannelId = await this.database.getGuild(member.guild.id, 'logChannel');
     const channel = member.guild.channels.cache.get(logChannelId);
     if (!channel) return;
 
     // TODO: Do this later...
+  }
+
+  async onCommandRun(message, command, args) {
+    if (command.passive) return;
+    if (command.tags?.find(t => t === 'fun')) return;
+    if (!newMember.guild) return;
+    if (newMember.user.bot) return;
+
+    if (await this.database.getGuild(newMember.guild.id, 'logsEnabled')) return;
+    const enabled = await this.database.getGuild(newMember.guild.id, 'logUpdate');
+    if (!enabled) return;
+    const logChannelId = await this.database.getGuild(member.guild.id, 'logCommands');
+    const channel = member.guild.channels.cache.get(logChannelId);
+    if (!channel) return;
+
+    const username = `${member.user.username}#${member.user.discriminator}`;
+    const embed = new MessageEmbed()
+      .setAuthor(username, message.author.displayAvatarURL())
+      .setColor(DEFAULT_COLOR)
+      .setDescription(`Used ${command.name} command in <#${message.channel.id}>\n${message.content}`)
+      .setTimestamp(Date.now());
+    channel.send(embed);
+  }
+
+  async onSlashCommandRun(interaction, command) {
+    if (command.passive) return;
+    if (command.tags.find(t => t === 'fun')) return;
+    if (!interaction.inGuild()) return;
+    if (inteaction.user.bot) return;
+
+    if (await this.database.getGuild(newMember.guild.id, 'logsEnabled')) return;
+    const enabled = await this.database.getGuild(newMember.guild.id, 'logUpdate');
+    if (!enabled) return;
+    const logChannelId = await this.database.getGuild(member.guild.id, 'logCommands');
+    const channel = member.guild.channels.cache.get(logChannelId);
+    if (!channel) return;
+
+    let message = interaction.commandName;
+    /*
+    const subName = interaction.options.getSubcommand(false);;
+    const subGroupName = interaction.options.getSubcommandGroup(false);
+    if (subGroupName) message = `${message} ${subGroupName}`;
+    if (subName) message = `${message} ${subName}`;
+    command.options.map(option => {
+      const given = interaction.options.get(option.name);
+      if (!given) return;
+      message = `${message} ${option.name} ${}`
+    });
+    */
+
+    const username = `${member.user.username}#${member.user.discriminator}`;
+    const embed = new MessageEmbed()
+      .setAuthor(username, message.author.displayAvatarURL())
+      .setColor(DEFAULT_COLOR)
+      .setDescription(`Used ${command.name} slash command in <#${interaction.channel.id}>\n${message.content}`)
+      .setTimestamp(Date.now());
+    channel.send(embed);
   }
 
   load({ commandHandler, eventHandler, slashHandler, database }) {
@@ -115,8 +172,8 @@ module.exports = class Logs extends Module {
     eventHandler.on('guildMemberAdd', this.onGuildMemberAdd.bind(this));
     eventHandler.on('guildMemberRemove', this.onGuildMemberRemove.bind(this));
     eventHandler.on('guidMemberUpdate', this.onGuildMemberUpdate.bind(this));
-    //commandHandler.on('commandRun', this.onCommand.bind(this));
-    //slashHandler.on('commandRun', this.onSlashCommand.bind(this));
+    commandHandler.on('commandRun', this.onCommandRun.bind(this));
+    slashHandler.on('commandRun', this.onSlashCommandRun.bind(this));
   }
 
   constructor(client) {
