@@ -18,24 +18,24 @@ module.exports = class ConfigCommand extends Command {
 
   async promptBool(given, reply, title, desc, footer) {
     const embed = new MessageEmbed()
-        .setTitle(title)
-        .setColor(DEFAULT_COLOR)
-        .setDescription(desc)
-        .setFooter(footer);
-      reply.reactions.removeAll();
-      reply.edit({ embeds: [ embed ] });
+      .setTitle(title)
+      .setColor(DEFAULT_COLOR)
+      .setDescription(desc)
+      .setFooter(footer);
+    reply.reactions.removeAll();
+    reply.edit({ embeds: [ embed ] });
 
-      await reply.react('✅');
-      await reply.react('❌');
-      const filter = r => r.users.cache.find(u => u === given.author);
-      const collector = reply.createReactionCollector({ filter, time: 30000,  })
-      const reaction = await this.awaitCollection(collector).catch(() => {
-        reply.reply(warning('Timed out.'));
-      });
+    await reply.react('✅');
+    await reply.react('❌');
+    const filter = r => r.users.cache.find(u => u === given.author);
+    const collector = reply.createReactionCollector({ filter, time: 30000,  })
+    const reaction = await this.awaitCollection(collector).catch(() => {
+      reply.reply(warning('Timed out.'));
+    });
 
-      if (!reaction) return;
-      if (reaction.emoji.name === '✅') return true;
-      if (reaction.emoji.name === '❌') return false;
+    if (!reaction) return;
+    if (reaction.emoji.name === '✅') return true;
+    if (reaction.emoji.name === '❌') return false;
   }
 
   async promptString(given, reply, name, promptMessage, encoder) {
