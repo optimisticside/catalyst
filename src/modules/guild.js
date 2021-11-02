@@ -70,7 +70,7 @@ module.exports = class Guild extends Module {
 
   constructor(client) {
     super({
-      name: 'logHandler',
+      name: 'guildHandler',
       client: client
     });
   }
