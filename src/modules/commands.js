@@ -184,6 +184,8 @@ module.exports = class Commands extends Module {
       this.executeCommand(command, this.client, message, finalArgs).catch(err => {
         console.error(`Unable to run ${command.name} command: ${err}`);
         message.channel.send(warning('An error occured during command execution.'));
+      }).then(() => {
+        this.emit('commandRun', message, command, finalArgs);
       });
     }).catch(err => {
       // TODO: Fix this bad error handling.

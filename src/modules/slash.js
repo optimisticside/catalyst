@@ -205,6 +205,8 @@ module.exports = class SlashModule extends Module {
     this.executeCommand(command, this.client, interaction).catch(err => {
       console.error(`Unable to run ${command.name} command: ${err}`);
       interaction.reply(warning('An error occured during command execution.'));
+    }).then(() => {
+      this.emit('commandRun', interaction, command);
     });
   }
 
