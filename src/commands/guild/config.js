@@ -49,8 +49,8 @@ module.exports = class ConfigCommand extends Command {
     });
 
     if (!message) return;
-    const failed = false;
-    const result = formatter && await formatter(message.content).catch(err => {
+    let failed = false;
+    const result = !formatter ? message.content : await formatter(message.content).catch(err => {
       failed = true;
     });
     if (failed) {
