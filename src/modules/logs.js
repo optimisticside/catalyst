@@ -134,7 +134,7 @@ module.exports = class Logs extends Module {
     if (command.passive) return;
     if (command.tags?.find(t => t === 'fun')) return;
     if (!interaction.inGuild()) return;
-    if (inteaction.user.bot) return;
+    if (interaction.user.bot) return;
 
     if (await this.database.getGuild(newMember.guild.id, 'logsEnabled')) return;
     const enabled = await this.database.getGuild(newMember.guild.id, 'logUpdate');
