@@ -373,28 +373,56 @@ module.exports = class ConfigCommand extends Command {
               (async channel => channel.match(/^<#(\d+)>$/)[1]), (async channelId => `<#${channelId}>`), null, 'logsChannel')
           },
           {
-            name: 'Message Delete',
-            desc: 'Keeping track of when messages are deleted.',
-            emoji: '🗑️',
-            handler: this.boolSetting('Message Delete', 'Message deletes are whenever someone deletes a message.', 'logDelete')
+            name: 'Message Logs',
+            menuDesc: 'React with the corresponding emoji to configure message logs.',
+            desc: 'Keeping track of messages.',
+            emoji: '📬',
+            menu: [
+              {
+                name: 'Message Delete',
+                desc: 'Keeping track of when messages are deleted.',
+                emoji: '🗑️',
+                handler: this.boolSetting('Message Delete', 'Message deletes are whenever someone deletes a message.', 'logDelete')
+              },
+              {
+                name: 'Message Edit',
+                desc: 'Keeping track of when messages are edited.',
+                emoji: '✏️',
+                handler: this.boolSetting('Message Edit', 'Message edits are whenever someone edits a message.', 'logEdit')
+              }
+            ]
           },
           {
-            name: 'Message Edit',
-            desc: 'Keeping track of when messages are edited.',
-            emoji: '✏️',
-            handler: this.boolSetting('Message Edit', 'Message edits are whenever someone edits a message.', 'logEdit')
+            name: 'Command Run',
+            desc: 'Keeping track of when commands are run.',
+            emoji: '💡',
+            handler: this.boolSetting('Command Run', 'Command runs are whenever someone runs a command.', 'logRun')
           },
           {
-            name: 'User Join',
-            desc: 'Keeping track of when users join the server.',
-            emoji: '📥',
-            handler: this.boolSetting('User Join', 'User Joins are whenever someone joins the server.', 'logJoin')
-          },
-          {
-            name: 'User Leave',
-            desc: 'Keeping track of when users leave the server.',
-            emoji: '📤',
-            handler: this.boolSetting('User Leave', 'Message edits are whenever someone leaves the server.', 'logLeave')
+            name: 'User Logs',
+            menuDesc: 'React with the corresponding emoji to configure user logs.',
+            desc: 'Keeping track of users.',
+            emoji: '🧑',
+            menu: [
+              {
+                name: 'User Join',
+                desc: 'Keeping track of when users join the server.',
+                emoji: '📥',
+                handler: this.boolSetting('User Join', 'User Joins are whenever someone joins the server.', 'logJoin')
+              },
+              {
+                name: 'User Leave',
+                desc: 'Keeping track of when users leave the server.',
+                emoji: '📤',
+                handler: this.boolSetting('User Leave', 'Message edits are whenever someone leaves the server.', 'logLeave')
+              },
+              {
+                name: 'User Update',
+                desc: 'Keeping track of when a user is updated.',
+                emoji: '📝',
+                handler: this.boolSetting('User Update', 'User updates are whenever a user is updated.', 'logMemberUpdate')
+              }
+            ]
           }
         ]
       },
