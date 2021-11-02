@@ -111,8 +111,8 @@ module.exports = class Logs extends Module {
   async onCommandRun(message, command, args) {
     if (command.passive) return;
     if (command.tags?.find(t => t === 'fun')) return;
-    if (!newMember.guild) return;
-    if (newMember.user.bot) return;
+    if (!message.guild) return;
+    if (messsage.user.bot) return;
 
     if (await this.database.getGuild(newMember.guild.id, 'logsEnabled')) return;
     const enabled = await this.database.getGuild(newMember.guild.id, 'logUpdate');
@@ -132,7 +132,7 @@ module.exports = class Logs extends Module {
 
   async onSlashCommandRun(interaction, command) {
     if (command.passive) return;
-    if (command.tags.find(t => t === 'fun')) return;
+    if (command.tags?.find(t => t === 'fun')) return;
     if (!interaction.inGuild()) return;
     if (inteaction.user.bot) return;
 
