@@ -112,10 +112,10 @@ module.exports = class Logs extends Module {
     if (command.passive) return;
     if (command.tags?.find(t => t === 'fun')) return;
     if (!message.guild) return;
-    if (messsage.user.bot) return;
+    if (message.author.bot) return;
 
-    if (await this.database.getGuild(newMember.guild.id, 'logsEnabled')) return;
-    const enabled = await this.database.getGuild(newMember.guild.id, 'logUpdate');
+    if (await this.database.getGuild(message.guild.id, 'logsEnabled')) return;
+    const enabled = await this.database.getGuild(message.guild.id, 'logUpdate');
     if (!enabled) return;
     const logChannelId = await this.database.getGuild(member.guild.id, 'logCommands');
     const channel = member.guild.channels.cache.get(logChannelId);
@@ -136,11 +136,11 @@ module.exports = class Logs extends Module {
     if (!interaction.inGuild()) return;
     if (interaction.user.bot) return;
 
-    if (await this.database.getGuild(newMember.guild.id, 'logsEnabled')) return;
-    const enabled = await this.database.getGuild(newMember.guild.id, 'logUpdate');
+    if (await this.database.getGuild(interaction.guild.id, 'logsEnabled')) return;
+    const enabled = await this.database.getGuild(interaction.guild.id, 'logUpdate');
     if (!enabled) return;
-    const logChannelId = await this.database.getGuild(member.guild.id, 'logCommands');
-    const channel = member.guild.channels.cache.get(logChannelId);
+    const logChannelId = await this.database.getGuild(interaction.guild.id, 'logCommands');
+    const channel = interaction.guild.channels.cache.get(logChannelId);
     if (!channel) return;
 
     let message = interaction.commandName;
@@ -156,9 +156,9 @@ module.exports = class Logs extends Module {
     });
     */
 
-    const username = `${member.user.username}#${member.user.discriminator}`;
+    const username = `${interaction.user.username}#${interaction.user.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor(username, message.author.displayAvatarURL())
+      .setAuthor(username, interaction.user.displayAvatarURL())
       .setColor(DEFAULT_COLOR)
       .setDescription(`Used ${command.name} slash command in <#${interaction.channel.id}>\n${message.content}`)
       .setTimestamp(Date.now());

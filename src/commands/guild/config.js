@@ -7,6 +7,8 @@ const { alert, success, warning, prompt, neutral } = require('../../util/formatt
 const { NAME, DEFAULT_COLOR } = require('../../config.json');
 const Command = require('../../structs/command.js');
 const OptionParser = require('../../util/optionParser.js');
+const Serializer = require('../../util/serializer.js');
+const promisify = (fn) => async (...given) => fn(...given);
 
 module.exports = class ConfigCommand extends Command {
   awaitCollection(collector) {
@@ -306,14 +308,14 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The message that users will be greeted with.',
             emoji: '✉️',
             handler: this.stringSetting('Greeting Message', 'The greeting channel is the message users will be greeted with.', null, null,
-              'How would you like to greet messages. You can access the user\'s name through `{user}` and guild name through `{guild}`', 'greetingMessage')
+              'How would you like to greet messages. You can access the user\'s name through `{user}`, the server name through `{guild}`, and the member count through `{count}`', 'greetingMessage')
           },
           {
             name: 'Channel',
             desc: 'The channel that new users will be greeted on.',
             emoji: '#️⃣',
             handler: this.stringSetting('Greeting Channel', 'The greeting channel is the channel users will be greeted on.',
-              (async channel => channel.match(/^<#(\d+)>$/)[1]), (async channelId => `<#${channelId}>`), null, 'greetingChannel')
+              promisify(Serializer.deserializeChannel), promisify(Serializer.serializeChannel), null, 'greetingChannel')
           }
         ]
       },
@@ -335,7 +337,7 @@ module.exports = class ConfigCommand extends Command {
             emoji: '✉️',
             handler: async (client, given, reply) => {
               const answer = await this.promptString(given, reply, 'goodbye message',
-                'How would you like to say goodbye to people? You can access the user\'s name through `{user}` and guild name through `{guild}`', null);
+                'How would you like to say goodbye to people? You can access the user\'s name through `{user}`, the server name through `{guild}`, and the member count through `{count}`', null);
               if (!answer) return;
 
               await client.database.setGuild(given.guild.id, 'goodbyeMessage', answer)
@@ -349,7 +351,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The channel that new users will be said goodbye on.',
             emoji: '#️⃣',
             handler: this.stringSetting('Greeting Channel', 'The greeting channel is the channel users will be greeted on.',
-              (async channel => channel.match(/^<#(\d+)>$/)[1]), (async channelId => `<#${channelId}>`), null, 'greetingChannel')
+              promisify(Serializer.deserializeChannel), promisify(Serializer.serializeChannel), null, 'greetingChannel')
           }
         ]
       },
@@ -370,7 +372,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The channel in which logs will be posted.',
             emoji: '#️⃣',
             handler: this.stringSetting('Log Channel', 'The log channel is the channel where logs will be posted.',
-              (async channel => channel.match(/^<#(\d+)>$/)[1]), (async channelId => `<#${channelId}>`), null, 'logsChannel')
+              promisify(Serializer.deserializeChannel), promisify(Serializer.serializeChannel), null, 'logsChannel')
           },
           {
             name: 'Message Logs',
@@ -449,7 +451,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The role that Auto Role will assign.',
             emoji: '✏️',
             handler: this.stringSetting('Role', 'Auto Role will assign a role to users that join the server.',
-              (async role => role.match(/^<@!?(\d+)>$/)[1]), (async roleId => `<@${roleId}>`), null, 'autoRoleRole')
+              promisify(Serializer.deserializeRole), promisify(Serializer.serializeRole), null, 'autoRoleRole')
           }
         ]
       }
