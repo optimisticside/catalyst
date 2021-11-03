@@ -166,6 +166,7 @@ module.exports = class SlashModule extends Module {
   async handleInteraction(interaction) {
     if (!interaction.isCommand()) return;
     const command = await this.findCommand(interaction);
+    const lastRun = await this.commandHandler.getCooldown(interaction.user, command);
 
     // Command execution requirements:
     // Command must support slash commands.
@@ -198,6 +199,13 @@ module.exports = class SlashModule extends Module {
         interaction.channel instanceof GuildChannel && interaction.channel)) {
       return interaction.reply(denial('I do not have the permissions required to run this command.'));
     }
+    if (lastRun) {
+      const deltaTime = Date.now() - lastRun;
+      if (deltaTime <= command.cooldown) {
+        const timeLeft = command.cooldown - deltaTime;
+        return interaction.reply(denial(`You're on cooldown. Please wait ${Math.ceil(timeLeft / 1000)} seconds before trying again.`));
+      }
+    }
     if ((this.validator && !await this.commandHandler.validator(interaction, command))
         || (command.validator && !await command.validator(interaction))) {
        return interaction.reply(denial('Command validation failed.'));
@@ -208,6 +216,7 @@ module.exports = class SlashModule extends Module {
       console.error(`Unable to run ${command.name} command: ${err}`);
       interaction.reply(warning('An error occured during command execution.'));
     }).then(() => {
+      this.commandHandler.saveCooldown(interaction.user, command);
       this.emit('commandRun', interaction, command);
     });
   }
