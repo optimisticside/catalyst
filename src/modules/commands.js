@@ -2,7 +2,7 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const { PREFIX, CREATOR } = require('../config.json');
+const { PREFIX, CREATOR, COOLDOWN_PERSISTANCE_THRESHOLD } = require('../config.json');
 const { warning, denial, log, prompt } = require('../util/formatter.js')('Command Handler');
 const { GuildChannel, Permissions } = require('discord.js');
 const Module = require('../structs/module.js');
@@ -138,11 +138,33 @@ module.exports = class Commands extends Module {
     return result;
   }
 
+  async getCooldown(user, command) {
+    const key = `${user.id}:${command.name}`;
+    const fromMap = this.cooldowns.get(key);
+    if (fromMap) return fromMap;
+    return await this.database.get('cooldown', user.id, command.name); 
+  }
+
+  async saveCooldown(user, command) {
+    if (command.cooldown === null) return;
+    const now = Date.now();
+    
+    // If the cooldown is longer than a certain threshold,
+    // we will store it in Redis in case we have to restart.
+    if (command.cooldown > COOLDOWN_PERSISTANCE_THRESHOLD) {
+      await this.database.set('cooldown', user.id, command.name, now);
+    } else {
+      const key = `${user.id}:${command.name}`;
+      this.cooldowns.set(key, now);
+    }
+  }
+
   async handleStatement(message, statement) {
     let content = statement.trim();
     let args = content.match(/(?:[^\s"]+|"[^"]*")+/g);
     const commandCall = args.shift();
     const command = await this.findCommand(commandCall);
+    const lastRun = await this.getCooldown(message.author, command);
 
     // Command execution requirements:
     // Blacklist/whitelist system must allow user.
@@ -176,6 +198,13 @@ module.exports = class Commands extends Module {
         message.channel instanceof GuildChannel && message.channel)) {
       return message.channel.send(denial('I do not have the permissions required to run this command.'));
     }
+    if (lastRun) {
+      const deltaTime = Date.now() - lastRun;
+      if (deltaTime <= command.cooldown) {
+        const timeLeft = command.cooldown - deltaTime;
+        return message.channel.send(denial(`You're on cooldown. Please wait ${Math.ceil(timeLeft / 1000)} seconds before trying again.`));
+      }
+    }
     if ((this.validator && !await this.validator(message, command))
         || (command.validator && !await command.validator(message))) {
        return message.channel.send(denial('Command validation failed.'));
@@ -186,6 +215,7 @@ module.exports = class Commands extends Module {
         console.error(`Unable to run ${command.name} command: ${err}`);
         message.channel.send(warning('An error occured during command execution.'));
       }).then(() => {
+        this.saveCooldown(message.author, command);
         this.emit('commandRun', message, command, finalArgs);
       });
     }).catch(err => {
@@ -235,6 +265,7 @@ module.exports = class Commands extends Module {
       client: client
     });
 
+    this.cooldowns = new Map();
     this.commands = [];
     this.groups = [];
     this.subGroups = [];
