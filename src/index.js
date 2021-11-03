@@ -15,6 +15,10 @@ const shardingManager = new ShardingManager(path.join(__dirname, 'core/shard.js'
 
 shardingManager.on('shardCreate', async shard => {
   console.log(`Shard ${shard.id} launched`);
+  shard.on('ready', async () => {
+    console.log(`Shard ${shard.id} connected to Discord `);
+    shard.send({ type: 'shardId', data: { shardId: shard.id } });
+  });
 });
 shardingManager.spawn(TOTAL_SHARDS || 'auto', 8000, -1);
 
