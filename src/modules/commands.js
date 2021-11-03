@@ -146,6 +146,7 @@ module.exports = class Commands extends Module {
   }
 
   async saveCooldown(user, command) {
+    if (!command) return;
     if (command.cooldown === null) return;
     const now = Date.now();
     
