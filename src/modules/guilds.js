@@ -36,9 +36,9 @@ module.exports = class Guilds extends Module {
     if (!message) return;
 
     const formatted = message.replace('{user}', member.user.username)
-      .replace('{guild}', member.guild.name); console.log('4')
+      .replace('{guild}', member.guild.name);
       .replace('{count}', member.guild.fetch().approximateMemberCount);
-    channel.send(formatted); console.log('5')
+    channel.send(formatted);
   }
 
   async autoRole(member) {
