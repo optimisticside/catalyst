@@ -8,6 +8,7 @@ const { GuildChannel, Permissions } = require('discord.js');
 const Module = require('../structs/module.js');
 const Command = require('../structs/command.js');
 const { CommandGroup, SubCommandGroup } = require('../structs/group.js');
+const Serializer = require('../util/serializer.js');
 const glob = require('glob');
 const path = require('path');
 
@@ -77,26 +78,26 @@ module.exports = class Commands extends Module {
       case 'boolean':
         return (given === 'yes' || given === 'true' || given === 'on');
       case 'user': {
-        const matches = given.match(/^<@!?(\d+)>$/);
-        return message.guild.users.cache.get(matches[1]);
+        const match = Serializer.deserializeUser(given);
+        return message.guild.users.cache.get(match);
       }
       // The 'member' argument-type is for when
       // the user MUST be in the guild
       case 'member': {
-        const matches = given.match(/^<@!?(\d+)>$/);
-        return message.guild.members.cache.get(matches[1]);
+        const match = Serializer.deserializeUser(given);
+        return message.guild.members.cache.get(match);
       }
       case 'channel': {
-        const matches = given.match(/^<#(\d+)>$/);
-        return message.guild.channels.cache.get(matches[1]);
+        const match = Serializer.deserializeChannel(given);
+        return message.guild.channels.cache.get(match);
       }
       case 'role': {
-        const matches = given.match(/^<@!?(\d+)>$/);
-        return message.guild.roles.cache.get(matches[1]);
+        const match = Serializer.deserializeRole(given);
+        return message.guild.roles.cache.get(match);
       }
       case 'mentionable': {
-        const matches = given.match(/^@?(\s+)$/);
-        return message.guild.roles.cache.get(matches[1]);
+        const match = Serializer.deserializeMentionable(given);
+        return message.guild.roles.cache.get(match);
       }
     }
   }
