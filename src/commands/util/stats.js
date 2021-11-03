@@ -8,14 +8,14 @@ const OptionParser = require('../../util/optionParser.js');
 const { warning } = require('../../util/formatter.js')('Invite Command');
 const { NAME, PREFIX, DEFAULT_COLOR } = require('../../config.json');
 const process = require('process');
-const os = require('os');
 const GIGA_BYTE = Math.pow(1024, 3);
 
 module.exports = class InfoCommand extends Command {
   async run(client, given, args) {
     // TODO: Clean up this code.
-    const usedMem = Math.round(((os.totalmem() - os.freemem()) / GIGA_BYTE) * 1000) / 1000;
-    const totalMem = Math.round((os.totalmem() / GIGA_BYTE) * 1000) / 1000;
+    const memoryUsage = process.memoryUsage();
+    const usedMem = Math.round((memoryUsage.heapUsed / GIGA_BYTE) * 1000) / 1000;
+    const totalMem = Math.round((memoryUsage.heapTotal / GIGA_BYTE) * 1000) / 1000;
     const uptime = new Date(process.uptime() * 1000).toISOString().substr(11, 8);
 
     const embed = new MessageEmbed()
