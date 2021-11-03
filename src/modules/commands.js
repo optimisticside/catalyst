@@ -180,41 +180,41 @@ module.exports = class Commands extends Module {
     if (!command || !command.run) {
       // After close consideration, I've decieded that
       // it's probably better to not warn of invalid commands.
-      return // message.channel.send(warning(`\`${commandCall}\` is not a valid command.`));
+      return // message.reply(warning(`\`${commandCall}\` is not a valid command.`));
     }
     if (command.guildOnly && !message.guild) {
-      return message.channel.send(denial('Guild-only commands cannot be run outside of a guild.'));
+      return message.reply(denial('Guild-only commands cannot be run outside of a guild.'));
     }
     if (command.ownerOnly && (!message.guild || !message.author.id === message.guild.ownerID)) {
-      return message.channel.send(denial('Owner-only commands can only be run by the owner.'));
+      return message.reply(denial('Owner-only commands can only be run by the owner.'));
     }
     if (command.nsfw && (!message.guild || !message.channel.nsfw)) {
-      return message.channel.send(denial('NSFW commands can only be run in NSFW channels.'));
+      return message.reply(denial('NSFW commands can only be run in NSFW channels.'));
     }
     if (!await this.checkPerms(command.userPerms, message.member,
         message.channel instanceof GuildChannel && message.channel)) {
-      return message.channel.send(denial('You do not have the permissions required by this command.'));
+      return message.reply(denial('You do not have the permissions required by this command.'));
     }
     if (!await this.checkPerms(command.botPerms, message.guild.me,
         message.channel instanceof GuildChannel && message.channel)) {
-      return message.channel.send(denial('I do not have the permissions required to run this command.'));
+      return message.reply(denial('I do not have the permissions required to run this command.'));
     }
     if (lastRun) {
       const deltaTime = Date.now() - lastRun;
       if (deltaTime <= command.cooldown) {
         const timeLeft = command.cooldown - deltaTime;
-        return message.channel.send(denial(`You're on cooldown. Please wait ${Math.ceil(timeLeft / 1000)} seconds before trying again.`));
+        return message.reply(denial(`You're on cooldown. Please wait ${Math.ceil(timeLeft / 1000)} seconds before trying again.`));
       }
     }
     if ((this.validator && !await this.validator(message, command))
         || (command.validator && !await command.validator(message))) {
-       return message.channel.send(denial('Command validation failed.'));
+       return message.reply(denial('Command validation failed.'));
     }
 
     await this.handleArgs(message, command, args).then(finalArgs => {
       this.executeCommand(command, this.client, message, finalArgs).catch(err => {
         console.error(`Unable to run ${command.name} command: ${err}`);
-        message.channel.send(warning('An error occured during command execution.'));
+        message.reply(warning('An error occured during command execution.'));
       }).then(() => {
         this.saveCooldown(message.author, command);
         this.emit('commandRun', message, command, finalArgs);
