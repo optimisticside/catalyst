@@ -57,6 +57,11 @@ const initModules = async () => {
 let moduleFiles = glob.sync(path.join(__dirname + '/../modules/*.js'))
   .concat(glob.sync(path.join(__dirname + '../modules/*/init.js')));
 
+process.on('message', async message => {
+  if (message.type !== 'shardId') return;
+  client.shardId = message.data.shardId;
+});
+
 (async () => {
   await Promise.all(moduleFiles.map(loadModule));
   await initModules();
