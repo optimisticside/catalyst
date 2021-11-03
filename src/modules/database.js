@@ -30,6 +30,11 @@ module.exports = class Database extends Module {
     return await this.redis.set(key.join(KEY_DELIM), value);
   }
 
+  async delete(...given) {
+    const key = [ ...given ];
+    return await this.redis.del(key.join(KEY_DELIM));
+  }
+
   async getGuild(...given) {
     return await this.get('guild', ...given);
   }

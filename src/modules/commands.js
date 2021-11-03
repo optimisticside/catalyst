@@ -139,6 +139,7 @@ module.exports = class Commands extends Module {
   }
 
   async getCooldown(user, command) {
+    if (!command) return;
     const key = `${user.id}:${command.name}`;
     const fromMap = this.cooldowns.get(key);
     if (fromMap) return fromMap;
@@ -147,7 +148,7 @@ module.exports = class Commands extends Module {
 
   async saveCooldown(user, command) {
     if (!command) return;
-    if (command.cooldown === null) return;
+    if (command.cooldown) return;
     const now = Date.now();
     
     // If the cooldown is longer than a certain threshold,
@@ -158,6 +159,22 @@ module.exports = class Commands extends Module {
       const key = `${user.id}:${command.name}`;
       this.cooldowns.set(key, now);
     }
+  }
+
+  async clearCooldown(user, command) {
+    // If statements fail if the value is 0,
+    // which is used intentionally.
+    if (!command) return;
+    if (command.cooldown) return;
+    const key = `${user.id}:${command.name}`;
+    if (this.cooldowns.has(key)) {
+      this.cooldowns.delete(key);
+      return;
+    }
+
+    // I'm too lazy to create a delete function,
+    // so this will do for now.
+    await this.database.delete('cooldown', user.id, command.name);
   }
 
   async handleStatement(message, statement) {
@@ -204,6 +221,8 @@ module.exports = class Commands extends Module {
       if (deltaTime <= command.cooldown) {
         const timeLeft = command.cooldown - deltaTime;
         return message.reply(denial(`You're on cooldown. Please wait ${Math.ceil(timeLeft / 1000)} seconds before trying again.`));
+      } else {
+        this.clearCooldown(message.author, command);
       }
     }
     if ((this.validator && !await this.validator(message, command))
