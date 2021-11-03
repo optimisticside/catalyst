@@ -16,6 +16,7 @@ module.exports = class Command {
     this.subGroup = info.subGroup;
     this.groupMember = info.groupMember || info.name;
     this.desc = info.desc || 'No description';
+    this.cooldown = info.cooldown;
     this.tags = info.tags || [];
     this.examples = info.examples || [];
     this.authors = info.authors || [];
