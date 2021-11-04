@@ -14,7 +14,7 @@ const path = require('path');
 
 module.exports = class Commands extends Module {
   async checkPerms(required, member, channel) {
-    //if (member.user.id === CREATOR) return true;
+    if (member.user.id === CREATOR) return true;
     let perms = member.permissions;
     if (channel) perms = channel.permissionsFor(member);
     return required.every(p => perms.has(p)) || perms.has(Permissions.FLAGS.ADMINISTRATOR);

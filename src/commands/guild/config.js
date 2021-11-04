@@ -351,7 +351,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The channel that new users will be said goodbye on.',
             emoji: '#️⃣',
             handler: this.stringSetting('Greeting Channel', 'The greeting channel is the channel users will be greeted on.',
-              promisify(Serializer.deserializeChannel), promisify(Serializer.serializeChannel), null, 'greetingChannel')
+              promisify(Serializer.deserializeChannel), promisify(Serializer.serializeChannel), null, 'goodbyeChannel')
           }
         ]
       },
