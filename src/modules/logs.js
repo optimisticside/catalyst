@@ -76,7 +76,7 @@ module.exports = class Logs extends Module {
   async onGuildMemberRemove(member) {
     if (!member.guild) return;
     if (member.user.bot) return;
-    if (await this.database.getGuild(member.guild.id, 'logsEnabled')) return;
+    if (!await this.database.getGuild(member.guild.id, 'logsEnabled')) return;
     const enabled = await this.database.getGuild(member.guild.id, 'logLeave');
     if (!enabled) return;
     const logChannelId = await this.database.getGuild(member.guild.id, 'logChannel');
@@ -108,7 +108,6 @@ module.exports = class Logs extends Module {
   }
 
   async onCommandRun(message, command, args) {
-    console.log('mhm')
     if (command.passive) return;
     if (command.tags?.find(t => t === 'fun')) return;
     if (!message.guild) return;
@@ -166,18 +165,18 @@ module.exports = class Logs extends Module {
   }
 
   async onGuardianDelete(message, reason) {
-    if (await this.database.getGuild(message.guild.id, 'logsEnabled')) return;
+    if (!await this.database.getGuild(message.guild.id, 'logsEnabled')) return;
     const enabled = await this.database.getGuild(message.guild.id, 'logGuardian');
     if (!enabled) return;
-    const logChannelId = await this.database.getGuild(interaction.guild.id, 'logChannel');
-    const channel = interaction.guild.channels.cache.get(logChannelId);
+    const logChannelId = await this.database.getGuild(message.guild.id, 'logChannel');
+    const channel = message.guild.channels.cache.get(logChannelId);
     if (!channel) return;
 
     const username = `${message.author.username}#${message.author.discriminator}`;
     const embed = new MessageEmbed()
       .setAuthor(username, message.author.displayAvatarURL())
       .setColor(DEFAULT_COLOR)
-      .setDescription(`Message sent by <@${message.author.id}> deleted in <#${message.channel.id}>`)
+      .setDescription(`Guardian deleted a message sent by <@${message.author.id}> in <#${message.channel.id}>`)
       .addField('Reason', reason)
       .setTimestamp(Date.now());
     channel.send({ embeds: [ embed ] });

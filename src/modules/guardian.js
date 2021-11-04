@@ -9,24 +9,13 @@ const Module = require('../structs/module.js');
 
 module.exports = class Guardian extends Module {
   async notify(message, reason) {
-    const messages = {
-      duplicate: 'Your message had too many duplicate phrases.',
-      zalgo: 'Zalgo is not allowed.',
-      invite: 'Invites are not allowed.',
-      link: 'Links are not allowed.',
-      image: 'Your message had too many images.',
-      blacklist: 'Your message had a blacklisted word.',
-      ip: 'Your message contained an IP address.',
-      spam: 'You are sending messages too quickly.'
-    }
-
-    await message.reply(warning(messages[reason] ?? 'Your message(s) were blocked.'));
+    await message.reply(warning(this.messages[reason] ?? 'Your message(s) were blocked.'));
   }
 
   async delete(message, reason) {
     await this.notify(message, reason);
-    await message.delete();
-    await this.logHandler.onGuardianDelete(message, reason);
+    await this.logHandler.onGuardianDelete(message, this.reasons[reason] ?? reason);
+    message.delete();
   }
 
   async handleMessage(message) {
@@ -92,5 +81,27 @@ module.exports = class Guardian extends Module {
       name: 'guardian',
       client: client
     });
+
+    this.messages = {
+      duplicate: 'Message had too many duplicate phrases.',
+      zalgo: 'Zalgo is not allowed.',
+      invite: 'Invites are not allowed.',
+      link: 'Links are not allowed.',
+      image: 'Your message had too many images.',
+      blacklist: 'Your message had a blacklisted word.',
+      ip: 'Your message contained an IP address.',
+      spam: 'You are sending messages too quickly.'
+    };
+
+    this.reasons = {
+      duplicate: 'Message contained duplicate phrases.',
+      zalgo: 'Message contained zalgo.',
+      invite: 'Message included Discord invite.',
+      link: 'Message included link.',
+      image: 'Message included too many images.',
+      blacklist: 'Message contained blacklisted word.',
+      ip: 'Message contained IP address.',
+      spam: 'Messages sent to quickly.'
+    }
   }
 };
