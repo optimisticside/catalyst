@@ -19,7 +19,7 @@ module.exports = class Guilds extends Module {
 
     const formatted = message.replace('{user}', `<@${member.user.id}>`) 
       .replace('{guild}', member.guild.name)
-      .replace('{count}', member.guild.fetch().approximateMemberCount);
+      .replace('{count}', member.guild.memberCount);
     channel.send(formatted);
   }
 
@@ -38,7 +38,7 @@ module.exports = class Guilds extends Module {
 
     const formatted = message.replace('{user}', user.username)
       .replace('{guild}', guild.name)
-      .replace('{count}', guild.approximateMemberCount);
+      .replace('{count}', guild.memberCount);
     channel.send(formatted);
   }
 
