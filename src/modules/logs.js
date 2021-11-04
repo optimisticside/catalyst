@@ -18,12 +18,11 @@ module.exports = class Logs extends Module {
     const channel = message.guild.channels.cache.get(logChannelId);
     if (!channel) return;
 
-    const title = `Message sent by <@${message.author.id}> deleted in <#${message.channel.id}>`;
     const username = `${message.author.username}#${message.author.discriminator}`;
     const embed = new MessageEmbed()
       .setAuthor(username, message.author.displayAvatarURL())
       .setColor(DEFAULT_COLOR)
-      .setDescription(`**${title}**\n${message.content}`)
+      .setDescription(`Message sent by <@${message.author.id}> deleted in <#${message.channel.id}>\n${message.content}`)
       .setFooter(`ID: ${message.id}`)
       .setTimestamp(Date.now());
     channel.send({ embeds: [ embed ] });
@@ -40,11 +39,11 @@ module.exports = class Logs extends Module {
     if (!channel) return;
 
     const url = `https://discordapp.com/channels/${newMessage.guild.id}/${newMessage.channel.id}/${newMessage.id}`;
-    const title = `Message sent by <@${newMessage.author.id}> edited in <#${newMessage.channel.id}> [Jump to message](${url})`;
     const username = `${newMessage.author.username}#${newMessage.author.discriminator}`;
     const embed = new MessageEmbed()
       .setAuthor(username, newMessage.author.displayAvatarURL())
       .setColor(DEFAULT_COLOR)
+      .setDescription( `Message sent by <@${newMessage.author.id}> edited in <#${newMessage.channel.id}> [Jump to message](${url})`)
       .addField('Before', oldMessage.content)
       .addField('After', newMessage.content)
       .setFooter(`ID: ${newMessage.id}`)
@@ -62,49 +61,77 @@ module.exports = class Logs extends Module {
     const channel = member.guild.channels.cache.get(logChannelId);
     if (!channel) return;
 
-    const title = `<@${member.author.id}> joined the server`;
     const username = `${member.user.username}#${member.user.discriminator}`;
     const embed = new MessageEmbed()
       .setAuthor(username, member.user.displayAvatarURL())
       .setColor(DEFAULT_COLOR)
-      .setTitle(title)
+      .setDescription(`<@${member.user.id}> joined the server`)
       .setFooter(`ID: ${member.user.id}`)
       .setTimestamp(Date.now());
     channel.send({ embeds: [ embed ] });
   }
 
   async onGuildMemberRemove(member) {
-    if (!member.guild) return;
-    if (member.user.bot) return;
-    if (!await this.database.getGuild(member.guild.id, 'logsEnabled')) return;
-    const enabled = await this.database.getGuild(member.guild.id, 'logLeave');
+    const user = await this.client.users.fetch(member.id);
+    const guild = await this.client.guilds.fetch(member.guild.id);
+
+    if (user.bot) return;
+    if (!await this.database.getGuild(guild.id, 'logsEnabled')) return;
+    const enabled = await this.database.getGuild(guild.id, 'logLeave');
     if (!enabled) return;
-    const logChannelId = await this.database.getGuild(member.guild.id, 'logChannel');
-    const channel = member.guild.channels.cache.get(logChannelId);
+    const logChannelId = await this.database.getGuild(guild.id, 'logChannel');
+    const channel = guild.channels.cache.get(logChannelId);
     if (!channel) return;
 
-    const title = `<@${member.author.id}> left the server`;
-    const username = `${member.user.username}#${member.user.discriminator}`;
+    const username = `${user.username}#${user.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor(username, member.user.displayAvatarURL())
+      .setAuthor(username, user.displayAvatarURL())
       .setColor(DEFAULT_COLOR)
-      .setTitle(title)
-      .setFooter(`ID: ${member.user.id}`)
+      .setDescription(`<@${user.id}> left the server`)
+      .setFooter(`ID: ${user.id}`)
       .setTimestamp(Date.now());
     channel.send({ embeds: [ embed ] });
   }
 
   async onGuildMemberUpdate(oldMember, newMember) {
-    if (!newMember.guild) return;
     if (newMember.user.bot) return;
     if (!await this.database.getGuild(newMember.guild.id, 'logsEnabled')) return;
     const enabled = await this.database.getGuild(newMember.guild.id, 'logMemberUpdate');
     if (!enabled) return;
-    const logChannelId = await this.database.getGuild(member.guild.id, 'logChannel');
-    const channel = member.guild.channels.cache.get(logChannelId);
+    const logChannelId = await this.database.getGuild(newMember.guild.id, 'logChannel');
+    const channel = newMember.guild.channels.cache.get(logChannelId);
     if (!channel) return;
+    console.log('a')
+    const username = `${newMember.user.username}#${newMember.user.discriminator}`;
+    if (oldMember.nickname !== newMember.nickname) {
+      const embed = new MessageEmbed()
+        .setAuthor(username, newMember.user.displayAvatarURL())
+        .setDescription(`<@${newMember.user.id}> nickname changed`)
+        .addField('Before', oldMember.nickname)
+        .addField('After', newMember.nickname)
+        .setTimestamp(Date.now());
+      channel.send({ embeds: [ embed ] });
+    }
 
-    // TODO: Do this later...
+    const removedRole = oldMember.roles.cache.find(r => !newMember.roles.cache.has(role.id));
+    if (removedRole) {
+      const embed = new MessageEmbed()
+        .setAuthor(username, newMember.user.displayAvatarURL())
+        .setDescription(`<@${newMember.user.id}> was removed from the \`${removedRole.name}\` role`)
+        .setFooter(`Author ID: ${newMember.user.id} | Role ID: ${removedRole.id}`)
+        .setTimestamp(Date.now());
+      channel.send({ embeds: [ embed ] });
+    }
+
+    const addedRole = newMember.roles.cache.find(r => !oldMember.roles.cache.has(role.id));
+    if (addedRole) {
+      const embed = new MessageEmbed()
+        .setAuthor(username, newMember.user.displayAvatarURL())
+        .setDescription(`<@${newMember.user.id}> was given the \`${removedRole.name}\` role`)
+        .setFooter(`Author ID: ${newMember.user.id} | Role ID: ${removedRole.id}`)
+        .setTimestamp(Date.now());
+      channel.send({ embeds: [ embed ] });
+    }
   }
 
   async onCommandRun(message, command, args) {
@@ -125,6 +152,7 @@ module.exports = class Logs extends Module {
       .setAuthor(username, message.author.displayAvatarURL())
       .setColor(DEFAULT_COLOR)
       .setDescription(`Used ${command.name} command in <#${message.channel.id}>\n${message.content}`)
+      .setFooter(`Author ID: ${message.author.id} | Message ID: ${message.id}`)
       .setTimestamp(Date.now());
     channel.send({ embeds: [ embed ] });
   }
@@ -160,6 +188,7 @@ module.exports = class Logs extends Module {
       .setAuthor(username, interaction.user.displayAvatarURL())
       .setColor(DEFAULT_COLOR)
       .setDescription(`Used ${command.name} slash command in <#${interaction.channel.id}>\n${message.content}`)
+      .setFooter(`ID: ${interaction.user.id}`)
       .setTimestamp(Date.now());
     channel.send({ embeds: [ embed ] });
   }
@@ -178,6 +207,7 @@ module.exports = class Logs extends Module {
       .setColor(DEFAULT_COLOR)
       .setDescription(`Guardian deleted a message sent by <@${message.author.id}> in <#${message.channel.id}>`)
       .addField('Reason', reason)
+      .setFooter(`ID: ${message.author.id}`)
       .setTimestamp(Date.now());
     channel.send({ embeds: [ embed ] });
   }

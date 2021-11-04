@@ -6,6 +6,7 @@ const Module = require('../structs/module.js');
 
 module.exports = class Guilds extends Module {
   async greetMember(member) {
+    if (member.partial) member = await member.fetch();
     const enabled = await this.database.getGuild(member.guild.id, 'greetingEnabled');
     if (!enabled) return;
 
@@ -23,21 +24,21 @@ module.exports = class Guilds extends Module {
   }
 
   async goodbyeMember(member) {
-    // TODO: There's too much duplicate code in
-    // goodbyeMember & greetMember. Is there a better way?
-    const enabled = await this.database.getGuild(member.guild.id, 'goodbyeEnabled');
+    const user = await this.client.users.fetch(member.id);
+    const guild = await this.client.guilds.fetch(member.guild.id);
+    const enabled = await this.database.getGuild(guild.id, 'goodbyeEnabled');
     if (!enabled) return;
 
-    const channelId = await this.database.getGuild(member.guild.id, 'goodbyeChannel');
-    const channel = member.guild.channels.cache.get(channelId);
+    const channelId = await this.database.getGuild(guild.id, 'goodbyeChannel');
+    const channel = guild.channels.cache.get(channelId);
     if (!channel) return;
 
-    const message = await this.database.getGuild(member.guild.id, 'goodbyeMessage');
+    const message = await this.database.getGuild(guild.id, 'goodbyeMessage');
     if (!message) return;
 
-    const formatted = message.replace('{user}', member.user.username)
-      .replace('{guild}', member.guild.name)
-      .replace('{count}', member.guild.fetch().approximateMemberCount);
+    const formatted = message.replace('{user}', user.username)
+      .replace('{guild}', guild.name)
+      .replace('{count}', guild.approximateMemberCount);
     channel.send(formatted);
   }
 
