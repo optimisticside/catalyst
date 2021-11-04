@@ -14,7 +14,7 @@ const path = require('path');
 
 module.exports = class Commands extends Module {
   async checkPerms(required, member, channel) {
-    if (member.user.id === CREATOR) return true;
+    //if (member.user.id === CREATOR) return true;
     let perms = member.permissions;
     if (channel) perms = channel.permissionsFor(member);
     return required.every(p => perms.has(p)) || perms.has(Permissions.FLAGS.ADMINISTRATOR);
@@ -263,7 +263,7 @@ module.exports = class Commands extends Module {
   async handleMessage(message) {
     let content = message.content.trim();
     const guildPrefix = message.guild && await this.database.getGuild(message.guild.id, 'prefix');
-    const prefixes = [ `<@${this.client.user.id}>`, `<@!${this.client.user.id}>`, PREFIX ].concat(guildPrefix);
+    const prefixes = [ `<@${this.client.user.id}>`, `<@&${this.client.user.id}>`, PREFIX ].concat(guildPrefix);
     const prefix = prefixes.find(p => content.startsWith(p));
     if (!prefix) return;
     content = content.slice(prefix.length);

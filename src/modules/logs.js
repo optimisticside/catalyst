@@ -94,7 +94,6 @@ module.exports = class Logs extends Module {
   }
 
   async onGuildMemberUpdate(oldMember, newMember) {
-    if (newMember.user.bot) return;
     if (!await this.database.getGuild(newMember.guild.id, 'logsEnabled')) return;
     const enabled = await this.database.getGuild(newMember.guild.id, 'logMemberUpdate');
     if (!enabled) return;
@@ -103,35 +102,39 @@ module.exports = class Logs extends Module {
     if (!channel) return;
     
     const username = `${newMember.user.username}#${newMember.user.discriminator}`;
-    if (oldMember.nickname !== newMember.nickname) {
+    if (oldMember.nickname != newMember.nickname) {
       const embed = new MessageEmbed()
         .setAuthor(username, newMember.user.displayAvatarURL())
+        .setColor(DEFAULT_COLOR)
         .setDescription(`<@${newMember.user.id}> nickname changed`)
-        .addField('Before', oldMember.nickname)
-        .addField('After', newMember.nickname)
+        .addField('Before', oldMember.nickname ?? oldMember.user.username)
+        .addField('After', newMember.nickname ?? newMember.user.username)
+        .setFooter(`ID: ${newMember.user.id}`)
         .setTimestamp(Date.now());
       channel.send({ embeds: [ embed ] });
     }
 
-    const removedRole = oldMember.roles.cache.find(r => !newMember.roles.cache.has(role.id));
-    if (removedRole) {
+    oldMember.roles.cache.forEach(role => {
+      if (newMember.roles.cache.has(role.id)) return;
       const embed = new MessageEmbed()
         .setAuthor(username, newMember.user.displayAvatarURL())
-        .setDescription(`<@${newMember.user.id}> was removed from the \`${removedRole.name}\` role`)
-        .setFooter(`Author ID: ${newMember.user.id} | Role ID: ${removedRole.id}`)
+        .setColor(DEFAULT_COLOR)
+        .setDescription(`<@${newMember.user.id}> was removed from the \`${role.name}\` role`)
+        .setFooter(`Author ID: ${newMember.user.id} | Role ID: ${role.id}`)
         .setTimestamp(Date.now());
       channel.send({ embeds: [ embed ] });
-    }
+    });
 
-    const addedRole = newMember.roles.cache.find(r => !oldMember.roles.cache.has(role.id));
-    if (addedRole) {
+    newMember.roles.cache.forEach(role => {
+      if (oldMember.roles.cache.has(role.id)) return;
       const embed = new MessageEmbed()
         .setAuthor(username, newMember.user.displayAvatarURL())
-        .setDescription(`<@${newMember.user.id}> was given the \`${removedRole.name}\` role`)
-        .setFooter(`Author ID: ${newMember.user.id} | Role ID: ${removedRole.id}`)
+        .setColor(DEFAULT_COLOR)
+        .setDescription(`<@${newMember.user.id}> was given the \`${role.name}\` role`)
+        .setFooter(`Author ID: ${newMember.user.id} | Role ID: ${role.id}`)
         .setTimestamp(Date.now());
       channel.send({ embeds: [ embed ] });
-    }
+    });
   }
 
   async onCommandRun(message, command, args) {
@@ -218,7 +221,7 @@ module.exports = class Logs extends Module {
     eventHandler.on('messageUpdate', this.onMessageEdit.bind(this));
     eventHandler.on('guildMemberAdd', this.onGuildMemberAdd.bind(this));
     eventHandler.on('guildMemberRemove', this.onGuildMemberRemove.bind(this));
-    eventHandler.on('guidMemberUpdate', this.onGuildMemberUpdate.bind(this));
+    eventHandler.on('guildMemberUpdate', this.onGuildMemberUpdate.bind(this));
     commandHandler.on('commandRun', this.onCommandRun.bind(this));
     slashHandler.on('commandRun', this.onSlashCommandRun.bind(this));
   }
