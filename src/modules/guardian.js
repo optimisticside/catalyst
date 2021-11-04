@@ -26,6 +26,7 @@ module.exports = class Guardian extends Module {
   async delete(message, reason) {
     await this.notify(message, reason);
     await message.delete();
+    await this.logHandler.onGuardianDelete(message, reason);
   }
 
   async handleMessage(message) {
@@ -80,8 +81,9 @@ module.exports = class Guardian extends Module {
     if (isBlacklisted) await this.delete(message, 'blacklist');
   }
 
-  load({ eventHandler, database }) {
+  load({ eventHandler, database, logHandler }) {
     this.database = database;
+    this.logHandler = logHandler;
     eventHandler.on('messageCreate', this.handleMessage.bind(this));
   }
   
