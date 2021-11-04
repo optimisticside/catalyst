@@ -101,7 +101,7 @@ module.exports = class Logs extends Module {
     const logChannelId = await this.database.getGuild(newMember.guild.id, 'logChannel');
     const channel = newMember.guild.channels.cache.get(logChannelId);
     if (!channel) return;
-    console.log('a')
+    
     const username = `${newMember.user.username}#${newMember.user.discriminator}`;
     if (oldMember.nickname !== newMember.nickname) {
       const embed = new MessageEmbed()
