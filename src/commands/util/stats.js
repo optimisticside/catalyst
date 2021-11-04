@@ -12,15 +12,23 @@ const GIGA_BYTE = Math.pow(1024, 3);
 
 module.exports = class InfoCommand extends Command {
   async run(client, given, args) {
-    // TODO: Clean up this code.
     const memoryUsage = process.memoryUsage();
     const usedMem = Math.round((memoryUsage.heapUsed / GIGA_BYTE) * 1000) / 1000;
     const totalMem = Math.round((memoryUsage.heapTotal / GIGA_BYTE) * 1000) / 1000;
     const uptime = new Date(process.uptime() * 1000).toISOString().substr(11, 8);
 
+    const result = await Promise.all([
+      client.shard.fetchClientValues('guilds.cache.size'),
+      client.shard.broadcastEval(c => c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0))
+    ]);
+    const totalGuilds = result[0].reduce((acc, count) => acc + count, 0);
+    const totalUsers = result[1].reduce((acc, count) => acc + count, 0);
+
     const embed = new MessageEmbed()
       .setTitle(NAME)
       .setColor(DEFAULT_COLOR)
+      .addField('Guilds', totalGuilds.toString(), true)
+      .addField('Users', totalUsers.toString(), true)
       .addField('Uptime', `${uptime}`, true)
       .addField('Memory Usage', `${usedMem} GB / ${totalMem} GB`, true)
       .addField('Guilds', client.guilds.cache.size.toString(), true) // This will do for now.
