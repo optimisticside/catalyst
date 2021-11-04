@@ -11,7 +11,7 @@ module.exports = class Logs extends Module {
   async onMessageDelete(message) {
     if (!message.guild) return;
     if (message.author.bot) return;
-    if (await this.database.getGuild(message.guild.id, 'logsEnabled')) return;
+    if (!await this.database.getGuild(message.guild.id, 'logsEnabled')) return;
     const enabled = await this.database.getGuild(message.guild.id, 'logDelete');
     if (!enabled) return;
     const logChannelId = await this.database.getGuild(message.guild.id, 'logChannel');
@@ -19,7 +19,7 @@ module.exports = class Logs extends Module {
     if (!channel) return;
 
     const title = `Message sent by <@${message.author.id}> deleted in <#${message.channel.id}>`;
-    const username = `${user.username}#${user.discriminator}`;
+    const username = `${message.author.username}#${message.author.discriminator}`;
     const embed = new MessageEmbed()
       .setAuthor(username, message.author.displayAvatarURL())
       .setColor(DEFAULT_COLOR)
@@ -32,7 +32,7 @@ module.exports = class Logs extends Module {
   async onMessageEdit(oldMessage, newMessage) {
     if (!newMessage.guild) return;
     if (newMessage.author.bot) return;
-    if (await this.database.getGuild(newMessage.guild.id, 'logsEnabled')) return;
+    if (!await this.database.getGuild(newMessage.guild.id, 'logsEnabled')) return;
     const enabled = await this.database.getGuild(newMessage.guild.id, 'logEdit');
     if (!enabled) return;
     const logChannelId = await this.database.getGuild(newMessage.guild.id, 'logChannel');
@@ -45,7 +45,6 @@ module.exports = class Logs extends Module {
     const embed = new MessageEmbed()
       .setAuthor(username, newMessage.author.displayAvatarURL())
       .setColor(DEFAULT_COLOR)
-      .setDescription(`**${title}**\n${newMessage.content}`)
       .addField('Before', oldMessage.content)
       .addField('After', newMessage.content)
       .setFooter(`ID: ${newMessage.id}`)
@@ -56,7 +55,7 @@ module.exports = class Logs extends Module {
   async onGuildMemberAdd(member) {
     if (!member.guild) return;
     if (member.user.bot) return;
-    if (await this.database.getGuild(member.guild.id, 'logsEnabled')) return;
+    if (!await this.database.getGuild(member.guild.id, 'logsEnabled')) return;
     const enabled = await this.database.getGuild(member.guild.id, 'logJoin');
     if (!enabled) return;
     const logChannelId = await this.database.getGuild(member.guild.id, 'logChannel');
@@ -98,7 +97,7 @@ module.exports = class Logs extends Module {
   async onGuildMemberUpdate(oldMember, newMember) {
     if (!newMember.guild) return;
     if (newMember.user.bot) return;
-    if (await this.database.getGuild(newMember.guild.id, 'logsEnabled')) return;
+    if (!await this.database.getGuild(newMember.guild.id, 'logsEnabled')) return;
     const enabled = await this.database.getGuild(newMember.guild.id, 'logMemberUpdate');
     if (!enabled) return;
     const logChannelId = await this.database.getGuild(member.guild.id, 'logChannel');
@@ -109,25 +108,26 @@ module.exports = class Logs extends Module {
   }
 
   async onCommandRun(message, command, args) {
+    console.log('mhm')
     if (command.passive) return;
     if (command.tags?.find(t => t === 'fun')) return;
     if (!message.guild) return;
     if (message.author.bot) return;
 
-    if (await this.database.getGuild(message.guild.id, 'logsEnabled')) return;
+    if (!await this.database.getGuild(message.guild.id, 'logsEnabled')) return;
     const enabled = await this.database.getGuild(message.guild.id, 'logCommands');
     if (!enabled) return;
-    const logChannelId = await this.database.getGuild(member.guild.id, 'logChannel');
-    const channel = member.guild.channels.cache.get(logChannelId);
+    const logChannelId = await this.database.getGuild(message.guild.id, 'logChannel');
+    const channel = message.guild.channels.cache.get(logChannelId);
     if (!channel) return;
 
-    const username = `${member.user.username}#${member.user.discriminator}`;
+    const username = `${message.author.username}#${message.author.discriminator}`;
     const embed = new MessageEmbed()
       .setAuthor(username, message.author.displayAvatarURL())
       .setColor(DEFAULT_COLOR)
       .setDescription(`Used ${command.name} command in <#${message.channel.id}>\n${message.content}`)
       .setTimestamp(Date.now());
-    channel.send(embed);
+    channel.send({ embeds: [ embed ] });
   }
 
   async onSlashCommandRun(interaction, command) {
@@ -136,7 +136,7 @@ module.exports = class Logs extends Module {
     if (!interaction.inGuild()) return;
     if (interaction.user.bot) return;
 
-    if (await this.database.getGuild(interaction.guild.id, 'logsEnabled')) return;
+    if (!await this.database.getGuild(interaction.guild.id, 'logsEnabled')) return;
     const enabled = await this.database.getGuild(interaction.guild.id, 'logCommands');
     if (!enabled) return;
     const logChannelId = await this.database.getGuild(interaction.guild.id, 'logChannel');
@@ -162,7 +162,7 @@ module.exports = class Logs extends Module {
       .setColor(DEFAULT_COLOR)
       .setDescription(`Used ${command.name} slash command in <#${interaction.channel.id}>\n${message.content}`)
       .setTimestamp(Date.now());
-    channel.send(embed);
+    channel.send({ embeds: [ embed ] });
   }
 
   async onGuardianDelete(message, reason) {
@@ -180,7 +180,7 @@ module.exports = class Logs extends Module {
       .setDescription(`Message sent by <@${message.author.id}> deleted in <#${message.channel.id}>`)
       .addField('Reason', reason)
       .setTimestamp(Date.now());
-    channel.send(embed);
+    channel.send({ embeds: [ embed ] });
   }
 
   load({ commandHandler, eventHandler, slashHandler, database }) {
