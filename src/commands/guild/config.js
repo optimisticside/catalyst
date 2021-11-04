@@ -372,7 +372,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The channel in which logs will be posted.',
             emoji: '#️⃣',
             handler: this.stringSetting('Log Channel', 'The log channel is the channel where logs will be posted.',
-              promisify(Serializer.deserializeChannel), promisify(Serializer.serializeChannel), null, 'logsChannel')
+              promisify(Serializer.deserializeChannel), promisify(Serializer.serializeChannel), null, 'logChannel')
           },
           {
             name: 'Message Logs',
@@ -398,7 +398,13 @@ module.exports = class ConfigCommand extends Command {
             name: 'Command Run',
             desc: 'Keeping track of when commands are run.',
             emoji: '💡',
-            handler: this.boolSetting('Command Run', 'Command runs are whenever someone runs a command.', 'logRun')
+            handler: this.boolSetting('Command Run', 'Command runs are whenever someone runs a command.', 'logCommands')
+          },
+          {
+            name: 'Guardian Logs',
+            desc: 'Keeping track of what Guardian does.',
+            emoji: '🔒',
+            handler: this.boolSetting('Guardian Logs', 'Guardian Logs are whenever Guardian does something.', 'logGuardian')
           },
           {
             name: 'User Logs',
