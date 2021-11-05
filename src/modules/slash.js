@@ -186,7 +186,10 @@ module.exports = class SlashModule extends Module {
       return interaction.reply(denial('Guild-only commands cannot be run outside of a guild.'));
     }
     if (command.ownerOnly && (!interaction.guild || !interaction.user.id === interaction.guild.ownerID)) {
-      return interaction.reply(denial('Owner-only commands can only be run by the owner.'));
+      return interaction.reply(denial('Owner-only commands can only be run by the guild owner.'));
+    }
+    if (command.creatorOnly && !CREATORS.find(c => c === message.author.id)) {
+      return message.reply(denial('Creator-only commands can only run by bot creators.'));
     }
     if (command.nsfw && (!interaction.guild || !interaction.channel.nsfw)) {
       return interaction.reply(denial('NSFW commands can only be run in NSFW channels.'));
