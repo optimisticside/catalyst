@@ -163,7 +163,7 @@ module.exports = class SlashModule extends Module {
     return command.slashRun ? await command.slashRun(...params) : await command.run(...params);
   }
 
-  async handleInteraction(interaction) {
+  async handleCommand(interaction) {
     if (!interaction.isCommand()) return;
     const command = await this.findCommand(interaction);
     const lastRun = await this.commandHandler.getCooldown(interaction.user, command);
@@ -219,6 +219,31 @@ module.exports = class SlashModule extends Module {
       this.commandHandler.saveCooldown(interaction.user, command);
       this.emit('commandRun', interaction, command);
     });
+  }
+
+  async handleAutocomplete(interaction) {
+    if (!interaction.isAutocomplete()) return;
+    const command = await this.findCommand(interaction);
+    if (!command) return;
+
+    const options = command.options.filter(o => o.autoComplete);
+    const result = await Promise.all(options.map(async o => {
+      const current = interaction.options.get(o.name);
+      const value = await o.autoComplete(current);
+      return { name: o.name, value };
+    }));
+    
+    return await interaction.respond(result);
+  }
+
+  async handleInteraction(interaction) {
+    if (interaction.isCommand()) {
+      return await this.handleCommand(interaction);
+    }
+
+    if (interaction.isAutocomplete()) {
+      return await this.handleAutocomplete(interaction);
+    }
   }
 
   load({ eventHandler, commandHandler }) {
