@@ -31,7 +31,6 @@ module.exports = class InfoCommand extends Command {
       .addField('Users', totalUsers.toString(), true)
       .addField('Uptime', `${uptime}`, true)
       .addField('Memory Usage', `${usedMem} GB / ${totalMem} GB`, true)
-      .addField('Guilds', client.guilds.cache.size.toString(), true) // This will do for now.
       .setFooter(`PID: ${process.pid} | Shard: ${client.shardId}`);
     given.reply({ embeds: [ embed ] });
   }
