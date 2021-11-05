@@ -70,6 +70,8 @@ module.exports = class Commands extends Module {
         if (option.choices) return this.handleArgChoices(option, given);
         const int = parseInt(given);
         if (isNaN(int)) throw 'Invalid integer';
+        if (option.minimum && int < minimum) throw 'Below minimum';
+        if (option.maximum && int > minimum) throw 'Below minimum';
         return int;
       case 'number':
         const num = parseFloat(given);

@@ -4,6 +4,9 @@ Arguments allow you to pass information to commands. There are different types o
 ## Prompting
 If a command request is sent but all required arguments are not provided, then Catalyst will ask you to provide it with the arguments in a prompt. This is done to create a smoother, more human-like experience. An example of this is in the `echo` command, which replies with the text you send. If no arguments are provided, there is nothing to say and the bot will ask you to tell it something to say. This is easier than just being told to run the command all over again, but with a message.
 
+## Autocomplete
+Recently, Discord released a feature that allows bots to have an automcomplete system for arguments. Discord.js has not released support for this in their builders yet, so Catalyst will not have this feature yet.
+
 ## Types
 There are many different types of arguments. These are done to make the job of the individual command easier. The argument types are as follow:
 
@@ -16,4 +19,4 @@ There are many different types of arguments. These are done to make the job of t
 - member: These are users that are in the guild.
 - channel: These are channels in the guild.
 - role: These are roles in the guild.
-- mentionable: These are anything mentionable, which includes `@everyone` and `@here` (they aren't technically roles, but they are mentionable).
+- mentionable: These are anything mentionable, which includes roles, users, `@everyone` and `@here`.
