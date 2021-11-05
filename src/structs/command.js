@@ -26,6 +26,7 @@ module.exports = class Command {
     this.hidden = Boolean(info.hidden);
     this.guildOnly = Boolean(info.guildOnly);
     this.ownerOnly = Boolean(info.ownerOnly);
+    this.creatorOnly = Boolean(info.creatorOnly);
     this.allowBots = Boolean(info.allowBots);
     this.nsfw = Boolean(info.nsfw);
   }

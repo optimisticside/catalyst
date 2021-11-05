@@ -2,7 +2,7 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const { PREFIX, CREATOR } = require('../config.json');
+const { PREFIX, CREATORS } = require('../config.json');
 const { warning, denial, log, prompt } = require('../util/formatter.js')('Guardian');
 const { Collection, Permissions } = require('discord.js');
 const Module = require('../structs/module.js');

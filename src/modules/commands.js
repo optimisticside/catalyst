@@ -2,7 +2,7 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const { PREFIX, CREATOR, COOLDOWN_PERSISTANCE_THRESHOLD } = require('../config.json');
+const { PREFIX, CREATORS, COOLDOWN_PERSISTANCE_THRESHOLD } = require('../config.json');
 const { warning, denial, log, prompt } = require('../util/formatter.js')('Command Handler');
 const { GuildChannel, Permissions } = require('discord.js');
 const Module = require('../structs/module.js');
@@ -14,7 +14,7 @@ const path = require('path');
 
 module.exports = class Commands extends Module {
   async checkPerms(required, member, channel) {
-    //if (member.user.id === CREATOR) return true;
+    //if (CREATORS.find(c => c === member.user.id)) return true;
     let perms = member.permissions;
     if (channel) perms = channel.permissionsFor(member);
     return required.every(p => perms.has(p)) || perms.has(Permissions.FLAGS.ADMINISTRATOR);
@@ -204,8 +204,11 @@ module.exports = class Commands extends Module {
     if (command.guildOnly && !message.guild) {
       return message.reply(denial('Guild-only commands cannot be run outside of a guild.'));
     }
+    if (command.creatorOnly && !CREATORS.find(c => c === message.author.id)) {
+      return message.reply(denial('Creator-only commands can only run by bot creators.'));
+    }
     if (command.ownerOnly && (!message.guild || !message.author.id === message.guild.ownerID)) {
-      return message.reply(denial('Owner-only commands can only be run by the owner.'));
+      return message.reply(denial('Owner-only commands can only be run by the guild owner.'));
     }
     if (command.nsfw && (!message.guild || !message.channel.nsfw)) {
       return message.reply(denial('NSFW commands can only be run in NSFW channels.'));
