@@ -8,17 +8,21 @@ const { MessageEmbed } = require('discord.js');
 const Module = require('../structs/module.js');
 
 module.exports = class Logs extends Module {
-  async onMessageDelete(message) {
-    // TODO: There's a lot of the same code
-    // in the beginning of these functions,
-    // is there any way we can clean this up?
-    if (!message.guild) return;
-    if (message.author.bot) return;
-    if (!JSON.parse(await this.database.getGuild(message.guild.id, 'logsEnabled'))) return;
-    const enabled = await this.database.getGuild(message.guild.id, 'logDelete');
+  async isEnabled(key, guild) {
+    if (!guild) return;
+    if (!JSON.parse(await this.database.getGuild(guild.id, 'logsEnabled'))) return;
+    const enabled = await this.database.getGuild(guild.id, 'logDelete');
     if (!enabled) return;
-    const logChannelId = await this.database.getGuild(message.guild.id, 'logChannel');
-    const channel = message.guild.channels.cache.get(logChannelId);
+
+    const logChannelId = await this.database.getGuild(guild.id, 'logChannel');
+    const channel = guild.channels.cache.get(logChannelId);
+    if (!channel) return;
+
+    return channel;
+  }
+  async onMessageDelete(message) {
+    if (message.user.bot) return;
+    const channel = await this.getData('logDelete', message.guild);
     if (!channel) return;
 
     const username = `${message.author.username}#${message.author.discriminator}`;
@@ -32,14 +36,8 @@ module.exports = class Logs extends Module {
   }
 
   async onMessageEdit(oldMessage, newMessage) {
-    if (!newMessage.guild) return;
-    if (newMessage.author.bot) return;
-    if (oldMessage.content === newMessage.content) return;
-    if (!JSON.parse(await this.database.getGuild(newMessage.guild.id, 'logsEnabled'))) return;
-    const enabled = JSON.parse(await this.database.getGuild(newMessage.guild.id, 'logEdit'));
-    if (!enabled) return;
-    const logChannelId = await this.database.getGuild(newMessage.guild.id, 'logChannel');
-    const channel = newMessage.guild.channels.cache.get(logChannelId);
+    if (member.user.bot) return;
+    const channel = await this.getData('logEdit', newMessage.guild);
     if (!channel) return;
 
     const url = `https://discordapp.com/channels/${newMessage.guild.id}/${newMessage.channel.id}/${newMessage.id}`;
@@ -56,13 +54,7 @@ module.exports = class Logs extends Module {
   }
 
   async onGuildMemberAdd(member) {
-    if (!member.guild) return;
-    if (member.user.bot) return;
-    if (!JSON.parse(await this.database.getGuild(member.guild.id, 'logsEnabled'))) return;
-    const enabled = JSON.parse(await this.database.getGuild(member.guild.id, 'logJoin'));
-    if (!enabled) return;
-    const logChannelId = await this.database.getGuild(member.guild.id, 'logChannel');
-    const channel = member.guild.channels.cache.get(logChannelId);
+    const channel = await this.getData('logJoin', member.guild);
     if (!channel) return;
 
     const username = `${member.user.username}#${member.user.discriminator}`;
@@ -79,12 +71,7 @@ module.exports = class Logs extends Module {
     const user = await this.client.users.fetch(member.id);
     const guild = await this.client.guilds.fetch(member.guild.id);
 
-    if (user.bot) return;
-    if (!JSON.parse(await this.database.getGuild(guild.id, 'logsEnabled'))) return;
-    const enabled = JSON.parse(await this.database.getGuild(guild.id, 'logLeave'));
-    if (!enabled) return;
-    const logChannelId = await this.database.getGuild(guild.id, 'logChannel');
-    const channel = guild.channels.cache.get(logChannelId);
+    const channel = await this.isEnabled('logLeave', member.guild);
     if (!channel) return;
 
     const username = `${user.username}#${user.discriminator}`;
@@ -98,11 +85,7 @@ module.exports = class Logs extends Module {
   }
 
   async onGuildMemberUpdate(oldMember, newMember) {
-    if (!JSON.parse(await this.database.getGuild(newMember.guild.id, 'logsEnabled'))) return;
-    const enabled = await this.database.getGuild(newMember.guild.id, 'logMemberUpdate');
-    if (!enabled) return;
-    const logChannelId = await this.database.getGuild(newMember.guild.id, 'logChannel');
-    const channel = newMember.guild.channels.cache.get(logChannelId);
+    const channel = await this.isEnabled(newMember.guild);
     if (!channel) return;
     
     const username = `${newMember.user.username}#${newMember.user.discriminator}`;
@@ -144,14 +127,9 @@ module.exports = class Logs extends Module {
   async onCommandRun(message, command, args) {
     if (command.passive) return;
     if (command.tags?.find(t => t === 'fun')) return;
-    if (!message.guild) return;
     if (message.author.bot) return;
 
-    if (!JSON.parse(await this.database.getGuild(message.guild.id, 'logsEnabled'))) return;
-    const enabled = JSON.parse(await this.database.getGuild(message.guild.id, 'logCommands'));
-    if (!enabled) return;
-    const logChannelId = await this.database.getGuild(message.guild.id, 'logChannel');
-    const channel = message.guild.channels.cache.get(logChannelId);
+    const channel = await this.isEnabled('logCommmands', message.guild);
     if (!channel) return;
 
     const username = `${message.author.username}#${message.author.discriminator}`;
@@ -170,11 +148,7 @@ module.exports = class Logs extends Module {
     if (!interaction.inGuild()) return;
     if (interaction.user.bot) return;
 
-    if (!JSON.parse(await this.database.getGuild(interaction.guild.id, 'logsEnabled'))) return;
-    const enabled = JSON.parse(await this.database.getGuild(interaction.guild.id, 'logCommands'));
-    if (!enabled) return;
-    const logChannelId = await this.database.getGuild(interaction.guild.id, 'logChannel');
-    const channel = interaction.guild.channels.cache.get(logChannelId);
+    const channel = await this.isEnabled('logCommands', interaction.guild);
     if (!channel) return;
 
     let message = interaction.commandName;
@@ -201,11 +175,7 @@ module.exports = class Logs extends Module {
   }
 
   async onGuardianDelete(message, reason) {
-    if (!JSON.parse(await this.database.getGuild(message.guild.id, 'logsEnabled'))) return;
-    const enabled = JSON.parse(await this.database.getGuild(message.guild.id, 'logGuardian'));
-    if (!enabled) return;
-    const logChannelId = await this.database.getGuild(message.guild.id, 'logChannel');
-    const channel = message.guild.channels.cache.get(logChannelId);
+    const channel = await this.isEnabled('logGuardian', message.guild);
     if (!channel) return;
 
     const username = `${message.author.username}#${message.author.discriminator}`;
