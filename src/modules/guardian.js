@@ -6,10 +6,13 @@ const { PREFIX, CREATORS } = require('../config.json');
 const { warning, denial, log, prompt } = require('../util/formatter.js')('Guardian');
 const { Collection, Permissions } = require('discord.js');
 const Module = require('../structs/module.js');
+const wait = require('timers/promises').setTimeout;
 
 module.exports = class Guardian extends Module {
   async notify(message, reason) {
-    await message.reply(warning(this.messages[reason] ?? 'Your message(s) were blocked.'));
+    const reply = await message.reply(warning(this.messages[reason] ?? 'Your message(s) were blocked.'));
+    await wait(5000);
+    reply.delete();
   }
 
   async delete(message, reason) {
@@ -20,21 +23,32 @@ module.exports = class Guardian extends Module {
 
   async handleMessage(message) {
     if (!message.guild) return;
+    if (message.author.bot) return;
     const enabled = await this.database.getGuild(message.guild.id, 'guardian');
     if (!enabled) return;
 
     const content = message.content;
+    const pressureRange = 60-10;
     const config = {
       whitelist: JSON.parse(await this.database.getGuild(message.guild.id, 'guardianWhitelist')) || [],
       blacklistedWords: JSON.parse(await this.database.getGuild(message.guild.id, 'blacklistedWords')) || [],
       antiSpam: JSON.parse(await this.database.getGuild(message.guild.id, 'antiSpam')),
-      spamLimit: 5,
       imageLimit: JSON.parse(await this.database.getGuild(message.guild.id, 'imageLimit')),
       blockZalgo: JSON.parse(await this.database.getGuild(message.guild.id, 'blockZalgo')),
       blockLinks: JSON.parse(await this.database.getGuild(message.guild.id, 'blockLinks')),
       blockInvites: JSON.parse(await this.database.getGuild(message.guild.id, 'blockInvites')),
       blockIps: JSON.parse(await this.database.getGuild(message.guild.id, 'blockIps')),
-      blockSelfBots: JSON.parse(await this.database.getGuild(message.guild.id, 'blockSelfBots'))
+      blockSelfBots: JSON.parse(await this.database.getGuild(message.guild.id, 'blockSelfBots')),
+
+      // Anti spam pressure values.
+      // For now, they are not changable by users.
+      pressureDecay: 2.5,
+      basePressure: 10,
+      maxPressure: 60,
+      imagePressure: pressureRange / 6,
+      lengthPressure: pressureRange / 8000,
+      linePressure: pressureRange / 70,
+      pingPressure: pressureRange / 20,
     };
 
     const images = message.attachments.filter(a => a.type === 'image');
@@ -46,17 +60,39 @@ module.exports = class Guardian extends Module {
     const hasEmbeds = message.embeds.length > 0;
     const isBlacklisted = config.blacklistedWords?.find(w => content.includes(w));
 
-    const messages = await message.channel.messages?.fetch({ limit: 10 }) ?? new Collection();
-    const recentMessages = messages.filter(m => m.author.id === message.author.id && message.createdAt - m.createdAt <= 5000);
-
     //if (message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) return;
     if (config.whitelist?.find(id => message.author.id === id)) return;
     if (config.ignoredChannels?.find(c => message.channel.name === c)) return;
-  
-    // recentMessages is a Collection, so `size` is used instead of `length`
-    if (config.antiSpam && config.spamLimit && recentMessages.size > config.spamLimit) {
-      await this.notify(message, 'spam');
-      recentMessages.map(m => m.delete());
+
+    if (config.antiSpam) {
+      if (this.messageTrackers.has(message.author.id)) {
+        const tracker = this.messageTrackers.get(message.author.id);
+        const wasZero = tracker.pressure === 0;
+        tracker.pressure -= (config.basePressure * (message.createdAt - tracker.last) / (config.pressureDecay * 1000));
+        tracker.pressure = Math.max(tracker.pressure, 0)
+         + config.basePressure
+         + config.imagePressure * message.attachments.size
+         + config.imagePressure * message.embeds.length
+         + config.lengthPressure * content.length
+         + config.linePressure * content.split(/\r\n|\r|\n/).length
+         + config.pingPressure * [ ...content.matchAll(/<@!?&?(\d+)>/g) ].length;
+
+        tracker.last = message.createdAt;
+        if (tracker.pressure !== 0 && wasZero) {
+          tracker.start = tracker.last;
+        }
+        if (tracker.pressure > config.maxPressure) {
+          // Until I can come up with a better way of dealing with this.
+          // (such as muting the user), we'll have to deal with this.
+          await this.notify(message, 'spam');
+          message.channel.messages?.fetch({ limit: 30 }).then(messages => {
+            messages.filter(m => m.author === message.author && message.createdAt > tracker.start)
+              .map(m => m.delete());
+          });
+        }
+      } else {
+        this.messageTrackers.set(message.author.id, { last: message.createdAt, pressure: 0 });
+      }
     }
   
     // TODO: Ban user instead of deleting when detecting self-bot.
@@ -82,6 +118,7 @@ module.exports = class Guardian extends Module {
       client: client
     });
 
+    this.messageTrackers = new Map();
     this.messages = {
       duplicate: 'Message had too many duplicate phrases.',
       zalgo: 'Zalgo is not allowed.',
