@@ -68,10 +68,11 @@ module.exports = class HelpCommand extends Command {
       return given.reply(warning('No command provided.'));
     }
 
+    const prefix = await client.database.getGuild(given.guild.id, 'prefix') ?? PREFIX;
     const embed = new MessageEmbed()
       .setTitle(`${NAME}`)
       .setColor(DEFAULT_COLOR)
-      .setDescription(`Hello! I'm ${NAME}. You can use me to run commands, as long as they start with the prefix \`${PREFIX}\`. For a list of commands, use the \`commands\` command, by doing \`${PREFIX}commands\`.`)
+      .setDescription(`Hello! I'm ${NAME}. You can use me to run commands, as long as they start with the prefix \`${prefix}\`. For a list of commands, use the \`commands\` command, by doing \`${prefix}commands\`.`)
     given.reply({ embeds: [ embed ] });
   }
 
