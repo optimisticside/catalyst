@@ -266,6 +266,7 @@ module.exports = class Commands extends Module {
   }
 
   async handleMessage(message) {
+    if (message.author.bot) return;
     let content = message.content.trim();
     const guildPrefix = message.guild && await this.database.getGuild(message.guild.id, 'prefix');
     const prefixes = [ `<@${this.client.user.id}>`, `<@!${this.client.user.id}>`, PREFIX ].concat(guildPrefix);
