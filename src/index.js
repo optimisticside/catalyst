@@ -29,7 +29,7 @@ if (LIFETIME) {
   }, LIFETIME * 1000);
 }
 
-const serviceFiles = glob.sync(path.join(__dirname, 'services/**/.js'));
+const serviceFiles = glob.sync(path.join(__dirname, 'services/**/*.js'));
 (async () => {
   serviceFiles.map(async file => {
     const result = await requirePromise(file).catch(err => {
@@ -37,7 +37,7 @@ const serviceFiles = glob.sync(path.join(__dirname, 'services/**/.js'));
       console.error(`Unable to load ${fileName} service: ${err}`);
     });
 
-    if (!result instanceof Function) return;
+    if (!result || !result instanceof Function) return;
     await result(shardingManager);
   });
 })();
