@@ -8,6 +8,7 @@ const OptionParser = require('../../util/optionParser.js');
 const { warning } = require('../../util/formatter.js')('Invite Command');
 const { NAME, PREFIX, DEFAULT_COLOR } = require('../../config.json');
 const process = require('process');
+const os = require('os');
 const GIGA_BYTE = Math.pow(1024, 3);
 
 module.exports = class InfoCommand extends Command {
@@ -30,6 +31,7 @@ module.exports = class InfoCommand extends Command {
       .addField('Guilds', totalGuilds.toString(), true)
       .addField('Users', totalUsers.toString(), true)
       .addField('Uptime', `${uptime}`, true)
+      //.addField('Load Avg', os.loadavg().map(n => n.toFixed(3)).join(', '))
       .addField('Memory Usage', `${usedMem} GB / ${totalMem} GB`, true)
       .setFooter(`PID: ${process.pid} | Shard: ${client.shardId}`);
     given.reply({ embeds: [ embed ] });
