@@ -5,6 +5,7 @@
 const { MessageEmbed, Permissions } = require('discord.js');
 const Command = require('../../structs/command.js');
 const OptionParser = require('../../util/optionParser.js');
+const permNames = require('../../util/permNames.js');
 const { warning } = require('../../util/formatter.js')('Invite Command');
 const { NAME, PREFIX, DEFAULT_COLOR } = require('../../config.json');
 
@@ -49,6 +50,8 @@ module.exports = class HelpCommand extends Command {
       .addField('Usage', usage)
       .addField('Aliases', (command.aliases?.length > 0 ? command.aliases.join(', ') : 'None'))
       .addField('Arguments', (argumentInfo.length > 0 ? argumentInfo.join('\n') : 'None'));
+      // .addField('User Perms', (command.userPerms?.length > 0 ? command.userPerms.map(p => permNames(p)).join(', ') : 'None'))
+      // .addField('Bot Perms', (command.botPerms?.length > 0 ? command.botPerms.map(p => permNames(p)).join(', ') : 'None'))
   
     given.reply({ embeds: [ embed ] });
   }
