@@ -3,7 +3,7 @@
 // See LICENSE for details
 
 const { MessageEmbed } = require('discord.js');
-const { DEFAULT_COLOR, SUCCESS_COLOR, ALERT_COLOR, WARNING_COLOR, PROMPT_COLOR } = require('../config.json');
+const { DEFAULT_COLOR, SUCCESS_COLOR, ALERT_COLOR, WARNING_COLOR, PROMPT_COLOR, DENIAL_COLOR } = require('../config.json');
 const DEFAULT_FORMATTER = 'plain';
 
 const randomColor = () => 'RANDOM';

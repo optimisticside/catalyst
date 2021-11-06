@@ -3,7 +3,7 @@
 // See LICENSE for details
 
 const { Permissions, MessageEmbed } = require('discord.js');
-const { alert, success, warning, prompt, neutral } = require('../../util/formatter.js')('Set-Prefix Command');
+const { alert, success, warning, prompt, neutral, denial } = require('../../util/formatter.js')('Set-Prefix Command');
 const { NAME, DEFAULT_COLOR } = require('../../config.json');
 const Command = require('../../structs/command.js');
 const OptionParser = require('../../util/optionParser.js');
@@ -74,25 +74,20 @@ module.exports = class ConfigCommand extends Command {
 
       // TODO: If it is already enabled, we should instead
       // ask the user if they want to disable it.
-      const answer = await this.promptBool(given, reply, name, desc, 'Would you like to enable it?');
+      const answer = await this.promptBool(given, reply, name, desc, `Would you like to ${current ? 'disable' : 'enable'} it?`);
       if (answer === null) return;
 
       if (answer) {
-        await client.database.setGuild(given.guild.id, ...key, true)
+        await client.database.setGuild(given.guild.id, ...key, !current)
           .finally(() => reply.reactions.removeAll())
-          .then(() => reply.edit(success(`Successfully enabled ${name}`, 'embed')))
+          .then(() => reply.edit(success(`Successfully ${current ? 'disabled' : 'enabled'} ${name}`, 'embed')))
           .catch(err => {
             console.log(`Unable to write to database: ${err}`);
-            reply.edit(alert(`Unable to enable ${name}`, 'embed'));
+            reply.edit(alert(`Unable to change ${name}`, 'embed'));
           });
       } else {
-        await client.database.setGuild(given.guild.id, ...key, false)
-          .finally(() => reply.reactions.removeAll())
-          .then(() => reply.edit(success(`Successfully disabled ${name}`, 'embed')))
-          .catch(err => {
-            console.log(`Unable to write to database: ${err}`);
-            reply.edit(alert(`Unable to disable ${name}`, 'embed'))
-          });
+          reply.reactions.removeAll();
+          reply.edit(neutral(`${name} was not changed`, 'embed'));
       }
     }
   }
@@ -201,7 +196,7 @@ module.exports = class ConfigCommand extends Command {
                   }
 
                   blacklisted.push(word);
-                  const json = JSON.stringify(blacklisted);
+                  const json = JSON.stringify(blacklisted)
                   await client.database.setGuild(given.guild.id, 'blacklistedWords', json)
                     .finally(() => reply.reactions.removeAll())
                     .then(() => reply.edit(success('Successfully updated database', 'embed')))
@@ -225,7 +220,7 @@ module.exports = class ConfigCommand extends Command {
                   }
 
                   blacklisted.splice(index, 1);
-                  const json = JSON.stringify(blacklisted);
+                  const json = JSON.parse(blacklisted);
                   await client.database.setGuild(given.guild.id, 'blacklistedWords', json)
                     .finally(() => reply.reactions.removeAll())
                     .then(() => reply.edit(success('Successfully updated database', 'embed')))
@@ -454,11 +449,84 @@ module.exports = class ConfigCommand extends Command {
             handler: this.boolSetting('Auto Role', 'Auto Role will automate role assignment.', 'autoRoleEnabled')
           },
           {
-            name: 'Role',
-            desc: 'The role that Auto Role will assign.',
+            name: 'Roles',
+            desc: 'The roles that Auto Role will assign.',
+            menuDesc: 'React with the corresponding emoji to configure roles.',
             emoji: '✏️',
-            handler: this.stringSetting('Role', 'Auto Role will assign a role to users that join the server.',
-              promisify(Serializer.deserializeRole), promisify(Serializer.serializeRole), null, 'autoRoleRole')
+            menu: [
+              {
+                name: 'Add',
+                desc: 'Add a word to the blacklist.',
+                emoji: '✏️',
+                handler: async (client, given, reply) => {
+                  const raw = await client.database.getGuild(given.guild.id, 'autoRoles') || '[]';
+                  const roles = JSON.parse(raw);
+                  const answer = await this.promptString(given, reply, 'role', 'What role would you like to add', promisify(Serializer.deserializeRole));
+                  if (!answer) return;
+
+                  if (!given.guild.roles.cache.get(answer)) return;
+                  if (given.member.roles.highest.comparePositionTo(answer) < 0) {
+                    return reply.edit(denial('You do not have permissions to add this role', 'embed'));
+                  }
+                  if (roles.find(r => r === answer)) {
+                    return reply.edit(warning('That role is already in the list', 'embed'))
+                  }
+
+                  roles.push(answer);
+                  const json = JSON.stringify(roles)
+                  await client.database.setGuild(given.guild.id, 'autoRoles', json)
+                    .finally(() => reply.reactions.removeAll())
+                    .then(() => reply.edit(success('Successfully updated database', 'embed')))
+                    .catch(err => reply.edit(alert('Unable to update database', 'embed')));
+                }
+              },
+              {
+                name: 'Remove',
+                desc: 'Remove a word from the blacklist.',
+                emoji: '🗑️',
+                handler: async (client, given, reply) => {
+                  const raw = await client.database.getGuild(given.guild.id, 'autoRoles') || '[]';
+                  const roles = JSON.parse(raw);
+                  const answer = await this.promptString(given, reply, 'role', 'What role would you like to remove', promisify(Serializer.deserializeRole));
+                  if (!answer) return;
+
+                  const index = roles.findIndex(r => r === answer.id);
+                  if (given.member.roles.highest.comparePositionTo(answer) < 0) {
+                    return reply.edit(denial('You do not have permissions to remove this role', 'embed'));
+                  }
+                  if (index === -1) {
+                    return reply.edit(warning('That role is not in the list', 'embed'))
+                  }
+
+                  roles.splice(index, 1);
+                  const json = JSON.parse(roles);
+                  await client.database.setGuild(given.guild.id, 'autoRoles', json)
+                    .finally(() => reply.reactions.removeAll())
+                    .then(() => reply.edit(success('Successfully updated database', 'embed')))
+                    .catch(err => reply.edit(alert('Unable to update database', 'embed')));
+                }
+              },
+              {
+                name: 'List',
+                desc: 'See the list of roles in your DMs.',
+                emoji: '👁️',
+                handler: async (client, given, reply) => {
+                  const raw = await client.database.getGuild(given.guild.id, 'autoRoles') || '[]';
+                  const roles = JSON.parse(raw);
+                  const embed = new MessageEmbed()
+                    .setTitle('Auto Role')
+                    .setColor(DEFAULT_COLOR)
+                    .setDescription(roles.map(r => given.guild.roles.cache.get(r)?.name).join('\n'));
+                  const dmChannel = await given.author.createDM()
+                    .catch(err => reply.edit(alert('Unable to create DM', 'embed')));
+                  if (!dmChannel) return;
+                  await dmChannel.send({ embeds: [ embed ] })
+                    .finally(() => reply.reactions.removeAll())
+                    .then(() => reply.edit(success('Check your DMs', 'embed')))
+                    .catch(err => reply.edit(alert('Unable to send DM', 'embed')));
+                }
+              }
+            ]
           }
         ]
       },
