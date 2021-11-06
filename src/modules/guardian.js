@@ -11,8 +11,8 @@ const wait = require('timers/promises').setTimeout;
 module.exports = class Guardian extends Module {
   async notify(message, reason) {
     const reply = await message.reply(warning(this.messages[reason] ?? 'Your message(s) were blocked.'));
-    await wait(5000);
-    reply.delete();
+    // We do not want to yield the `notify` function.
+    wait(5000).then(() => reply.delete());
   }
 
   async delete(message, reason) {
@@ -54,7 +54,7 @@ module.exports = class Guardian extends Module {
     const images = message.attachments.filter(a => a.type === 'image');
     const hasDuplicates = (/^(.+)(?: +\1){3}/).test(content);
     const hasZalgo = (/%CC%/g).test(encodeURIComponent(content));
-    const hasInvite = content.includes('discord.gg/' || 'discordapp.com/invite/');
+    const hasInvite = content.includes('discord.gg/') || content.includes('discordapp.com/invite/');
     const hasLink = (/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/).test(content);
     const hasIp = (/^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$/).test(content);
     const hasEmbeds = message.embeds.length > 0;
@@ -94,7 +94,7 @@ module.exports = class Guardian extends Module {
         this.messageTrackers.set(message.author.id, { last: message.createdAt, pressure: 0 });
       }
     }
-  
+
     // TODO: Ban user instead of deleting when detecting self-bot.
     if (config.blockSelfBots && hasEmbeds) await this.delete(message, 'selfBot');
     if (config.blockDuplicates && hasDuplicates) await this.delete(message, 'duplicate');

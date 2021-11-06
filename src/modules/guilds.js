@@ -7,7 +7,7 @@ const Module = require('../structs/module.js');
 module.exports = class Guilds extends Module {
   async greetMember(member) {
     if (member.partial) member = await member.fetch();
-    const enabled = await this.database.getGuild(member.guild.id, 'greetingEnabled');
+    const enabled = JSON.parse(await this.database.getGuild(member.guild.id, 'greetingEnabled'));
     if (!enabled) return;
 
     const channelId = await this.database.getGuild(member.guild.id, 'greetingChannel');
@@ -26,7 +26,7 @@ module.exports = class Guilds extends Module {
   async goodbyeMember(member) {
     const user = await this.client.users.fetch(member.id);
     const guild = await this.client.guilds.fetch(member.guild.id);
-    const enabled = await this.database.getGuild(guild.id, 'goodbyeEnabled');
+    const enabled = JSON.parse(await this.database.getGuild(guild.id, 'goodbyeEnabled'));
     if (!enabled) return;
 
     const channelId = await this.database.getGuild(guild.id, 'goodbyeChannel');
@@ -46,11 +46,9 @@ module.exports = class Guilds extends Module {
     const enabled = await this.database.getGuild(member.guild.id, 'autoRoleEnabled');
     if (!enabled) return;
 
-    const roleId = await this.database.getGuild(member.guild.id, 'autoRole');
-    const role = member.guild.roles.cache.get(roleId);
-    if (!role) return;
-
-    await member.roles.add(role);
+    const roleIds = JSON.parse(await this.database.getGuild(member.guild.id, 'autoRoles')) ?? [];
+    const roles = roleIds.map(r => member.guild.roles.cache.get(r));
+    await Promise.all(roles.map(r => member.roles.add(r)));
   }
 
   async onMemberAdd(member) {
@@ -63,7 +61,7 @@ module.exports = class Guilds extends Module {
   }
 
   async onReactionAdd(reaction, user) {
-    const enabled = await this.database.getGuild(reaction.message.guild.id, 'reactionRolesEnabled');
+    const enabled = JSON.parse(await this.database.getGuild(reaction.message.guild.id, 'reactionRolesEnabled'));
     if (!enabled) return;
     const messageId = await this.database.getGuild(reaction.message.guild.id, 'ractionRolesMessage');
     if (!messageId || messageId !== reaction.message.id) return;
@@ -88,7 +86,7 @@ module.exports = class Guilds extends Module {
     const emoji = reaction.emoji;
     const message = this.client.messages.fetch(reaction.message.id);
 
-    const enabled = await this.database.getGuild(reaction.message.guild.id, 'reactionRolesEnabled');
+    const enabled = JSON.parse(await this.database.getGuild(reaction.message.guild.id, 'reactionRolesEnabled'));
     if (!enabled) return;
     const messageId = await this.database.getGuild(reaction.message.guild.id, 'ractionRolesMessage');
     if (!messageId || messageId !== reaction.message.id) return;

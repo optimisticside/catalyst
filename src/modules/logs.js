@@ -9,9 +9,12 @@ const Module = require('../structs/module.js');
 
 module.exports = class Logs extends Module {
   async onMessageDelete(message) {
+    // TODO: There's a lot of the same code
+    // in the beginning of these functions,
+    // is there any way we can clean this up?
     if (!message.guild) return;
     if (message.author.bot) return;
-    if (!await this.database.getGuild(message.guild.id, 'logsEnabled')) return;
+    if (!JSON.parse(await this.database.getGuild(message.guild.id, 'logsEnabled'))) return;
     const enabled = await this.database.getGuild(message.guild.id, 'logDelete');
     if (!enabled) return;
     const logChannelId = await this.database.getGuild(message.guild.id, 'logChannel');
@@ -31,8 +34,9 @@ module.exports = class Logs extends Module {
   async onMessageEdit(oldMessage, newMessage) {
     if (!newMessage.guild) return;
     if (newMessage.author.bot) return;
-    if (!await this.database.getGuild(newMessage.guild.id, 'logsEnabled')) return;
-    const enabled = await this.database.getGuild(newMessage.guild.id, 'logEdit');
+    if (oldMessage.content === newMessage.content) return;
+    if (!JSON.parse(await this.database.getGuild(newMessage.guild.id, 'logsEnabled'))) return;
+    const enabled = JSON.parse(await this.database.getGuild(newMessage.guild.id, 'logEdit'));
     if (!enabled) return;
     const logChannelId = await this.database.getGuild(newMessage.guild.id, 'logChannel');
     const channel = newMessage.guild.channels.cache.get(logChannelId);
@@ -54,8 +58,8 @@ module.exports = class Logs extends Module {
   async onGuildMemberAdd(member) {
     if (!member.guild) return;
     if (member.user.bot) return;
-    if (!await this.database.getGuild(member.guild.id, 'logsEnabled')) return;
-    const enabled = await this.database.getGuild(member.guild.id, 'logJoin');
+    if (!JSON.parse(await this.database.getGuild(member.guild.id, 'logsEnabled'))) return;
+    const enabled = JSON.parse(await this.database.getGuild(member.guild.id, 'logJoin'));
     if (!enabled) return;
     const logChannelId = await this.database.getGuild(member.guild.id, 'logChannel');
     const channel = member.guild.channels.cache.get(logChannelId);
@@ -76,8 +80,8 @@ module.exports = class Logs extends Module {
     const guild = await this.client.guilds.fetch(member.guild.id);
 
     if (user.bot) return;
-    if (!await this.database.getGuild(guild.id, 'logsEnabled')) return;
-    const enabled = await this.database.getGuild(guild.id, 'logLeave');
+    if (!JSON.parse(await this.database.getGuild(guild.id, 'logsEnabled'))) return;
+    const enabled = JSON.parse(await this.database.getGuild(guild.id, 'logLeave'));
     if (!enabled) return;
     const logChannelId = await this.database.getGuild(guild.id, 'logChannel');
     const channel = guild.channels.cache.get(logChannelId);
@@ -94,7 +98,7 @@ module.exports = class Logs extends Module {
   }
 
   async onGuildMemberUpdate(oldMember, newMember) {
-    if (!await this.database.getGuild(newMember.guild.id, 'logsEnabled')) return;
+    if (!JSON.parse(await this.database.getGuild(newMember.guild.id, 'logsEnabled'))) return;
     const enabled = await this.database.getGuild(newMember.guild.id, 'logMemberUpdate');
     if (!enabled) return;
     const logChannelId = await this.database.getGuild(newMember.guild.id, 'logChannel');
@@ -143,8 +147,8 @@ module.exports = class Logs extends Module {
     if (!message.guild) return;
     if (message.author.bot) return;
 
-    if (!await this.database.getGuild(message.guild.id, 'logsEnabled')) return;
-    const enabled = await this.database.getGuild(message.guild.id, 'logCommands');
+    if (!JSON.parse(await this.database.getGuild(message.guild.id, 'logsEnabled'))) return;
+    const enabled = JSON.parse(await this.database.getGuild(message.guild.id, 'logCommands'));
     if (!enabled) return;
     const logChannelId = await this.database.getGuild(message.guild.id, 'logChannel');
     const channel = message.guild.channels.cache.get(logChannelId);
@@ -166,8 +170,8 @@ module.exports = class Logs extends Module {
     if (!interaction.inGuild()) return;
     if (interaction.user.bot) return;
 
-    if (!await this.database.getGuild(interaction.guild.id, 'logsEnabled')) return;
-    const enabled = await this.database.getGuild(interaction.guild.id, 'logCommands');
+    if (!JSON.parse(await this.database.getGuild(interaction.guild.id, 'logsEnabled'))) return;
+    const enabled = JSON.parse(await this.database.getGuild(interaction.guild.id, 'logCommands'));
     if (!enabled) return;
     const logChannelId = await this.database.getGuild(interaction.guild.id, 'logChannel');
     const channel = interaction.guild.channels.cache.get(logChannelId);
@@ -197,8 +201,8 @@ module.exports = class Logs extends Module {
   }
 
   async onGuardianDelete(message, reason) {
-    if (!await this.database.getGuild(message.guild.id, 'logsEnabled')) return;
-    const enabled = await this.database.getGuild(message.guild.id, 'logGuardian');
+    if (!JSON.parse(await this.database.getGuild(message.guild.id, 'logsEnabled'))) return;
+    const enabled = JSON.parse(await this.database.getGuild(message.guild.id, 'logGuardian'));
     if (!enabled) return;
     const logChannelId = await this.database.getGuild(message.guild.id, 'logChannel');
     const channel = message.guild.channels.cache.get(logChannelId);
