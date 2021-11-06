@@ -27,5 +27,5 @@ module.exports = async (shardingManager) => {
     });
   };
 
-  setTimeout(updateStats, 1000);
+  setInterval(updateStats, STATS_UPDATE_INTERVAL);
 }
