@@ -85,7 +85,7 @@ module.exports = class Logs extends Module {
   }
 
   async onGuildMemberUpdate(oldMember, newMember) {
-    const channel = await this.isEnabled(newMember.guild);
+    const channel = await this.getData(newMember.guild);
     if (!channel) return;
     
     const username = `${newMember.user.username}#${newMember.user.discriminator}`;
