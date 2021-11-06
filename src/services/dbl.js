@@ -20,8 +20,6 @@ module.exports = async (shardingManager) => {
     return await got.post(API_URL, {
       headers: { Authorization: DBL_TOKEN },
       json: { users, guilds }
-    }).then(() => {
-      console.log('Posted stats to DBL');
     }).catch(err => {
       console.error(`Unable to post stats to DBL: ${err}`);
     });

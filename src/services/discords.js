@@ -16,8 +16,6 @@ module.exports = async (shardingManager) => {
     return await got.post(API_URL, {
       headers: { Authorization: DISCORDS_TOKEN },
       json: { server_count: guilds }
-    }).then(() => {
-      console.log('Posted stats to Discords');
     }).catch(err => {
       console.error(`Unable to post stats to Discords: ${err}`);
     });
