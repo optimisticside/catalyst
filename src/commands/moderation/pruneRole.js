@@ -13,8 +13,8 @@ module.exports = class PruneAvatarCommand extends Command {
     const role = parser.getOption('role');
     const reason = parser.getOption('reason');
 
-    Promise.all(given.guild.members.map(async member => {
-      if (member.roles.cache.find(r => r === role)) return;
+    await Promise.all(given.guild.members.map(async member => {
+      if (member.roles.cache.get(role.id)) return;
       member.kick(reason);
     })).then(() => {
       given.reply(success('Successfully pruned members.'));

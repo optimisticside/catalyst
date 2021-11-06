@@ -14,7 +14,7 @@ module.exports = class PruneAvatarCommand extends Command {
 
     await Promise.all(given.guild.members.cache.map(async member => {
       if (member.user.avatarURL() !== member.user.defaultAvatarURL) return;
-      member.kick(reason);
+      await member.kick(reason);
     })).then(() => {
       given.reply(success('Successfully pruned members.'));
     }).catch(err => {
