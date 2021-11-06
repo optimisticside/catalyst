@@ -43,10 +43,10 @@ module.exports = class Guilds extends Module {
   }
 
   async autoRole(member) {
-    const enabled = await this.database.getGuild(member.guild.id, 'autoRole');
+    const enabled = await this.database.getGuild(member.guild.id, 'autoRoleEnabled');
     if (!enabled) return;
 
-    const roleId = await this.database.getGuild(member.guild.id, 'autoRoleRole');
+    const roleId = await this.database.getGuild(member.guild.id, 'autoRole');
     const role = member.guild.roles.cache.get(roleId);
     if (!role) return;
 
@@ -62,10 +62,59 @@ module.exports = class Guilds extends Module {
     await this.goodbyeMember(member);
   }
 
+  async onReactionAdd(reaction, user) {
+    const enabled = await this.database.getGuild(reaction.message.guild.id, 'reactionRolesEnabled');
+    if (!enabled) return;
+    const messageId = await this.database.getGuild(reaction.message.guild.id, 'ractionRolesMessage');
+    if (!messageId || messageId !== reaction.message.id) return;
+
+    const raw = await this.database.getGuild(reaction.message.guild.id, 'reactionRoles');
+    const roles = JSON.parse(raw ?? '[]');
+    const roleData = roles.find(r => r[1] === reaction.emoji);
+    const role = message.guild.roles.cache.get(roleData[0]);
+    if (!role) return;
+
+    const member = reaction.message.guild.members.fetch(user.id);
+    if (!member) return;
+    if (member.roles.cache.find(r => r === role)) return;
+    console.log('b')
+    await member.roles.add(role, 'Added through Reaction Roles.').then(async () => {
+      const dmChannel = await user.createDM();
+      dmChannel.send(`You now have the ${role.name} role in ${guild.name}.`);
+    });
+  }
+
+  async onReactionRemove(reaction, user) { console.log('a')
+    const emoji = reaction.emoji;
+    const message = this.client.messages.fetch(reaction.message.id);
+
+    const enabled = await this.database.getGuild(reaction.message.guild.id, 'reactionRolesEnabled');
+    if (!enabled) return;
+    const messageId = await this.database.getGuild(reaction.message.guild.id, 'ractionRolesMessage');
+    if (!messageId || messageId !== reaction.message.id) return;
+
+    const raw = await this.database.getGuild(reaction.message.guild.id, 'reactionRoles');
+    const roles = JSON.parse(raw ?? '[]');
+    const roleData = roles.find(r => r[1] === emoji);
+    const role = message.guild.roles.cache.get(roleData[0]);
+    if (!role) return;
+
+    const member = reaction.message.guild.members.fetch(user.id);
+    if (!member) return;
+    if (!member.roles.cache.find(r => r === role)) return;
+  
+    await member.roles.remove(role, 'Removed through Reaction Roles.').then(async () => {
+      const dmChannel = await user.createDM();
+      dmChannel.send(`You no longer have the ${role.name} role in ${guild.name}.`);
+    });
+  }
+
   load({ eventHandler, database }) {
     this.database = database;
     eventHandler.on('guildMemberAdd', this.onMemberAdd.bind(this));
     eventHandler.on('guildMemberRemove', this.onMemberRemove.bind(this));
+    // eventHandler.on('messageReactionAdd', this.onReactionAdd.bind(this));
+    // eventHandler.on('messageReactionRemove', this.onReactionRemove.bind(this));
   }
 
   constructor(client) {

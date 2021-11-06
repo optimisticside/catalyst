@@ -7,6 +7,7 @@ const { alert, success, warning, prompt, neutral } = require('../../util/formatt
 const { NAME, DEFAULT_COLOR } = require('../../config.json');
 const Command = require('../../structs/command.js');
 const OptionParser = require('../../util/optionParser.js');
+const emojiRegex = require('emoji-regex');
 const Serializer = require('../../util/serializer.js');
 const promisify = (fn) => async (...given) => fn(...given);
 
@@ -460,7 +461,134 @@ module.exports = class ConfigCommand extends Command {
               promisify(Serializer.deserializeRole), promisify(Serializer.serializeRole), null, 'autoRoleRole')
           }
         ]
+      },
+      /*
+      {
+        name: 'Reaction Roles',
+        desc: 'Lets users assign themselves roles by reacting to a message.',
+        menuDesc:' React with the corresponding emoji to configure Reacion Roles.',
+        emoji: '🖌️',
+        menu: [
+          {
+            name: 'Toggle',
+            desc: 'Enable or disable Reaction Roles.',
+            emoji: '🔧',
+            handler: this.boolSetting('Reaction Roles', 'Reaction Roles will let users choose their own roles.', 'reactionRoleEnabled')
+          },
+          {
+            name: 'Post',
+            desc: 'Posts the reaction roles message.',
+            emoji: '✅',
+            handler: async (client, given, reply) => {
+              const channelId = await this.promptString(given, reply, 'Channel', 'What channel should I post the message in?',
+                promisify(Serializer.deserializeChannel));
+              const channel = given.guild.channels.cache.get(channelId);
+              if (!channel) return;
+
+              const desc = await this.promptString(given, reply, 'Message', 'What should the message say?');
+              if (!desc) return;
+
+              const embed = new MessageEmbed()
+                .setTitle('Reaction Roles')
+                .setColor(DEFAULT_COLOR)
+                .setDescription(desc);
+
+              const message = await channel.send({ embeds: [ embed ] });
+              const raw = await client.database.getGuild(given.guild.id, 'reactionRoles');
+              const reactionRoles = JSON.parse(raw ?? '[]');
+
+              await Promise.all(reactionRoles.map(rr => message.react(rr[1])));
+              await client.database.setGuild(given.guild.id, 'reactionRolesMessage', message.id)
+              .finally(() => reply.reactions.removeAll())
+              .then(() => reply.edit(success('Successfully updated database', 'embed')))
+              .catch(err => reply.edit(alert('Unable to update database', 'embed')));
+            }
+          },
+          {
+            name: 'Roles',
+            desc: 'The roles that users will be able to give themselves.',
+            menuDesc: 'React with the corresponding emoji to configure roles.',
+            emoji: '📝',
+            menu: [
+              // TODO: This is basically the same code in the blacklist menu,
+              // so we need to try to make a function for editing an array.
+              {
+                name: 'Add',
+                desc: 'Add a role to the list of reaction roles.',
+                emoji: '✏️',
+                handler: async (client, given, reply) => {
+                  const raw = await client.database.getGuild(given.guild.id, 'reactionRoles') || '[]';
+                  const roles = JSON.parse(raw);
+                  const role = await this.promptString(given, reply, 'role', 'What role would you like to add', promisify(Serializer.deserializeRole));
+                  if (!role) return;
+                  if (roles.find(r => r[0] === role)) {
+                    return reply.edit(warning('That role is already added', 'embed'))
+                  }
+
+                  const emoji = await this.promptString(given, reply, 'emoji', 'What emoji would you like to set', async answer => {
+                    return answer.match(emojiRegex())[0];
+                  });
+                  if (!emoji) return;
+
+                  roles.push([ role, emoji ]);
+                  const json = JSON.stringify(roles);
+                  await client.database.setGuild(given.guild.id, 'reactionRoles', json)
+                    .finally(() => reply.reactions.removeAll())
+                    .then(() => reply.edit(success('Successfully updated database', 'embed')))
+                    .catch(err => reply.edit(alert('Unable to update database', 'embed')));
+                }
+              },
+              {
+                name: 'Remove',
+                desc: 'Remove a role from the list of reaction roles.',
+                emoji: '🗑️',
+                handler: async (client, given, reply) => {
+                  const raw = await client.database.getGuild(given.guild.id, 'reactionRoles') || '[]';
+                  const roles = JSON.parse(raw);
+                  const answer = await this.promptString(given, reply, 'role', 'What role would you like to remove', promisify(Serializer.deserializeRole));
+                  if (!answer) return;
+
+                  const index = roles.findIndex(r => r[0] === answer);
+                  if (index === null) {
+                    return reply.edit(warning('That role is not in the list', 'embed'))
+                  }
+
+                  roles.splice(index, 1);
+                  const json = JSON.stringify(roles);
+                  await client.database.setGuild(given.guild.id, 'reactionRoles', json)
+                    .finally(() => reply.reactions.removeAll())
+                    .then(() => reply.edit(success('Successfully updated database', 'embed')))
+                    .catch(err => reply.edit(alert('Unable to update database', 'embed')));
+                }
+              },
+              {
+                name: 'List',
+                desc: 'See the list of reaction roles in your DMs.',
+                emoji: '👁️',
+                handler: async (client, given, reply) => {
+                  const raw = await client.database.getGuild(given.guild.id, 'reactionRoles') || '[]';
+                  const roles = JSON.parse(raw);
+                  const embed = new MessageEmbed()
+                    .setTitle('Reaction Roles')
+                    .setColor(DEFAULT_COLOR)
+                    .addFields(roles.map(r => {
+                      const name = given.guild.roles.cache.get(r[0])?.name;
+                      return { name, value: r[1] };
+                    }));
+                  const dmChannel = await given.author.createDM()
+                    .catch(err => reply.edit(alert('Unable to create DM', 'embed')));
+                  if (!dmChannel) return;
+                  await dmChannel.send({ embeds: [ embed ] })
+                    .finally(() => reply.reactions.removeAll())
+                    .then(() => reply.edit(success('Check your DMs', 'embed')))
+                    .catch(err => reply.edit(alert('Unable to send DM', 'embed')));
+                }
+              }
+            ]
+          }
+        ]
       }
+      */
     ]
   }
 };
