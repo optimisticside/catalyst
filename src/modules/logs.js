@@ -36,7 +36,7 @@ module.exports = class Logs extends Module {
   }
 
   async onMessageEdit(oldMessage, newMessage) {
-    if (member.user.bot) return;
+    if (newMessage.author.bot) return;
     const channel = await this.getData('logEdit', newMessage.guild);
     if (!channel) return;
 
