@@ -8,7 +8,7 @@ const { MessageEmbed } = require('discord.js');
 const Module = require('../structs/module.js');
 
 module.exports = class Logs extends Module {
-  async isEnabled(key, guild) {
+  async getData(key, guild) {
     if (!guild) return;
     if (!JSON.parse(await this.database.getGuild(guild.id, 'logsEnabled'))) return;
     const enabled = await this.database.getGuild(guild.id, 'logDelete');
@@ -71,7 +71,7 @@ module.exports = class Logs extends Module {
     const user = await this.client.users.fetch(member.id);
     const guild = await this.client.guilds.fetch(member.guild.id);
 
-    const channel = await this.isEnabled('logLeave', member.guild);
+    const channel = await this.getData('logLeave', member.guild);
     if (!channel) return;
 
     const username = `${user.username}#${user.discriminator}`;
@@ -129,7 +129,7 @@ module.exports = class Logs extends Module {
     if (command.tags?.find(t => t === 'fun')) return;
     if (message.author.bot) return;
 
-    const channel = await this.isEnabled('logCommmands', message.guild);
+    const channel = await this.getData('logCommmands', message.guild);
     if (!channel) return;
 
     const username = `${message.author.username}#${message.author.discriminator}`;
@@ -175,7 +175,7 @@ module.exports = class Logs extends Module {
   }
 
   async onGuardianDelete(message, reason) {
-    const channel = await this.isEnabled('logGuardian', message.guild);
+    const channel = await this.getData('logGuardian', message.guild);
     if (!channel) return;
 
     const username = `${message.author.username}#${message.author.discriminator}`;
