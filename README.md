@@ -17,7 +17,7 @@ c!help kick
 ```
 
 ## Slash Commands
-Catalyst offers full support for slash commands. These slash commands can be viewed by entering the `/` key in the Discord message box, and navigating to the Catalyst menu. From here, you can see a list of commands that can be run. For more information about slash commands, you can read [#Discord's blog post](https://blog.discord.com/slash-commands-are-here-8db0a385d9e6).
+Catalyst offers full support for slash commands. These slash commands can be viewed by entering the `/` key in the Discord message box, and navigating to the Catalyst menu. From here, you can see a list of commands that can be run. For more information about slash commands, you can read [Discord's blog post](https://blog.discord.com/slash-commands-are-here-8db0a385d9e6).
 
 ## Guardian
 Guardian is Catalyst's auto-moderation system, which ensures a safe and friendly environment to chat in. Guardian can be configured by using the `config` command and navigating to the `Guardian` menu. Some of Guardian's features include anti-spam, self-bot detection, and anti-advertising.
