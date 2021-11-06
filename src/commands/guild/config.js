@@ -220,7 +220,7 @@ module.exports = class ConfigCommand extends Command {
 
                   const word = answer.toLowerCase();
                   const index = blacklisted.findIndex(w => w === word);
-                  if (index === null) {
+                  if (index === -1) {
                     return reply.edit(warning('That word is not blacklisted', 'embed'))
                   }
 
