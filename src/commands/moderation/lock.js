@@ -24,6 +24,7 @@ module.exports = class BanCommand extends Command {
       perms: [ Permissions.FLAGS.BAN_MEMBERS ],
       tags: [ 'moderation' ],
       guildOnly: true,
+      hidden: true, // This command is not complete.
       options: [
         {
           name: 'channel',
