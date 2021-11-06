@@ -148,7 +148,7 @@ module.exports = class Logs extends Module {
     if (!interaction.inGuild()) return;
     if (interaction.user.bot) return;
 
-    const channel = await this.isEnabled('logCommands', interaction.guild);
+    const channel = await this.getData('logCommands', interaction.guild);
     if (!channel) return;
 
     let message = interaction.commandName;
