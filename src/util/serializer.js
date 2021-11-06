@@ -17,7 +17,7 @@ module.exports = {
   serializeChannel: channel => `<#${channel}>`,
   deserializeChannel: str => str.match(/^<#(\d+)>$/)[1],
   serializeRole: role => `<@${role}>`,
-  deserializeRole: str => str.match(/^<@!?(\d+)>$/)[1],
+  deserializeRole: str => str.match(/^<@&?(\d+)>$/)[1],
   serializeMentionable: mentionable => `<@${mentionable}>`,
-  deserializeMentionable: str => str.match(/^<@!?(\d+)>$/)[1]
+  deserializeMentionable: str => str.match(/^<@&?(\d+)>$/)[1]
 };

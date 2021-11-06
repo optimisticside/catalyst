@@ -19,7 +19,7 @@ const client = new Client({
     Intents.FLAGS.GUILD_INVITES,
     Intents.FLAGS.GUILD_MEMBERS
   ],
-  partials: [ 'GUILD_MEMBER' ],
+  partials: [ 'GUILD_MEMBER', 'REACTION' ],
   restTimeOffset: REST_TIME_OFFSET ?? 500
 });
 
