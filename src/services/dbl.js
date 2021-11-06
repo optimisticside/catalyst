@@ -9,7 +9,7 @@ const got = require('got');
 module.exports = async (shardingManager) => {
   if (!DBL_TOKEN) return;
 
-  const updateStats = async () => { console.log('alr')
+  const updateStats = async () => {
     const result = await Promise.all([
       shardingManager.fetchClientValues('guilds.cache.size'),
       shardingManager.broadcastEval(c => c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0))
@@ -17,13 +17,14 @@ module.exports = async (shardingManager) => {
     const guilds = result[0].reduce((acc, count) => acc + count, 0);
     const users = result[1].reduce((acc, count) => acc + count, 0);
 
-    const response = await got.post(API_URL, {
+    return await got.post(API_URL, {
       headers: { Authorization: DBL_TOKEN },
       json: { users, guilds }
+    }).then(() => {
+      console.log('Posted stats to DBL');
     }).catch(err => {
       console.error(`Unable to post stats to DBL: ${err}`);
     });
-    console.log(response.body)
   };
 
   setTimeout(updateStats, 1000);
