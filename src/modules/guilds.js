@@ -75,14 +75,14 @@ module.exports = class Guilds extends Module {
     const member = reaction.message.guild.members.fetch(user.id);
     if (!member) return;
     if (member.roles.cache.find(r => r === role)) return;
-    console.log('b')
+
     await member.roles.add(role, 'Added through Reaction Roles.').then(async () => {
       const dmChannel = await user.createDM();
       dmChannel.send(`You now have the ${role.name} role in ${guild.name}.`);
     });
   }
 
-  async onReactionRemove(reaction, user) { console.log('a')
+  async onReactionRemove(reaction, user) {
     const emoji = reaction.emoji;
     const message = this.client.messages.fetch(reaction.message.id);
 

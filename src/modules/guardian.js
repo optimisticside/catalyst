@@ -42,6 +42,7 @@ module.exports = class Guardian extends Module {
 
       // Anti spam pressure values.
       // For now, they are not changable by users.
+      // TODO: stop using `pressureRange`.
       pressureDecay: 2.5,
       basePressure: 10,
       maxPressure: 60,
