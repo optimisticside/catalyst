@@ -10,15 +10,18 @@ const wait = require('timers/promises').setTimeout;
 
 module.exports = class Guardian extends Module {
   async notify(message, reason) {
-    const reply = await message.reply(warning(this.messages[reason] ?? 'Your message(s) were blocked.'));
-    // We do not want to yield the `notify` function.
-    wait(5000).then(() => reply.delete());
+    message.reply(warning(this.messages[reason] ?? 'Your message(s) were blocked.')).then(reply => {
+      // We do not want to yield the `notify` function.
+      wait(5000).then(() => reply.delete());
+    });
   }
 
   async delete(message, reason) {
     await this.notify(message, reason);
     await this.logHandler.onGuardianDelete(message, this.reasons[reason] ?? reason);
-    message.delete();
+    // This causes the shard to restart so
+    // we will do this >:)
+    message.delete().catch(err => {});
   }
 
   async handleMessage(message) {
@@ -97,7 +100,7 @@ module.exports = class Guardian extends Module {
     }
 
     // TODO: Ban user instead of deleting when detecting self-bot.
-    if (config.blockSelfBots && hasEmbeds) await this.delete(message, 'selfBot');
+    // if (config.blockSelfBots && hasEmbeds) await this.delete(message, 'selfBot');
     if (config.blockDuplicates && hasDuplicates) await this.delete(message, 'duplicate');
     if (config.blockZalgo && hasZalgo) await this.delete(message, 'zalgo');
     if (config.blockInvites && hasInvite) await this.delete(message, 'invite');
@@ -128,7 +131,8 @@ module.exports = class Guardian extends Module {
       image: 'Your message had too many images.',
       blacklist: 'Your message had a blacklisted word.',
       ip: 'Your message contained an IP address.',
-      spam: 'You are sending messages too quickly.'
+      spam: 'You are sending messages too quickly.',
+      selfBot: 'Self-bots are not allowed on Discord.'
     };
 
     this.reasons = {
@@ -139,7 +143,8 @@ module.exports = class Guardian extends Module {
       image: 'Message included too many images.',
       blacklist: 'Message contained blacklisted word.',
       ip: 'Message contained IP address.',
-      spam: 'Messages sent to quickly.'
+      spam: 'Messages sent to quickly.',
+      selfBot: 'Flagged as self-bot.'
     }
   }
 };
