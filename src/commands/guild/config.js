@@ -220,7 +220,7 @@ module.exports = class ConfigCommand extends Command {
                   }
 
                   blacklisted.splice(index, 1);
-                  const json = JSON.parse(blacklisted);
+                  const json = JSON.stringify(blacklisted);
                   await client.database.setGuild(given.guild.id, 'blacklistedWords', json)
                     .finally(() => reply.reactions.removeAll())
                     .then(() => reply.edit(success('Successfully updated database', 'embed')))
