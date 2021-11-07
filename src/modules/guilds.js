@@ -17,7 +17,8 @@ module.exports = class Guilds extends Module {
     const message = await this.database.getGuild(member.guild.id, 'greetingMessage');
     if (!message) return;
 
-    const formatted = message.replace('{user}', `<@${member.user.id}>`) 
+    const formatted = message.replace('{mention}', `<@${member.user.id}>`) 
+      .replace('{user}', member.username)
       .replace('{guild}', member.guild.name)
       .replace('{count}', member.guild.memberCount);
     channel.send(formatted);

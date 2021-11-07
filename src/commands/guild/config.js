@@ -339,7 +339,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The message that users will be greeted with.',
             emoji: '✉️',
             handler: this.stringSetting('Greeting Message', 'The greeting channel is the message users will be greeted with.', null, null,
-              'How would you like to greet messages. You can access the user\'s name through `{user}`, the server name through `{guild}`, and the member count through `{count}`', 'greetingMessage')
+              'How would you like to greet messages. You can mention the user through {mention}, and access the user\'s name through `{user}`, the server name through `{guild}`, and the member count through `{count}`', 'greetingMessage')
           },
           {
             name: 'Channel',
