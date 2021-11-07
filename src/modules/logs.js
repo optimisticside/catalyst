@@ -21,7 +21,7 @@ module.exports = class Logs extends Module {
     return channel;
   }
   async onMessageDelete(message) {
-    if (message.user.bot) return;
+    if (message.author.bot) return;
     const channel = await this.getData('logDelete', message.guild);
     if (!channel) return;
 
