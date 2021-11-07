@@ -2,6 +2,7 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
+const PATH_DELIM = ':';
 const { Permissions, MessageEmbed } = require('discord.js');
 const { alert, success, warning, prompt, neutral, denial } = require('../../util/formatter.js')('Set-Prefix Command');
 const { NAME, DEFAULT_COLOR } = require('../../config.json');
@@ -148,6 +149,20 @@ module.exports = class ConfigCommand extends Command {
 
   async run(client, given, args) {
     const parser = new OptionParser(this, given, args);
+    //const path = await parser.getOption('path');
+
+    /*if (path) { console.log(path.split(PATH_DELIM))
+      const elements = path.split(PATH_DELIM);
+      let position = this.settings;
+      elements.forEach(e => {
+        if (!position || (!position.menu && position !== this.settings)) return;
+        position = position.menu[e];
+      });
+      if (!position || !position.menu) return;
+      await this.loadMenu(client, given, null, position.name,
+        position.desc, position.menu);
+    }*/
+
     return await this.loadMenu(client, given, null, NAME,
       `React with the corresponding emoji to configure ${NAME}.`, this.settings);
   }
@@ -158,7 +173,16 @@ module.exports = class ConfigCommand extends Command {
       desc: 'Lets you manage the guild configuration.',
       perms: [ Permissions.FLAGS.MANAGE_GUILD ],
       guildOnly: true,
-      tags: [ 'guild' ]
+      tags: [ 'guild' ],
+      options: [
+        /*{
+          name: 'path',
+          type: 'string',
+          desc: 'The setting you want to configure (split by colons)',
+          prompt: 'What path do you want to configure?',
+          required: false
+        }*/
+      ]
     })
 
     this.settings = [
