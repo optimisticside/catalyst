@@ -71,8 +71,6 @@ module.exports = class ConfigCommand extends Command {
       const current = JSON.parse(await client.database.getGuild(given.guild.id, ...key));
       const newDesc = current != null ? `${desc}\nIt is currently ${current == true ? 'on' : 'off'}` : desc;
 
-      // TODO: If it is already enabled, we should instead
-      // ask the user if they want to disable it.
       const answer = await this.promptBool(given, reply, name, newDesc, `Would you like to ${current == true ? 'disable' : 'enable'} it?`);
       if (answer === null) return;
 
