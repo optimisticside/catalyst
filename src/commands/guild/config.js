@@ -3,7 +3,7 @@
 // See LICENSE for details
 
 const PATH_DELIM = ':';
-const { Permissions, MessageEmbed } = require('discord.js');
+const { Permissions, MessageEmbed, Interaction } = require('discord.js');
 const { alert, success, warning, prompt, neutral, denial } = require('../../util/formatter.js')('Set-Prefix Command');
 const { NAME, DEFAULT_COLOR } = require('../../config.json');
 const Command = require('../../structs/command.js');
@@ -162,6 +162,10 @@ module.exports = class ConfigCommand extends Command {
       await this.loadMenu(client, given, null, position.name,
         position.desc, position.menu);
     }*/
+
+    if (given instanceof Interaction) {
+      return given.reply(warning('The config command cannot be run as a slash command'));
+    }
 
     return await this.loadMenu(client, given, null, NAME,
       `React with the corresponding emoji to configure ${NAME}.`, this.settings);
