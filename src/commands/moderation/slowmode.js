@@ -30,9 +30,9 @@ module.exports = class BanCommand extends Command {
       options: [
         {
           name: 'time',
-          type: 'time',
-          desc: 'How long the channel should be locked for.',
-          prompt: 'How long should the channel be locked for?',
+          type: 'integer',
+          desc: 'How many seconds the slowmode should be set to.',
+          prompt: 'What should the slowmode be set to?',
           required: true
         }
       ]
