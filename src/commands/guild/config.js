@@ -69,15 +69,15 @@ module.exports = class ConfigCommand extends Command {
   boolSetting(name, desc, ...key) {
     return async (client, given, reply) => {
       const current = JSON.parse(await client.database.getGuild(given.guild.id, ...key));
-      const newDesc = current != null ? `${desc}\nIt is currently ${current == true ? 'on' : 'off'}` : desc;
+      const newDesc = current != null ? `${desc}\nIt is currently ${current === true ? 'on' : 'off'}` : desc;
 
-      const answer = await this.promptBool(given, reply, name, newDesc, `Would you like to ${current == true ? 'disable' : 'enable'} it?`);
+      const answer = await this.promptBool(given, reply, name, newDesc, `Would you like to ${current === true ? 'disable' : 'enable'} it?`);
       if (answer === null) return;
 
       if (answer) {
         await client.database.setGuild(given.guild.id, ...key, !current)
           .finally(() => reply.reactions.removeAll())
-          .then(() => reply.edit(success(`Successfully ${current == true ? 'disabled' : 'enabled'} ${name}`, 'embed')))
+          .then(() => reply.edit(success(`Successfully ${current === true ? 'disabled' : 'enabled'} ${name}`, 'embed')))
           .catch(err => {
             console.log(`Unable to write to database: ${err}`);
             reply.edit(alert(`Unable to change ${name}`, 'embed'));
