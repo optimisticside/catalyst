@@ -69,13 +69,11 @@ module.exports = class ConfigCommand extends Command {
   boolSetting(name, desc, ...key) {
     return async (client, given, reply) => {
       const current = await client.database.getGuild(given.guild.id, ...key);
-      if (current !== null) {
-        desc = `${desc}\nIt is currently ${current ? 'on' : 'off'}`;
-      }
+      const newDesc = current !== null ? `${desc}\nIt is currently ${current ? 'on' : 'off'}` : desc;
 
       // TODO: If it is already enabled, we should instead
       // ask the user if they want to disable it.
-      const answer = await this.promptBool(given, reply, name, desc, `Would you like to ${current ? 'disable' : 'enable'} it?`);
+      const answer = await this.promptBool(given, reply, name, newDesc, `Would you like to ${current ? 'disable' : 'enable'} it?`);
       if (answer === null) return;
 
       if (answer) {
