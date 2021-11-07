@@ -34,6 +34,7 @@ module.exports = class BanCommand extends Command {
       perms: [ Permissions.FLAGS.BAN_MEMBERS ],
       tags: [ 'moderation' ],
       guildOnly: true,
+      passive: false,
       options: [
         {
           name: 'target',
