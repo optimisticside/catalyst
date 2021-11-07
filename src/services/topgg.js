@@ -13,7 +13,7 @@ module.exports = async (shardingManager) => {
     const guildCounts = await shardingManager.fetchClientValues('guilds.cache.size');
     const guilds = guildCounts.reduce((acc, count) => acc + count, 0);
     const shards = shardingManager.shards.size;
-   
+
     return await got.post(API_URL, {
       headers: { Authorization: TOPGG_TOKEN },
       json: { server_count: guilds, shard_count: shards }
