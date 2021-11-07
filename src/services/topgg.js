@@ -15,7 +15,7 @@ module.exports = async (shardingManager) => {
     const shards = shardingManager.shards.size;
    
     return await got.post(API_URL, {
-      headers: { Authorization: DISCORDS_TOKEN },
+      headers: { Authorization: TOPGG_TOKEN },
       json: { server_count: guilds, shard_count: shards }
     }).catch(err => {
       console.error(`Unable to post stats to Top.gg: ${err}`);
