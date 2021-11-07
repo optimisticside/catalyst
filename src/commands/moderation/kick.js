@@ -30,6 +30,7 @@ module.exports = class KickCommand extends Command {
       perms: [ Permissions.FLAGS.KICK_MEMBERS ],
       tags: [ 'moderation' ],
       guildOnly: true,
+      passive: false,
       options: [
         {
           name: 'target',

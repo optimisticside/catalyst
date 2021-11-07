@@ -26,6 +26,7 @@ module.exports = class BanCommand extends Command {
       perms: [ Permissions.FLAGS.MANAGE_CHANNELS ],
       tags: [ 'moderation' ],
       guildOnly: true,
+      passive: false,
       options: [
         {
           name: 'time',

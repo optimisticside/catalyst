@@ -28,6 +28,7 @@ module.exports = class PurgeCommand extends Command {
       perms: [ Permissions.FLAGS.MANAGE_MESSAGES ],
       tags: [ 'moderation' ],
       guildOnly: true,
+      passive: false,
       options: [
         {
           name: 'amount',

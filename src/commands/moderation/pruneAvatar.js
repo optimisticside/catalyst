@@ -32,6 +32,7 @@ module.exports = class PruneAvatarCommand extends Command {
       perms: [ Permissions.FLAGS.KICK_MEMBERS ],
       tags: [ 'moderation' ],
       guildOnly: true,
+      passive: false,
       options: [
         {
           name: 'reason',
