@@ -12,7 +12,7 @@ module.exports = class Guardian extends Module {
   async notify(message, reason) {
     message.reply(warning(this.messages[reason] ?? 'Your message(s) were blocked.')).then(reply => {
       // We do not want to yield the `notify` function.
-      wait(5000).then(() => reply.delete());
+      wait(5000).then(() => reply.delete().catch(err => console.log(`${mhm}\n${err}`)));
     });
   }
 
@@ -21,7 +21,7 @@ module.exports = class Guardian extends Module {
     await this.logHandler.onGuardianDelete(message, this.reasons[reason] ?? reason);
     // This causes the shard to restart so
     // we will do this >:)
-    message.delete().catch(err => {});
+    message.delete().catch(err => console.log(err));
   }
 
   async handleMessage(message) {
@@ -53,6 +53,7 @@ module.exports = class Guardian extends Module {
       lengthPressure: pressureRange / 8000,
       linePressure: pressureRange / 70,
       pingPressure: pressureRange / 20,
+      notifyInterval: 5000
     };
 
     const images = message.attachments.filter(a => a.type === 'image');
@@ -88,10 +89,13 @@ module.exports = class Guardian extends Module {
         if (tracker.pressure > config.maxPressure) {
           // Until I can come up with a better way of dealing with this.
           // (such as muting the user), we'll have to deal with this.
-          await this.notify(message, 'spam');
-          message.channel.messages?.fetch({ limit: 30 }).then(messages => {
+          if (!tracker.lastReply || message.createdAt - tracker.lastReply > config.notifyInterval) {
+            tracker.lastReply = Date.now();
+            await this.notify(message, 'spam');
+          }
+          message.channel.messages?.fetch({ limit: 20 }).then(messages => {
             messages.filter(m => m.author === message.author && message.createdAt > tracker.start)
-              .map(m => m.delete());
+              .map(m => m.delete().catch(err => console.log(err)));
           });
         }
       } else {
