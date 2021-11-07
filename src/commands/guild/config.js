@@ -112,6 +112,84 @@ module.exports = class ConfigCommand extends Command {
     }
   }
 
+  listSetting(title, elementName, elementPlural, encoder, decoder, ...key) {
+    return [
+      {
+        name: 'Add',
+        desc: `Add a ${elementName} to the list.`,
+        emoji: '✏️',
+        handler: async (client, given, reply) => {
+          const raw = await client.database.getGuild(given.guild.id, ...key) || '[]';
+          const list = JSON.parse(raw);
+          const answer = await this.promptString(given, reply, elementName, `What ${elementName} would you like to add`, encoder);
+          if (!answer) return;
+
+          if (list.find(e => e === answer)) {
+            return reply.edit(warning(`That ${elementName} is already in the list`, 'embed'))
+          }
+
+          list.push(answer);
+          const json = JSON.stringify(list)
+          await client.database.setGuild(given.guild.id, ...key, json)
+            .finally(() => reply.reactions.removeAll())
+            .then(() => reply.edit(success('Successfully updated database', 'embed')))
+            .catch(err => reply.edit(alert('Unable to update database', 'embed')));
+        }
+      },
+      {
+        name: 'Remove',
+        desc: `Remove a ${elementName} from the list.`,
+        emoji: '🗑️',
+        handler: async (client, given, reply) => {
+          const raw = await client.database.getGuild(given.guild.id, ...key) || '[]';
+          const list = JSON.parse(raw);
+          const answer = await this.promptString(given, reply, 'word', `What ${elementName} would you like to remove`, encoder);
+          if (!answer) return;
+
+          const index = list.findIndex(e => e === answer);
+          if (index === -1) {
+            return reply.edit(warning(`That ${elementName} is not in the list`, 'embed'))
+          }
+
+          list.splice(index, 1);
+          const json = JSON.stringify(list);
+          await client.database.setGuild(given.guild.id, ...key, json)
+            .finally(() => reply.reactions.removeAll())
+            .then(() => reply.edit(success('Successfully updated database', 'embed')))
+            .catch(err => reply.edit(alert('Unable to update database', 'embed')));
+        }
+      },
+      {
+        name: 'List',
+        desc: `See the list of ${elementPlural} in your DMs.`,
+        emoji: '👁️',
+        handler: async (client, given, reply) => {
+          const raw = await client.database.getGuild(given.guild.id, ...key) || '[]';
+          const list = JSON.parse(raw);
+          const data = await Promise.all(list.map(async e => {
+            if (decoder) {
+              e = await decoder(e);
+            }
+            return e;
+          }));
+
+          const embed = new MessageEmbed()
+            .setTitle(title)
+            .setColor(DEFAULT_COLOR)
+            .setDescription(data.join('\n'));
+
+          const dmChannel = await given.author.createDM()
+            .catch(err => reply.edit(alert('Unable to create DM', 'embed')));
+          if (!dmChannel) return;
+          await dmChannel.send({ embeds: [ embed ] })
+            .finally(() => reply.reactions.removeAll())
+            .then(() => reply.edit(success('Check your DMs', 'embed')))
+            .catch(err => reply.edit(alert('Unable to send DM', 'embed')));
+        }
+      }
+    ]
+  }
+
   async loadMenu(client, given, reply, title, desc, settings) {
     const embed = new MessageEmbed()
       .setTitle(title)
@@ -204,75 +282,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'Automatically deletes messages that contain blacklisted words.',
             menuDesc: 'React with the corresponding emoji to configure Guardian Blacklist.',
             emoji: '🚫',
-            menu: [
-              {
-                name: 'Add',
-                desc: 'Add a word to the blacklist.',
-                emoji: '✏️',
-                handler: async (client, given, reply) => {
-                  const raw = await client.database.getGuild(given.guild.id, 'blacklistedWords') || '[]';
-                  const blacklisted = JSON.parse(raw);
-                  const answer = await this.promptString(given, reply, 'word', 'What word would you like to add', null);
-                  if (!answer) return;
-
-                  const word = answer.toLowerCase();
-                  if (blacklisted.find(w => w === word)) {
-                    return reply.edit(warning('That word is already blacklisted', 'embed'))
-                  }
-
-                  blacklisted.push(word);
-                  const json = JSON.stringify(blacklisted)
-                  await client.database.setGuild(given.guild.id, 'blacklistedWords', json)
-                    .finally(() => reply.reactions.removeAll())
-                    .then(() => reply.edit(success('Successfully updated database', 'embed')))
-                    .catch(err => reply.edit(alert('Unable to update database', 'embed')));
-                }
-              },
-              {
-                name: 'Remove',
-                desc: 'Remove a word from the blacklist.',
-                emoji: '🗑️',
-                handler: async (client, given, reply) => {
-                  const raw = await client.database.getGuild(given.guild.id, 'blacklistedWords') || '[]';
-                  const blacklisted = JSON.parse(raw);
-                  const answer = await this.promptString(given, reply, 'word', 'What word would you like to remove', null);
-                  if (!answer) return;
-
-                  const word = answer.toLowerCase();
-                  const index = blacklisted.findIndex(w => w === word);
-                  if (index === -1) {
-                    return reply.edit(warning('That word is not blacklisted', 'embed'))
-                  }
-
-                  blacklisted.splice(index, 1);
-                  const json = JSON.stringify(blacklisted);
-                  await client.database.setGuild(given.guild.id, 'blacklistedWords', json)
-                    .finally(() => reply.reactions.removeAll())
-                    .then(() => reply.edit(success('Successfully updated database', 'embed')))
-                    .catch(err => reply.edit(alert('Unable to update database', 'embed')));
-                }
-              },
-              {
-                name: 'List',
-                desc: 'See the list of blacklisted words in your DMs.',
-                emoji: '👁️',
-                handler: async (client, given, reply) => {
-                  const raw = await client.database.getGuild(given.guild.id, 'blacklistedWords') || '[]';
-                  const blacklisted = JSON.parse(raw);
-                  const embed = new MessageEmbed()
-                    .setTitle('Guardian Blacklist')
-                    .setColor(DEFAULT_COLOR)
-                    .setDescription(blacklisted.join('\n'));
-                  const dmChannel = await given.author.createDM()
-                    .catch(err => reply.edit(alert('Unable to create DM', 'embed')));
-                  if (!dmChannel) return;
-                  await dmChannel.send({ embeds: [ embed ] })
-                    .finally(() => reply.reactions.removeAll())
-                    .then(() => reply.edit(success('Check your DMs', 'embed')))
-                    .catch(err => reply.edit(alert('Unable to send DM', 'embed')));
-                }
-              }
-            ]
+            menu: this.listSetting('Guardian Blacklist', 'word', 'words', async w => w.toLowerCase(), null, 'blacklistedWords')
           },
           {
             name: 'Antispam',
@@ -478,80 +488,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The roles that Auto Role will assign.',
             menuDesc: 'React with the corresponding emoji to configure roles.',
             emoji: '✏️',
-            menu: [
-              {
-                name: 'Add',
-                desc: 'Add a word to the blacklist.',
-                emoji: '✏️',
-                handler: async (client, given, reply) => {
-                  const raw = await client.database.getGuild(given.guild.id, 'autoRoles') || '[]';
-                  const roles = JSON.parse(raw);
-                  const answer = await this.promptString(given, reply, 'role', 'What role would you like to add', promisify(Serializer.deserializeRole));
-                  if (!answer) return;
-
-                  if (!given.guild.roles.cache.get(answer)) return;
-                  if (given.member.roles.highest.comparePositionTo(answer) < 0) {
-                    return reply.edit(denial('You do not have permissions to add this role', 'embed'));
-                  }
-                  if (roles.find(r => r === answer)) {
-                    return reply.edit(warning('That role is already in the list', 'embed'))
-                  }
-
-                  roles.push(answer);
-                  const json = JSON.stringify(roles)
-                  await client.database.setGuild(given.guild.id, 'autoRoles', json)
-                    .finally(() => reply.reactions.removeAll())
-                    .then(() => reply.edit(success('Successfully updated database', 'embed')))
-                    .catch(err => reply.edit(alert('Unable to update database', 'embed')));
-                }
-              },
-              {
-                name: 'Remove',
-                desc: 'Remove a word from the blacklist.',
-                emoji: '🗑️',
-                handler: async (client, given, reply) => {
-                  const raw = await client.database.getGuild(given.guild.id, 'autoRoles') || '[]';
-                  const roles = JSON.parse(raw);
-                  const answer = await this.promptString(given, reply, 'role', 'What role would you like to remove', promisify(Serializer.deserializeRole));
-                  if (!answer) return;
-
-                  const index = roles.findIndex(r => r === answer.id);
-                  if (given.member.roles.highest.comparePositionTo(answer) < 0) {
-                    return reply.edit(denial('You do not have permissions to remove this role', 'embed'));
-                  }
-                  if (index === -1) {
-                    return reply.edit(warning('That role is not in the list', 'embed'))
-                  }
-
-                  roles.splice(index, 1);
-                  const json = JSON.parse(roles);
-                  await client.database.setGuild(given.guild.id, 'autoRoles', json)
-                    .finally(() => reply.reactions.removeAll())
-                    .then(() => reply.edit(success('Successfully updated database', 'embed')))
-                    .catch(err => reply.edit(alert('Unable to update database', 'embed')));
-                }
-              },
-              {
-                name: 'List',
-                desc: 'See the list of roles in your DMs.',
-                emoji: '👁️',
-                handler: async (client, given, reply) => {
-                  const raw = await client.database.getGuild(given.guild.id, 'autoRoles') || '[]';
-                  const roles = JSON.parse(raw);
-                  const embed = new MessageEmbed()
-                    .setTitle('Auto Role')
-                    .setColor(DEFAULT_COLOR)
-                    .setDescription(roles.map(r => given.guild.roles.cache.get(r)?.name).join('\n'));
-                  const dmChannel = await given.author.createDM()
-                    .catch(err => reply.edit(alert('Unable to create DM', 'embed')));
-                  if (!dmChannel) return;
-                  await dmChannel.send({ embeds: [ embed ] })
-                    .finally(() => reply.reactions.removeAll())
-                    .then(() => reply.edit(success('Check your DMs', 'embed')))
-                    .catch(err => reply.edit(alert('Unable to send DM', 'embed')));
-                }
-              }
-            ]
+            menu: this.listSetting('Auto Role', 'role', 'roles', promisify(Serializer.deserializeRole), promisify(Serializer.serializeRole), 'autoRoles')
           }
         ]
       },
@@ -602,82 +539,7 @@ module.exports = class ConfigCommand extends Command {
             desc: 'The roles that users will be able to give themselves.',
             menuDesc: 'React with the corresponding emoji to configure roles.',
             emoji: '📝',
-            menu: [
-              // TODO: This is basically the same code in the blacklist menu,
-              // so we need to try to make a function for editing an array.
-              {
-                name: 'Add',
-                desc: 'Add a role to the list of reaction roles.',
-                emoji: '✏️',
-                handler: async (client, given, reply) => {
-                  const raw = await client.database.getGuild(given.guild.id, 'reactionRoles') || '[]';
-                  const roles = JSON.parse(raw);
-                  const role = await this.promptString(given, reply, 'role', 'What role would you like to add', promisify(Serializer.deserializeRole));
-                  if (!role) return;
-                  if (roles.find(r => r[0] === role)) {
-                    return reply.edit(warning('That role is already added', 'embed'))
-                  }
-
-                  const emoji = await this.promptString(given, reply, 'emoji', 'What emoji would you like to set', async answer => {
-                    return answer.match(emojiRegex())[0];
-                  });
-                  if (!emoji) return;
-
-                  roles.push([ role, emoji ]);
-                  const json = JSON.stringify(roles);
-                  await client.database.setGuild(given.guild.id, 'reactionRoles', json)
-                    .finally(() => reply.reactions.removeAll())
-                    .then(() => reply.edit(success('Successfully updated database', 'embed')))
-                    .catch(err => reply.edit(alert('Unable to update database', 'embed')));
-                }
-              },
-              {
-                name: 'Remove',
-                desc: 'Remove a role from the list of reaction roles.',
-                emoji: '🗑️',
-                handler: async (client, given, reply) => {
-                  const raw = await client.database.getGuild(given.guild.id, 'reactionRoles') || '[]';
-                  const roles = JSON.parse(raw);
-                  const answer = await this.promptString(given, reply, 'role', 'What role would you like to remove', promisify(Serializer.deserializeRole));
-                  if (!answer) return;
-
-                  const index = roles.findIndex(r => r[0] === answer);
-                  if (index === null) {
-                    return reply.edit(warning('That role is not in the list', 'embed'))
-                  }
-
-                  roles.splice(index, 1);
-                  const json = JSON.stringify(roles);
-                  await client.database.setGuild(given.guild.id, 'reactionRoles', json)
-                    .finally(() => reply.reactions.removeAll())
-                    .then(() => reply.edit(success('Successfully updated database', 'embed')))
-                    .catch(err => reply.edit(alert('Unable to update database', 'embed')));
-                }
-              },
-              {
-                name: 'List',
-                desc: 'See the list of reaction roles in your DMs.',
-                emoji: '👁️',
-                handler: async (client, given, reply) => {
-                  const raw = await client.database.getGuild(given.guild.id, 'reactionRoles') || '[]';
-                  const roles = JSON.parse(raw);
-                  const embed = new MessageEmbed()
-                    .setTitle('Reaction Roles')
-                    .setColor(DEFAULT_COLOR)
-                    .addFields(roles.map(r => {
-                      const name = given.guild.roles.cache.get(r[0])?.name;
-                      return { name, value: r[1] };
-                    }));
-                  const dmChannel = await given.author.createDM()
-                    .catch(err => reply.edit(alert('Unable to create DM', 'embed')));
-                  if (!dmChannel) return;
-                  await dmChannel.send({ embeds: [ embed ] })
-                    .finally(() => reply.reactions.removeAll())
-                    .then(() => reply.edit(success('Check your DMs', 'embed')))
-                    .catch(err => reply.edit(alert('Unable to send DM', 'embed')));
-                }
-              }
-            ]
+            menu: this.listSetting('Reaction Roles', 'role', 'roles', promisify(Serializer.deserializeRole), promisify(Serializer.serializeRole), 'reactionRoles')
           }
         ]
       }
