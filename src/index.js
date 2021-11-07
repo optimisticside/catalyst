@@ -2,7 +2,7 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const { TOKEN, TOTAL_SHARDS, LIFETIME } = require('./config.json');
+const { TOKEN, PORT, TOTAL_SHARDS, LIFETIME } = require('./config.json');
 const { ShardingManager } = require('discord.js');
 const requirePromise = async f => require(f);
 const glob = require('glob');
@@ -31,13 +31,15 @@ if (LIFETIME) {
 
 const serviceFiles = glob.sync(path.join(__dirname, 'services/**/*.js'));
 (async () => {
-  serviceFiles.map(async file => {
+  await Promise.all(serviceFiles.map(async file => {
+    const fileName = path.basename(file, path.extname(file));
     const result = await requirePromise(file).catch(err => {
-      const fileName = path.basename(file, path.extname(file));
       console.error(`Unable to load ${fileName} service: ${err}`);
     });
 
     if (!result || !result instanceof Function) return;
-    await result(shardingManager);
-  });
+    await result(shardingManager).catch(err => {
+      console.error(`Unable to start ${fileName} service: ${err}`);
+    });
+  }));
 })();
