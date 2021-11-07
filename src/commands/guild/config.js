@@ -445,12 +445,12 @@ module.exports = class ConfigCommand extends Command {
                 emoji: '📤',
                 handler: this.boolSetting('User Leave', 'Message edits are whenever someone leaves the server.', 'logLeave')
               },
-              {
+              /*{
                 name: 'User Update',
                 desc: 'Keeping track of when a user is updated.',
                 emoji: '📝',
                 handler: this.boolSetting('User Update', 'User updates are whenever a user is updated.', 'logMemberUpdate')
-              }
+              }*/
             ]
           }
         ]
