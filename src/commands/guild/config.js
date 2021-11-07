@@ -171,7 +171,8 @@ module.exports = class ConfigCommand extends Command {
     super({
       name: 'config',
       desc: 'Lets you manage the guild configuration.',
-      perms: [ Permissions.FLAGS.MANAGE_GUILD ],
+      userPerms: [ Permissions.FLAGS.MANAGE_GUILD ],
+      botPerms: [ Permissions.FLAGS.SEND_MESSAGES ],
       guildOnly: true,
       tags: [ 'guild' ],
       options: [
