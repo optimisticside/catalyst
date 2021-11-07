@@ -7,7 +7,7 @@ const Command = require('../../structs/command.js');
 const OptionParser = require('../../util/optionParser.js');
 const permNames = require('../../util/permNames.js');
 const { warning } = require('../../util/formatter.js')('Invite Command');
-const { NAME, PREFIX, DEFAULT_COLOR } = require('../../config.json');
+const { NAME, PREFIX, SUPPORT_SERVER, DEFAULT_COLOR } = require('../../config.json');
 
 module.exports = class HelpCommand extends Command {
   async argumentHelp(client, given, parser, command, argumentName) {
@@ -72,7 +72,7 @@ module.exports = class HelpCommand extends Command {
     const embed = new MessageEmbed()
       .setTitle(`${NAME}`)
       .setColor(DEFAULT_COLOR)
-      .setDescription(`Hello! I'm ${NAME}. You can use me to run commands, as long as they start with the prefix \`${prefix}\`. For a list of commands, use the \`commands\` command, by doing \`${prefix}commands\`.`)
+      .setDescription(`Hello! I'm ${NAME}. You can use me to run commands, as long as they start with the prefix \`${prefix}\`. For a list of commands, use the \`commands\` command, by doing \`${prefix}commands\`.${SUPPORT_SERVER ? ` For additional help, feel free to join my [support server](${SUPPORT_SERVER})` : ''}`)
     given.reply({ embeds: [ embed ] });
   }
 
