@@ -13,7 +13,7 @@ module.exports = class BanCommand extends Command {
     const time = await parser.getOption('time');
     const username = `${given.member.user.username}#${given.member.user.discriminator}`;
 
-    channel.setRateLimitPerUser(time, `Changed by ${username}`).catch(err => {
+    given.channel.setRateLimitPerUser(time, `Changed by ${username}`).catch(err => {
       given.reply(alert(`Unable to set slowmode to ${time} seconds.`));
       console.log(`Unable to set rate limit to ${time} seconds: ${err}`);
     });
@@ -23,7 +23,7 @@ module.exports = class BanCommand extends Command {
     super({
       name: 'slowmode',
       desc: 'Toggles slowmode in a channel.',
-      perms: [ Permissions.FLAGS.MANAGE_CHANNELS ],
+      perms: [ Permissions.FLAGS.MANAGE_MESSAGES ],
       tags: [ 'moderation' ],
       guildOnly: true,
       passive: false,
