@@ -42,19 +42,19 @@ module.exports = class Guardian extends Module {
       blockInvites: JSON.parse(await this.database.getGuild(message.guild.id, 'blockInvites')),
       blockIps: JSON.parse(await this.database.getGuild(message.guild.id, 'blockIps')),
       blockSelfBots: JSON.parse(await this.database.getGuild(message.guild.id, 'blockSelfBots')),
-
-      // Anti spam pressure values.
-      // For now, they are not changable by users.
-      // TODO: stop using `pressureRange`.
-      pressureDecay: 2.5,
-      basePressure: 10,
-      maxPressure: 60,
-      imagePressure: pressureRange / 6,
-      lengthPressure: pressureRange / 8000,
-      linePressure: pressureRange / 70,
-      pingPressure: pressureRange / 20,
-      notifyInterval: 5000
     };
+
+    // Anti spam pressure values.
+    // For now, they are not changable by users.
+    // TODO: Create a new table for this.
+    config.pressureDecay = 2.5;
+    config.basePressure = 10;
+    config.maxPressure = 60;
+    config.imagePressure = (config.maxPressure - config.basePressure) / 6;
+    config.lengthPressure = (config.maxPressure - config.basePressure) / 8000;
+    config.linePressure = (config.maxPressure - config.basePressure) / 70;
+    config.pingPressure = (config.maxPressure - config.basePressure) / 20;
+    config.notifyInterval = 7500;
 
     const images = message.attachments.filter(a => a.type === 'image');
     const hasDuplicates = (/^(.+)(?: +\1){3}/).test(content);
