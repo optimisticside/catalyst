@@ -40,6 +40,9 @@ module.exports = class Logs extends Module {
     const channel = await this.getData('logEdit', newMessage.guild);
     if (!channel) return;
 
+    // Yes, this sometimes happens.
+    if (oldMessage.content === newMessage.content) return;
+
     const url = `https://discordapp.com/channels/${newMessage.guild.id}/${newMessage.channel.id}/${newMessage.id}`;
     const username = `${newMessage.author.username}#${newMessage.author.discriminator}`;
     const embed = new MessageEmbed()
