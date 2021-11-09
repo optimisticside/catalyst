@@ -10,7 +10,7 @@ const Command = require('../../structs/command.js');
 const OptionParser = require('../../util/optionParser.js');
 const emojiRegex = require('emoji-regex');
 const Serializer = require('../../util/serializer.js');
-const promisify = (fn) => async (...given) => fn(...given);
+const promisify = (fn) => async (...given) => await fn(...given);
 
 module.exports = class ConfigCommand extends Command {
   awaitCollection(collector) {
