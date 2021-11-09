@@ -31,7 +31,6 @@ module.exports = class Guardian extends Module {
     if (!enabled) return;
 
     const content = message.content;
-    const pressureRange = 60-10;
     const config = {
       whitelist: JSON.parse(await this.database.getGuild(message.guild.id, 'guardianWhitelist')) || [],
       blacklistedWords: JSON.parse(await this.database.getGuild(message.guild.id, 'blacklistedWords')) || [],
