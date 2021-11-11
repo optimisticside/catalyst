@@ -43,6 +43,26 @@ module.exports = class Guilds extends Module {
     channel.send(formatted);
   }
 
+  async joinDmMember(member) {
+    if (member.partial) member = await member.fetch();
+    const enabled = JSON.parse(await this.database.getGuild(member.guild.id, 'joinDmEnabled'));
+    if (!enabled) return;
+
+    const message = await this.database.getGuild(member.guild.id, 'joinDmMessage');
+    if (!message) return;
+
+    const formatted = message.replace('{mention}', `<@${member.user.id}>`) 
+      .replace('{user}', member.user.username)
+      .replace('{guild}', member.guild.name)
+      .replace('{count}', member.guild.memberCount);
+
+    // TODO: Handle errors when creating a DM channel.
+    // It can force the shard to restart.
+    const dmChannel = await member.createDM();
+    if (!dmChannel) return;
+    dmChannel.send(formatted);
+  }
+
   async autoRole(member) {
     const enabled = await this.database.getGuild(member.guild.id, 'autoRoleEnabled');
     if (!enabled) return;
@@ -54,6 +74,7 @@ module.exports = class Guilds extends Module {
 
   async onMemberAdd(member) {
     await this.greetMember(member);
+    await this.joinDmMember(member);
     await this.autoRole(member);
   }
 

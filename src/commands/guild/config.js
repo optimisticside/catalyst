@@ -323,66 +323,95 @@ module.exports = class ConfigCommand extends Command {
         ]
       },
       {
-        name: 'Greeting',
-        desc: 'Set the greeting for when people join the server.',
-        menuDesc: 'React with the corresponding emoji to configure greeting.',
-        emoji: '👋',
+        name: 'Auto Message',
+        desc: 'Automatically sends messages when something happens.',
+        menuDesc: 'React with the corresponding emoji to congfigure Auto Message',
+        emoji: '✉️',
         menu: [
           {
-            name: 'Toggle',
-            desc: 'Whether channel greeting will be enabled.',
-            emoji: '🔧',
-            handler: this.boolSetting('Greeting', 'Greeting will greet new users that join the server.', 'greetingEnabled')
+            name: 'Greeting',
+            desc: 'Set the greeting for when people join the server.',
+            menuDesc: 'React with the corresponding emoji to configure greeting.',
+            emoji: '👋',
+            menu: [
+              {
+                name: 'Toggle',
+                desc: 'Whether channel greeting will be enabled.',
+                emoji: '🔧',
+                handler: this.boolSetting('Greeting', 'Greeting will greet new users that join the server.', 'greetingEnabled')
+              },
+              {
+                name: 'Message',
+                desc: 'The message that users will be greeted with.',
+                emoji: '✉️',
+                handler: this.stringSetting('Greeting Message', 'The greeting channel is the message users will be greeted with.', null, null,
+                  'How would you like to greet messages. You can mention the user through {mention}, and access the user\'s name through `{user}`, the server name through `{guild}`, and the member count through `{count}`', 'greetingMessage')
+              },
+              {
+                name: 'Channel',
+                desc: 'The channel that new users will be greeted on.',
+                emoji: '#️⃣',
+                handler: this.stringSetting('Greeting Channel', 'The greeting channel is the channel users will be greeted on.',
+                  promisify(Serializer.deserializeChannel), promisify(Serializer.serializeChannel), null, 'greetingChannel')
+              }
+            ]
           },
           {
-            name: 'Message',
-            desc: 'The message that users will be greeted with.',
-            emoji: '✉️',
-            handler: this.stringSetting('Greeting Message', 'The greeting channel is the message users will be greeted with.', null, null,
-              'How would you like to greet messages. You can mention the user through {mention}, and access the user\'s name through `{user}`, the server name through `{guild}`, and the member count through `{count}`', 'greetingMessage')
+            name: 'Join DM',
+            desc: 'Sends a DM when someone joins the server.',
+            menuDesc: 'React with the corresponding emoji to configure join DMs.',
+            emoji: '📩',
+            menu: [
+              {
+                name: 'Toggle',
+                desc: 'Whether join DMs will be enabled.',
+                emoji: '🔧',
+                handler: this.boolSetting('Join DM', 'Join DMs will send new users a DM.', 'joinDmEnabled')
+              },
+              {
+                name: 'Message',
+                desc: 'The DM that users will be greeted with.',
+                emoji: '✉️',
+                handler: this.stringSetting('Join DM Message', 'This is the message users will be DMed with when they join.', null, null,
+                  'How would you like to greet messages. You can mention the user through {mention}, and access the user\'s name through `{user}`, the server name through `{guild}`, and the member count through `{count}`', 'joinDmMessage')
+              }
+            ]
           },
           {
-            name: 'Channel',
-            desc: 'The channel that new users will be greeted on.',
-            emoji: '#️⃣',
-            handler: this.stringSetting('Greeting Channel', 'The greeting channel is the channel users will be greeted on.',
-              promisify(Serializer.deserializeChannel), promisify(Serializer.serializeChannel), null, 'greetingChannel')
-          }
-        ]
-      },
-      {
-        name: 'Goodbye',
-        desc: 'Set the goodbye for when people leave the server.',
-        menuDesc: 'React with the corresponding emoji to configure goodbye.',
-        emoji: '🚪',
-        menu: [
-          {
-            name: 'Toggle',
-            desc: 'Whether goodbyes will be enabled.',
-            emoji: '🔧',
-            handler: this.boolSetting('Goodbye', 'Goodbye will say goodbye to users that leave the server.', 'goodbyeEnabled')
-          },
-          {
-            name: 'Message',
-            desc: 'The message that users will be said goodbye with.',
-            emoji: '✉️',
-            handler: async (client, given, reply) => {
-              const answer = await this.promptString(given, reply, 'goodbye message',
-                'How would you like to say goodbye to people? You can access the user\'s name through `{user}`, the server name through `{guild}`, and the member count through `{count}`', null);
-              if (!answer) return;
-
-              await client.database.setGuild(given.guild.id, 'goodbyeMessage', answer)
-                .finally(() => reply.reactions.removeAll())
-                .then(() => reply.edit(success('Successfully updated database', 'embed')))
-                .catch(err => reply.edit(alert('Unable to update database', 'embed')));
-            }
-          },
-          {
-            name: 'Channel',
-            desc: 'The channel that new users will be said goodbye on.',
-            emoji: '#️⃣',
-            handler: this.stringSetting('Greeting Channel', 'The greeting channel is the channel users will be greeted on.',
-              promisify(Serializer.deserializeChannel), promisify(Serializer.serializeChannel), null, 'goodbyeChannel')
+            name: 'Goodbye',
+            desc: 'Set the goodbye for when people leave the server.',
+            menuDesc: 'React with the corresponding emoji to configure goodbye.',
+            emoji: '🚪',
+            menu: [
+              {
+                name: 'Toggle',
+                desc: 'Whether goodbyes will be enabled.',
+                emoji: '🔧',
+                handler: this.boolSetting('Goodbye', 'Goodbye will say goodbye to users that leave the server.', 'goodbyeEnabled')
+              },
+              {
+                name: 'Message',
+                desc: 'The message that users will be said goodbye with.',
+                emoji: '✉️',
+                handler: async (client, given, reply) => {
+                  const answer = await this.promptString(given, reply, 'goodbye message',
+                    'How would you like to say goodbye to people? You can access the user\'s name through `{user}`, the server name through `{guild}`, and the member count through `{count}`', null);
+                  if (!answer) return;
+    
+                  await client.database.setGuild(given.guild.id, 'goodbyeMessage', answer)
+                    .finally(() => reply.reactions.removeAll())
+                    .then(() => reply.edit(success('Successfully updated database', 'embed')))
+                    .catch(err => reply.edit(alert('Unable to update database', 'embed')));
+                }
+              },
+              {
+                name: 'Channel',
+                desc: 'The channel that new users will be said goodbye on.',
+                emoji: '#️⃣',
+                handler: this.stringSetting('Greeting Channel', 'The greeting channel is the channel users will be greeted on.',
+                  promisify(Serializer.deserializeChannel), promisify(Serializer.serializeChannel), null, 'goodbyeChannel')
+              }
+            ]
           }
         ]
       },
