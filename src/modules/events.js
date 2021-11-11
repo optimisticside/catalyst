@@ -3,9 +3,9 @@
 // See LICENSE for details
 
 const Module = require('../structs/module.js');
-const { promisify } = require('util');
 const path = require('path');
 const glob = require('glob');
+const requireAsync = async f => require(f);
 
 module.exports = class Events extends Module {
   async on(name, run) {
@@ -20,8 +20,9 @@ module.exports = class Events extends Module {
   load() {
     let files = glob.sync(path.join(__dirname, '/../events/*.js')
       .concat(glob.sync(path.join(__dirname, '/../events/**/*.js'))));
-    files.map(file => {
-      promisify(require)(file).then(this.registerHandler.bind(this));
+    files.map(async file => {
+      const handler = requireAsync(file);
+      this.registerHandler(handler);
     });
   }
 
