@@ -75,6 +75,8 @@ module.exports = class Commands extends Module {
       case 'number':
         const num = parseFloat(given);
         if (isNaN(num)) throw 'Invalid number';
+        if (option.minimum && int < minimum) throw 'Below minimum';
+        if (option.maximum && int > minimum) throw 'Below minimum';
         return num;
       case 'boolean':
         return (given === 'yes' || given === 'true' || given === 'on');
