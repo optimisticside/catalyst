@@ -32,7 +32,7 @@ module.exports = class ConfigCommand extends Command {
     await reply.react('✅');
     await reply.react('❌');
     const filter = r => r.users.cache.find(u => u === given.author);
-    const collector = reply.createReactionCollector({ filter, time: 30000,  })
+    const collector = reply.createReactionCollector({ filter, time: 30000 })
     const reaction = await this.awaitCollection(collector).catch(() => {
       reply.reply(warning('Timed out.'));
     });
@@ -45,14 +45,29 @@ module.exports = class ConfigCommand extends Command {
   async promptString(given, reply, name, promptMessage, encoder) {
     reply.reactions.removeAll();
     reply.edit(prompt(promptMessage ?? `What would you like to set the ${name.toLowerCase()} to`, 'embed'));
+    reply.react('❌');
 
-    const filter = m => m.author === given.author;
-    const collector = reply.channel.createMessageCollector({ filter, time: 30000 });
-    const message = await this.awaitCollection(collector).catch(() => {
+    let exited = false;
+    const reactionFilter = r => r.users.cache.find(u => u === given.author)
+    const reactionCollector = reply.createReactionCollector({ filter: reactionFilter, time: 30000 });
+    this.awaitCollection(reactionCollector).then(reaction => {
+      if (!reaction || reaction.emoji.name !== '❌') return;
+      exited = true;
+      reply.reactions.removeAll();
+      reply.edit(neutral('Prompt has exited', 'embed'));
+    }).catch(() => {
+      // There is nothing to do here, since reacting
+      // was optional.
+    });
+
+    const messageFilter = m => m.author === given.author;
+    const messageCollector = reply.channel.createMessageCollector({ filter: messageFilter, time: 30000 });
+    const message = await this.awaitCollection(messageCollector).catch(() => {
+      if (exited) return;
       reply.reply(warning('Timed out.'));
     });
 
-    if (!message) return;
+    if (exited || !message) return;
     let failed = false;
     const result = !encoder ? message.content : await encoder(message.content).catch(err => {
       failed = true;
@@ -206,6 +221,8 @@ module.exports = class ConfigCommand extends Command {
     }
 
     settings.map(c => reply.react(`${c.emoji}`));
+    reply.react('❌');
+
     const filter = r => r.users.cache.find(u => u === given.author);
     const collector = reply.createReactionCollector({ filter, time: 30000 });
     const reaction = await this.awaitCollection(collector).catch(() => {
@@ -213,12 +230,17 @@ module.exports = class ConfigCommand extends Command {
     });
 
     if (!reaction) return;
+    if (reaction.emoji.name === '❌') {
+      reply.reactions.removeAll();
+      return reply.edit(neutral('Prompt has exited', 'embed'));
+    }
+
     const setting = settings.find(c => c.emoji === reaction.emoji.name);
     if (!setting) return;
     if (!setting.handler) {
       return await this.loadMenu(client, given, reply, setting.name, setting.menuDesc ?? setting.desc, setting.menu);
     }
-    return setting.handler(client, given, reply)
+    return setting.handler(client, given, reply);
   }
 
   async run(client, given, args) {
