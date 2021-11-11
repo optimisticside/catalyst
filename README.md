@@ -25,8 +25,8 @@ Guardian is Catalyst's auto-moderation system, which ensures a safe and friendly
 ## Logs
 Logs allow you to keep track of everything that happens in your Discord server. Different types of logs can be toggled, so only things that are important to you are logged. These logs include message-related logs, Guardian logs, command logs, and user-related logs. Logs can be configured in the `config` command by navigating to the `Logs` menu.
 
-## Greetings & Goodbyes
-Catalyst supports greetings and goodbye-messages for when users join and leave the server. You can choose your own greeting and goodbye-message and you are provided keywords that will be replaced with information such as `{user}`, which is replaced with the username of the person that leaves or joins the server. Greetings and goodbyes can be configured in the `config` command by navigating to the `Greeting` and `Goodbye` menus.
+## Auto Message
+Catalyst supports greetings and goodbye-messages for when users join and leave the server, as well as join DMs. You can choose your own greeting and goodbye-message and you are provided keywords that will be replaced with information such as `{user}`, which is replaced with the username of the person that leaves or joins the server. Greetings and goodbyes can be configured in the `config` command by navigating to the `Auto Message` menu.
 
 ## Auto Role
 Roles can be assigned to users when the join the Discord server. Catalyst now supports adding multiple roles to Auto Role. Auto Role can be configured in the `config` command by navigating to the `Auto Role` menu.
