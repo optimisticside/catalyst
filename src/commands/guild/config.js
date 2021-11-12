@@ -10,6 +10,7 @@ const Command = require('../../structs/command.js');
 const OptionParser = require('../../util/optionParser.js');
 const emojiRegex = require('emoji-regex');
 const Serializer = require('../../util/serializer.js');
+const GuildConfig = require('../../models/guildConfig.js');
 const promisify = (fn) => async (...given) => await fn(...given);
 
 module.exports = class ConfigCommand extends Command {
@@ -81,16 +82,20 @@ module.exports = class ConfigCommand extends Command {
     return result;
   }
 
-  boolSetting(name, desc, ...key) {
+  boolSetting(name, desc, key) {
     return async (client, given, reply) => {
-      const current = JSON.parse(await client.database.getGuild(given.guild.id, ...key));
+      const config = await GuildConfig.findOne({ id: given.guild.id })
+        ?? await GuildConfig.create({ id: given.guild.id });
+      const current = config[key];
       const newDesc = current != null ? `${desc}\nIt is currently ${current === true ? 'on' : 'off'}` : desc;
 
       const answer = await this.promptBool(given, reply, name, newDesc, `Would you like to ${current === true ? 'disable' : 'enable'} it?`);
       if (answer === null) return;
 
       if (answer) {
-        await client.database.setGuild(given.guild.id, ...key, !current)
+        config[key] = !current;
+        config.markModified(key);
+        await config.save()
           .finally(() => reply.reactions.removeAll())
           .then(() => reply.edit(success(`Successfully ${current === true ? 'disabled' : 'enabled'} ${name}`, 'embed')))
           .catch(err => {
@@ -104,10 +109,12 @@ module.exports = class ConfigCommand extends Command {
     }
   }
 
-  stringSetting(name, desc, encoder, decoder, promptMessage, ...key) {
+  stringSetting(name, desc, encoder, decoder, promptMessage, key) {
     return async (client, given, reply) => {
-      let current = await client.database.getGuild(given.guild.id, ...key);
-      if (current && decoder) current = await decoder(current);
+      const config = await GuildConfig.findOne({ id: given.guild.id })
+        ?? await GuildConfig.create({ id: given.guild.id });
+      let current = config[key];
+        if (current && decoder) current = await decoder(current);
       const shouldContinue = await this.promptBool(given, reply, name, `${desc}\nThe current ${name.toLowerCase()} is ${current}`,
         'Would you like to change it?');
       if (shouldContinue === null) return;
@@ -119,7 +126,9 @@ module.exports = class ConfigCommand extends Command {
         const answer = await this.promptString(given, reply, name, promptMessage, encoder);
         if (!answer) return;
 
-        await client.database.setGuild(given.guild.id, ...key, answer)
+        config[key] = answer;
+        config.markModified(key);
+        await config.save()
           .finally(() => reply.reactions.removeAll())
           .then(() => reply.edit(success('Successfully updated database', 'embed')))
           .catch(err => reply.edit(alert('Unable to update database', 'embed')));
@@ -127,15 +136,16 @@ module.exports = class ConfigCommand extends Command {
     }
   }
 
-  listSetting(title, elementName, elementPlural, encoder, decoder, ...key) {
+  listSetting(title, elementName, elementPlural, encoder, decoder, key) {
     return [
       {
         name: 'Add',
         desc: `Add a ${elementName} to the list.`,
         emoji: '✏️',
         handler: async (client, given, reply) => {
-          const raw = await client.database.getGuild(given.guild.id, ...key) || '[]';
-          const list = JSON.parse(raw);
+          const config = await GuildConfig.findOne({ id: given.guild.id })
+            ?? await GuildConfig.create({ id: given.guild.id });
+          const list = config[key];
           const answer = await this.promptString(given, reply, elementName, `What ${elementName} would you like to add`, encoder);
           if (!answer) return;
 
@@ -144,8 +154,8 @@ module.exports = class ConfigCommand extends Command {
           }
 
           list.push(answer);
-          const json = JSON.stringify(list)
-          await client.database.setGuild(given.guild.id, ...key, json)
+          config.markModified(key);
+          await config.save()
             .finally(() => reply.reactions.removeAll())
             .then(() => reply.edit(success('Successfully updated database', 'embed')))
             .catch(err => reply.edit(alert('Unable to update database', 'embed')));
@@ -156,8 +166,9 @@ module.exports = class ConfigCommand extends Command {
         desc: `Remove a ${elementName} from the list.`,
         emoji: '🗑️',
         handler: async (client, given, reply) => {
-          const raw = await client.database.getGuild(given.guild.id, ...key) || '[]';
-          const list = JSON.parse(raw);
+          const config = await GuildConfig.findOne({ id: given.guild.id })
+            ?? await GuildConfig.create({ id: given.guild.id });
+          const list = config[key];
           const answer = await this.promptString(given, reply, 'word', `What ${elementName} would you like to remove`, encoder);
           if (!answer) return;
 
@@ -167,8 +178,8 @@ module.exports = class ConfigCommand extends Command {
           }
 
           list.splice(index, 1);
-          const json = JSON.stringify(list);
-          await client.database.setGuild(given.guild.id, ...key, json)
+          config.markModified(key);
+          await config.save()
             .finally(() => reply.reactions.removeAll())
             .then(() => reply.edit(success('Successfully updated database', 'embed')))
             .catch(err => reply.edit(alert('Unable to update database', 'embed')));
@@ -179,8 +190,9 @@ module.exports = class ConfigCommand extends Command {
         desc: `See the list of ${elementPlural} in your DMs.`,
         emoji: '👁️',
         handler: async (client, given, reply) => {
-          const raw = await client.database.getGuild(given.guild.id, ...key) || '[]';
-          const list = JSON.parse(raw);
+          const config = await GuildConfig.findOne({ id: given.guild.id })
+            ?? await GuildConfig.create({ id: given.guild.id });
+          const list = config[key];
           const data = await Promise.all(list.map(async e => {
             if (decoder) {
               e = await decoder(e);
@@ -297,7 +309,7 @@ module.exports = class ConfigCommand extends Command {
             name: 'Toggle',
             desc: 'Enable or disable Guardian.',
             emoji: '🔧',
-            handler: this.boolSetting('Guardian', 'Guardian will automate moderation.', 'guardian')
+            handler: this.boolSetting('Guardian', 'Guardian will automate moderation.', 'guardianEnabled')
           },
           {
             name: 'Blacklist',
@@ -310,37 +322,37 @@ module.exports = class ConfigCommand extends Command {
             name: 'Antispam',
             desc: 'Automatically mute users who spam in the chat.',
             emoji: '🔨',
-            handler: this.boolSetting('Antispam', 'Antispam will automatically mute users who spam in the chat.', 'antiSpam')
+            handler: this.boolSetting('Antispam', 'Antispam will automatically mute users who spam in the chat.', 'antiSpamEnabled')
           },
           {
             name: 'URL Filter',
             desc: 'Remove messages that contain links.',
             emoji: '🌐',
-            handler: this.boolSetting('URL Filter', 'URL Filter will remove messages that contain links.', 'blockLinks')
+            handler: this.boolSetting('URL Filter', 'URL Filter will remove messages that contain links.', 'filterLinks')
           },
           {
             name: 'Invite Filter',
             desc: 'Remove messages that contain a Discord invite.',
             emoji: '📧',
-            handler: this.boolSetting('Invite Filter', 'Invite filter will remove messages that contain Discord invites.', 'blockInvites')
+            handler: this.boolSetting('Invite Filter', 'Invite filter will remove messages that contain Discord invites.', 'filterInvites')
           },
           {
             name: 'IP Filter',
             desc: 'Removes messages that contain an IP address.',
             emoji: '❗',
-            handler: this.boolSetting('IP Filter', 'IP filter will remove messages that contain IP addresses.', 'blockIps')
+            handler: this.boolSetting('IP Filter', 'IP filter will remove messages that contain IP addresses.', 'filterIps')
           },
           {
             name: 'Zalgo Filter',
             desc: 'Removes messages that contain zalgo.',
             emoji: '🗑️',
-            handler: this.boolSetting('Zalgo Filter', 'Zalgo filter will remove messages that contain zalgo.', 'blockZalgo')
+            handler: this.boolSetting('Zalgo Filter', 'Zalgo filter will remove messages that contain zalgo.', 'filterZalgo')
           },
           /*{
             name: 'Self-Bot Detector',
             desc: 'Bans users who have self-bots.',
             emoji: '🤖',
-            handler: this.boolSetting('Self-Bot Detector', 'Self-bot detector will ban users who use self-bots.', 'blockSelfBots')
+            handler: this.boolSetting('Self-Bot Detector', 'Self-bot detector will ban users who use self-bots.', 'filterSelfBots')
           }*/
         ]
       },

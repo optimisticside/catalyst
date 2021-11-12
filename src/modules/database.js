@@ -2,45 +2,22 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const Redis = require('ioredis');
 const Module = require('../structs/module.js');
-const { REDIS_HOST, REDIS_PORT, KEY_DELIM } = require('../config.json');
+const mongoose = require('mongoose');
+const { MONGODB_SRV } = require('../config.json');
 
-// We will implement caching later, so for now
-// these are 'nothing' functions.
 module.exports = class Database extends Module {
-  async getRaw(key) {
-    return await this.redis.get(key);
-  }
-
-  async setRaw(key, value) {
-    return await this.redis.set(key, value);
-  }
-
-  async get(...given) {
-    const key = [ ...given ];
-    //console.log(...given);
-    return await this.redis.get(key.join(KEY_DELIM));
-  }
-
-  async set(...given) {
-    const key = [ ...given ];
-    const value = key.pop();
-    console.log(key, value);
-    return await this.redis.set(key.join(KEY_DELIM), value);
-  }
-
-  async delete(...given) {
-    const key = [ ...given ];
-    return await this.redis.del(key.join(KEY_DELIM));
-  }
-
-  async getGuild(...given) {
-    return await this.get('guild', ...given);
-  }
-
-  async setGuild(...given) {
-    return await this.set('guild', ...given);
+  load() {
+    mongoose.connect(MONGODB_SRV, {
+      useNewUrlParser: false,
+      useUnifiedTopology: true
+    }).then(() => {
+      console.log('Connected to Mongo DB');
+      this.connected = true;
+      this.emit('connect');
+    }).catch(err => {
+      console.error(`Unable to connect to Mongo DB: ${err}`);
+    });
   }
 
   constructor(client) {
@@ -48,9 +25,7 @@ module.exports = class Database extends Module {
       name: 'database',
       client: client
     });
-    
-    this.guilds = {};
-    this.redis = new Redis({ host: REDIS_HOST, port: REDIS_PORT });
-    client.redis = this.redis;
+
+    this.connected = false;
   }
 }

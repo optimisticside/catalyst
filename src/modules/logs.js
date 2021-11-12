@@ -6,23 +6,21 @@ const { DEFAULT_COLOR } = require('../config.json');
 const { warning, denial, log, prompt } = require('../util/formatter.js')('Log Handler');
 const { MessageEmbed } = require('discord.js');
 const Module = require('../structs/module.js');
+const GuildConfig = require('../models/guildConfig.js');
 
 module.exports = class Logs extends Module {
-  async getData(key, guild) {
-    if (!guild) return;
-    if (!JSON.parse(await this.database.getGuild(guild.id, 'logsEnabled'))) return;
-    const enabled = await this.database.getGuild(guild.id, 'logDelete');
-    if (!enabled) return;
+  async getData(key, guild, config) {
+    if (!guild || !config) return;
+    if (!config.logsEnabled || !config[key]) return;
 
-    const logChannelId = await this.database.getGuild(guild.id, 'logChannel');
-    const channel = guild.channels.cache.get(logChannelId);
-    if (!channel) return;
-
+    const channel = guild.channels.cache.get(config.logChannel);
     return channel;
   }
   async onMessageDelete(message) {
     if (message.author.bot) return;
-    const channel = await this.getData('logDelete', message.guild);
+    const config = await GuildConfig.findOne({ id: message.guild.id })
+      ?? await GuildConfig.create({ id: message.guild.id });
+    const channel = await this.getData('logDelete', message.guild, config);
     if (!channel) return;
 
     const username = `${message.author.username}#${message.author.discriminator}`;
@@ -37,7 +35,9 @@ module.exports = class Logs extends Module {
 
   async onMessageEdit(oldMessage, newMessage) {
     if (newMessage.author.bot) return;
-    const channel = await this.getData('logEdit', newMessage.guild);
+    const config = await GuildConfig.findOne({ id: newMessage.guild.id })
+      ?? await GuildConfig.create({ id: newMessage.guild.id });
+    const channel = await this.getData('logEdit', newMessage.guild, config);
     if (!channel) return;
 
     // Yes, this sometimes happens.
@@ -57,7 +57,9 @@ module.exports = class Logs extends Module {
   }
 
   async onGuildMemberAdd(member) {
-    const channel = await this.getData('logJoin', member.guild);
+    const config = await GuildConfig.findOne({ id: member.guild.id })
+      ?? await GuildConfig.create({ id: member.guild.id });
+    const channel = await this.getData('logJoin', member.guild, config);
     if (!channel) return;
 
     const username = `${member.user.username}#${member.user.discriminator}`;
@@ -74,7 +76,9 @@ module.exports = class Logs extends Module {
     const user = await this.client.users.fetch(member.id);
     const guild = await this.client.guilds.fetch(member.guild.id);
 
-    const channel = await this.getData('logLeave', member.guild);
+    const config = await GuildConfig.findOne({ id: guild.id })
+      ?? await GuildConfig.create({ id: guild.id });
+    const channel = await this.getData('logLeave', member.guild, config);
     if (!channel) return;
 
     const username = `${user.username}#${user.discriminator}`;
@@ -88,7 +92,9 @@ module.exports = class Logs extends Module {
   }
 
   async onGuildMemberUpdate(oldMember, newMember) {
-    const channel = await this.getData(newMember.guild);
+    const config = await GuildConfig.findOne({ id: newMember.guild.id })
+      ?? await GuildConfig.create({ id: newMember.guild.id });
+    const channel = await this.getData(newMember.guild, config);
     if (!channel) return;
     
     const username = `${newMember.user.username}#${newMember.user.discriminator}`;
@@ -132,7 +138,9 @@ module.exports = class Logs extends Module {
     if (command.tags?.find(t => t === 'fun')) return;
     if (message.author.bot) return;
 
-    const channel = await this.getData('logCommmands', message.guild);
+    const config = await GuildConfig.findOne({ id: message.guild.id })
+      ?? await GuildConfig.create({ id: message.guild.id });
+    const channel = await this.getData('logCommmands', message.guild, config);
     if (!channel) return;
 
     const username = `${message.author.username}#${message.author.discriminator}`;
@@ -151,7 +159,9 @@ module.exports = class Logs extends Module {
     if (!interaction.inGuild()) return;
     if (interaction.user.bot) return;
 
-    const channel = await this.getData('logCommands', interaction.guild);
+    const config = await GuildConfig.findOne({ id: message.guild.id })
+      ?? await GuildConfig.create({ id: message.guild.id });
+    const channel = await this.getData('logCommands', interaction.guild, config);
     if (!channel) return;
 
     let message = interaction.commandName;
@@ -178,7 +188,9 @@ module.exports = class Logs extends Module {
   }
 
   async onGuardianDelete(message, reason) {
-    const channel = await this.getData('logGuardian', message.guild);
+    const config = await GuildConfig.findOne({ id: message.guild.id })
+      ?? await GuildConfig.create({ id: message.guild.id });
+    const channel = await this.getData('logGuardian', message.guild, config);
     if (!channel) return;
 
     const username = `${message.author.username}#${message.author.discriminator}`;
