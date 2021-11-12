@@ -6,6 +6,7 @@ const { PREFIX, CREATORS } = require('../config.json');
 const { warning, denial, log, prompt } = require('../util/formatter.js')('Guardian');
 const { Collection, Permissions } = require('discord.js');
 const Module = require('../structs/module.js');
+const GuildConfig = require('../models/guildConfig.js');
 const wait = require('timers/promises').setTimeout;
 
 module.exports = class Guardian extends Module {
@@ -27,10 +28,12 @@ module.exports = class Guardian extends Module {
   async handleMessage(message) {
     if (!message.guild) return;
     if (message.author.bot) return;
-    const enabled = await this.database.getGuild(message.guild.id, 'guardian');
-    if (!enabled) return;
 
     const content = message.content;
+    const config = await GuildConfig.findOne({ id: message.guild.id })
+      ?? await GuildConfig.create({ id: message.guild.id });
+    if (!config.guardianEnabled) return;
+    /*
     const config = {
       whitelist: JSON.parse(await this.database.getGuild(message.guild.id, 'guardianWhitelist')) || [],
       blacklistedWords: JSON.parse(await this.database.getGuild(message.guild.id, 'blacklistedWords')) || [],
@@ -42,18 +45,21 @@ module.exports = class Guardian extends Module {
       blockIps: JSON.parse(await this.database.getGuild(message.guild.id, 'blockIps')),
       blockSelfBots: JSON.parse(await this.database.getGuild(message.guild.id, 'blockSelfBots')),
     };
+    */
 
     // Anti spam pressure values.
     // For now, they are not changable by users.
     // TODO: Create a new table for this.
-    config.pressureDecay = 2.5;
-    config.basePressure = 10;
-    config.maxPressure = 60;
-    config.imagePressure = (config.maxPressure - config.basePressure) / 6;
-    config.lengthPressure = (config.maxPressure - config.basePressure) / 8000;
-    config.linePressure = (config.maxPressure - config.basePressure) / 70;
-    config.pingPressure = (config.maxPressure - config.basePressure) / 20;
-    config.notifyInterval = 7500;
+    const antiSpam = {};
+    antiSpam.pressureDecay = 2.5;
+    antiSpam.basePressure = 10;
+    antiSpam.maxPressure = 60;
+    antiSpam.pressureRange = antiSpam.maxPressure - antiSpam.basePressure;
+    antiSpam.imagePressure = antiSpam.pressureRange / 6;
+    antiSpam.lengthPressure = antiSpam.pressureRange / 8000;
+    antiSpam.linePressure = antiSpam.pressureRange / 70;
+    antiSpam.pingPressure = antiSpam.pressureRange / 20;
+    antiSpam.notifyInterval = 7500;
 
     const images = message.attachments.filter(a => a.type === 'image');
     const hasDuplicates = (/^(.+)(?: +\1){3}/).test(content);
@@ -68,27 +74,27 @@ module.exports = class Guardian extends Module {
     if (config.whitelist?.find(id => message.author.id === id)) return;
     if (config.ignoredChannels?.find(c => message.channel.name === c)) return;
 
-    if (config.antiSpam) {
+    if (config.antiSpamEnabled) {
       if (this.messageTrackers.has(message.author.id)) {
         const tracker = this.messageTrackers.get(message.author.id);
         const wasZero = tracker.pressure === 0;
-        tracker.pressure -= (config.basePressure * (message.createdAt - tracker.last) / (config.pressureDecay * 1000));
+        tracker.pressure -= (antiSpam.basePressure * (message.createdAt - tracker.last) / (antiSpam.pressureDecay * 1000));
         tracker.pressure = Math.max(tracker.pressure, 0)
-         + config.basePressure
-         + config.imagePressure * message.attachments.size
-         + config.imagePressure * message.embeds.length
-         + config.lengthPressure * content.length
-         + config.linePressure * content.split(/\r\n|\r|\n/).length
-         + config.pingPressure * [ ...content.matchAll(/<@!?&?(\d+)>/g) ].length;
+         + antiSpam.basePressure
+         + antiSpam.imagePressure * message.attachments.size
+         + antiSpam.imagePressure * message.embeds.length
+         + antiSpam.lengthPressure * content.length
+         + antiSpam.linePressure * content.split(/\r\n|\r|\n/).length
+         + antiSpam.pingPressure * [ ...content.matchAll(/<@!?&?(\d+)>/g) ].length;
 
         tracker.last = message.createdAt;
         if (tracker.pressure !== 0 && wasZero) {
           tracker.start = tracker.last;
         }
-        if (tracker.pressure > config.maxPressure) {
+        if (tracker.pressure > antiSpam.maxPressure) {
           // Until I can come up with a better way of dealing with this.
           // (such as muting the user), we'll have to deal with this.
-          if (!tracker.lastReply || message.createdAt - tracker.lastReply > config.notifyInterval) {
+          if (!tracker.lastReply || message.createdAt - tracker.lastReply > antiSpam.notifyInterval) {
             tracker.lastReply = Date.now();
             await this.notify(message, 'spam');
           }
@@ -103,13 +109,13 @@ module.exports = class Guardian extends Module {
     }
 
     // TODO: Ban user instead of deleting when detecting self-bot.
-    // if (config.blockSelfBots && hasEmbeds) await this.delete(message, 'selfBot');
+    // if (config.filterSelfBots && hasEmbeds) await this.delete(message, 'selfBot');
     if (config.blockDuplicates && hasDuplicates) await this.delete(message, 'duplicate');
-    if (config.blockZalgo && hasZalgo) await this.delete(message, 'zalgo');
-    if (config.blockInvites && hasInvite) await this.delete(message, 'invite');
-    if (config.blockLinks && hasLink) await this.delete(message, 'link');
-    if (config.blockIps && hasIp) await this.delete(message, 'ip');
-    if (config.imageLimit && images.length < config.imageLimit) await this.delete(message, 'image');
+    if (config.filterZalgo && hasZalgo) await this.delete(message, 'zalgo');
+    if (config.filterInvites && hasInvite) await this.delete(message, 'invite');
+    if (config.filterLinks && hasLink) await this.delete(message, 'link');
+    if (config.filterIps && hasIp) await this.delete(message, 'ip');
+    //if (config.imageLimit && images.length < config.imageLimit) await this.delete(message, 'image');
     if (isBlacklisted) await this.delete(message, 'blacklist');
   }
 

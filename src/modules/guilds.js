@@ -5,39 +5,29 @@
 const Module = require('../structs/module.js');
 
 module.exports = class Guilds extends Module {
-  async greetMember(member) {
+  async greetMember(member, config) {
     if (member.partial) member = await member.fetch();
-    const enabled = JSON.parse(await this.database.getGuild(member.guild.id, 'greetingEnabled'));
-    if (!enabled) return;
+    if (!config.greetingEnabled) return;
 
-    const channelId = await this.database.getGuild(member.guild.id, 'greetingChannel');
-    const channel = member.guild.channels.cache.get(channelId);
-    if (!channel) return;
+    const channel = member.guild.channels.cache.get(config.greetingChannel);
+    if (!channel || !config.greetingMessage) return;
 
-    const message = await this.database.getGuild(member.guild.id, 'greetingMessage');
-    if (!message) return;
-
-    const formatted = message.replace('{mention}', `<@${member.user.id}>`) 
+    const formatted = config.greetingMessage.replace('{mention}', `<@${member.user.id}>`) 
       .replace('{user}', member.username)
       .replace('{guild}', member.guild.name)
       .replace('{count}', member.guild.memberCount);
     channel.send(formatted);
   }
 
-  async goodbyeMember(member) {
+  async goodbyeMember(member, config) {
     const user = await this.client.users.fetch(member.id);
     const guild = await this.client.guilds.fetch(member.guild.id);
-    const enabled = JSON.parse(await this.database.getGuild(guild.id, 'goodbyeEnabled'));
-    if (!enabled) return;
+    if (!config.goodbyeEnabled) return;
 
-    const channelId = await this.database.getGuild(guild.id, 'goodbyeChannel');
-    const channel = guild.channels.cache.get(channelId);
-    if (!channel) return;
+    const channel = guild.channels.cache.get(config.goodbyeChannel);
+    if (!channel || config.goodbyeMessage) return;
 
-    const message = await this.database.getGuild(guild.id, 'goodbyeMessage');
-    if (!message) return;
-
-    const formatted = message.replace('{user}', user.username)
+    const formatted = config.goodbyeMessage.replace('{user}', user.username)
       .replace('{guild}', guild.name)
       .replace('{count}', guild.memberCount);
     channel.send(formatted);
@@ -63,26 +53,27 @@ module.exports = class Guilds extends Module {
     dmChannel.send(formatted);
   }
 
-  async autoRole(member) {
-    const enabled = await this.database.getGuild(member.guild.id, 'autoRoleEnabled');
-    if (!enabled) return;
-
-    const roleIds = JSON.parse(await this.database.getGuild(member.guild.id, 'autoRoles')) ?? [];
-    const roles = roleIds.map(r => member.guild.roles.cache.get(r));
+  async autoRole(member, config) {
+    if (!config.autoRoleEnabled) return;
+    const roles = config.autoRoles.map(r => member.guild.roles.cache.get(r));
     await Promise.all(roles.map(r => member.roles.add(r)));
   }
 
   async onMemberAdd(member) {
-    await this.greetMember(member);
-    await this.joinDmMember(member);
-    await this.autoRole(member);
+    const config = await GuildConfig.findOne({ id: message.guild.id })
+      ?? await GuildConfig.create({ id: message.guild.id });
+    await this.greetMember(member, config);
+    await this.joinDmMember(member, config);
+    await this.autoRole(member, config);
   }
 
   async onMemberRemove(member) {
-    await this.goodbyeMember(member);
+    const config = await GuildConfig.findOne({ id: message.guild.id })
+      ?? await GuildConfig.create({ id: message.guild.id });
+    await this.goodbyeMember(member, config);
   }
 
-  async onReactionAdd(reaction, user) {
+  /*async onReactionAdd(reaction, user) {
     const enabled = JSON.parse(await this.database.getGuild(reaction.message.guild.id, 'reactionRolesEnabled'));
     if (!enabled) return;
     const messageId = await this.database.getGuild(reaction.message.guild.id, 'ractionRolesMessage');
@@ -127,7 +118,7 @@ module.exports = class Guilds extends Module {
       const dmChannel = await user.createDM();
       dmChannel.send(`You no longer have the ${role.name} role in ${guild.name}.`);
     });
-  }
+  }*/
 
   load({ eventHandler, database }) {
     this.database = database;

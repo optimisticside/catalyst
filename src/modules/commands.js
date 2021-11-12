@@ -9,6 +9,7 @@ const Module = require('../structs/module.js');
 const Command = require('../structs/command.js');
 const { CommandGroup, SubCommandGroup } = require('../structs/group.js');
 const Serializer = require('../util/serializer.js');
+const GuildConfig = require('../models/guildConfig.js');
 const glob = require('glob');
 const path = require('path');
 
@@ -184,12 +185,12 @@ module.exports = class Commands extends Module {
     await this.database.delete('cooldown', user.id, command.name);
   }
 
-  async handleStatement(message, statement) {
+  async handleStatement(message, statement, config) {
     let content = statement.trim();
     let args = content.match(/(?:[^\s"]+|"[^"]*")+/g);
     const commandCall = args.shift();
     const command = await this.findCommand(commandCall);
-    const lastRun = await this.getCooldown(message.author, command);
+    const lastRun = null// = await this.getCooldown(message.author, command);
 
     // Command execution requirements:
     // Blacklist/whitelist system must allow user.
@@ -273,15 +274,21 @@ module.exports = class Commands extends Module {
   async handleMessage(message) {
     if (message.author.bot) return;
     let content = message.content.trim();
-    const guildPrefix = message.guild && await this.database.getGuild(message.guild.id, 'prefix');
-    const prefixes = [ `<@${this.client.user.id}>`, `<@!${this.client.user.id}>`, PREFIX ].concat(guildPrefix);
+    let config, guildPrefix;
+    if (message.guild) {
+      config = await GuildConfig.findOne({ id: message.guild.id })
+        ?? await GuildConfig.create({ id: message.guild.id });
+      guildPrefix = config.prefix;
+    }
+
+    const prefixes = [ `<@${this.client.user.id}>`, `<@!${this.client.user.id}>` ].concat(guildPrefix ?? PREFIX);
     const prefix = prefixes.find(p => content.startsWith(p));
     if (!prefix) return;
     content = content.slice(prefix.length);
 
     const statements = content.match(/(?!;|$)[^;"]*(("[^"]*")[^;"]*)*/g);
     if (!statements) return;
-    statements.map(s => this.handleStatement(message, s));
+    statements.map(s => this.handleStatement(message, s, config));
   }
 
   load({ eventHandler, database }) {
