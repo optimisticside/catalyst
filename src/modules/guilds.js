@@ -60,16 +60,16 @@ module.exports = class Guilds extends Module {
   }
 
   async onMemberAdd(member) {
-    const config = await GuildConfig.findOne({ id: message.guild.id })
-      ?? await GuildConfig.create({ id: message.guild.id });
+    const config = await GuildConfig.findOne({ id: member.guild.id })
+      ?? await GuildConfig.create({ id: member.guild.id });
     await this.greetMember(member, config);
     await this.joinDmMember(member, config);
     await this.autoRole(member, config);
   }
 
   async onMemberRemove(member) {
-    const config = await GuildConfig.findOne({ id: message.guild.id })
-      ?? await GuildConfig.create({ id: message.guild.id });
+    const config = await GuildConfig.findOne({ id: member.guild.id })
+      ?? await GuildConfig.create({ id: member.guild.id });
     await this.goodbyeMember(member, config);
   }
 

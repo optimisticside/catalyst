@@ -159,8 +159,8 @@ module.exports = class Logs extends Module {
     if (!interaction.inGuild()) return;
     if (interaction.user.bot) return;
 
-    const config = await GuildConfig.findOne({ id: message.guild.id })
-      ?? await GuildConfig.create({ id: message.guild.id });
+    const config = await GuildConfig.findOne({ id: interaction.guild.id })
+      ?? await GuildConfig.create({ id: interaction.guild.id });
     const channel = await this.getData('logCommands', interaction.guild, config);
     if (!channel) return;
 
