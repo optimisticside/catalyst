@@ -19,7 +19,7 @@ module.exports = class Guardian extends Module {
 
   async delete(message, reason) {
     await this.notify(message, reason);
-    await this.logHandler.onGuardianDelete(message, this.reasons[reason] ?? reason);
+    this.emit('messageDelete', message, this.reasons[reason] ?? reason);
     // This causes the shard to restart so
     // we will do this >:)
     message.delete().catch(err => console.log(err));
