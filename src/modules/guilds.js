@@ -33,15 +33,9 @@ module.exports = class Guilds extends Module {
     channel.send(formatted);
   }
 
-  async joinDmMember(member) {
-    if (member.partial) member = await member.fetch();
-    const enabled = JSON.parse(await this.database.getGuild(member.guild.id, 'joinDmEnabled'));
-    if (!enabled) return;
-
-    const message = await this.database.getGuild(member.guild.id, 'joinDmMessage');
-    if (!message) return;
-
-    const formatted = message.replace('{mention}', `<@${member.user.id}>`) 
+  async joinDmMember(member, config) {
+    if (!config.joinDmEnabled || !config.joinDmMessage) return;
+    const formatted = config.joinDmMessage.replace('{mention}', `<@${member.user.id}>`) 
       .replace('{user}', member.user.username)
       .replace('{guild}', member.guild.name)
       .replace('{count}', member.guild.memberCount);
@@ -54,7 +48,7 @@ module.exports = class Guilds extends Module {
   }
 
   async autoRole(member, config) {
-    if (!config.autoRoleEnabled) return;
+    if (!config.autoRoleEnabled || !config.autoRoles) return;
     const roles = config.autoRoles.map(r => member.guild.roles.cache.get(r));
     await Promise.all(roles.map(r => member.roles.add(r)));
   }
