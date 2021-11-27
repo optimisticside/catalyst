@@ -4,7 +4,7 @@
 </div>
 
 ## About
-Catalyst is a powerful Discord bot. It's built with a very modular structure for mantainability and extendability. It is published under the `MIT` license, meaning you can do whatever on earth you'd want to. You can invite the bot [here](https://discord.com/oauth2/authorize?&client_id=679060088002052118&scope=bot%20applications.commands&permissions=2134207679)
+Catalyst is a powerful Discord bot. It's built with a very modular structure for maintainability and extendibility. It is published under the `MIT` license, meaning you can do whatever on earth you'd want to. You can invite the bot [here](https://discord.com/oauth2/authorize?&client_id=679060088002052118&scope=bot%20applications.commands&permissions=2134207679)
 
 ## Usage
 From above the hood, Catalyst is used just as any other Discord bot. You can give it commands via the chat. Each command message should begin with a *prefix*, which is used to distinguish commands from messages. The default prefix is `c!`, but this can be changed through the guild configuration. Following the prefix should be the command, along with any arguments to be passed to the command. For example, if I wanted to run the `ping` command, I would do:
