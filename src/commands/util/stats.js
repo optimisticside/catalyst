@@ -8,7 +8,6 @@ const OptionParser = require('../../util/optionParser.js');
 const { warning } = require('../../util/formatter.js')('Invite Command');
 const { NAME, PREFIX, DEFAULT_COLOR } = require('../../config.json');
 const process = require('process');
-const os = require('os');
 const GIGA_BYTE = Math.pow(1024, 3);
 
 module.exports = class InfoCommand extends Command {
