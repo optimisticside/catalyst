@@ -204,7 +204,7 @@ module.exports = class Logs extends Module {
     channel.send({ embeds: [ embed ] });
   }
 
-  load({ commandHandler, eventHandler, slashHandler, database }) {
+  load({ commandHandler, eventHandler, slashHandler, guardian, database }) {
     this.database = database;
     eventHandler.on('messageDelete', this.onMessageDelete.bind(this));
     eventHandler.on('messageUpdate', this.onMessageEdit.bind(this));
@@ -213,6 +213,7 @@ module.exports = class Logs extends Module {
     eventHandler.on('guildMemberUpdate', this.onGuildMemberUpdate.bind(this));
     commandHandler.on('commandRun', this.onCommandRun.bind(this));
     slashHandler.on('commandRun', this.onSlashCommandRun.bind(this));
+    guardian.on('messageDelete', this.onGuardianDelete.bind(this));
   }
 
   constructor(client) {
