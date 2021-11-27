@@ -18,7 +18,19 @@ module.exports = async (shardingManager) => {
     const users = result[1].reduce((acc, count) => acc + count, 0);
    
     return await got.post(API_URL, {
-      json: { id: CLIENT_ID, key: STATCORD_TOKEN, servers, users }
+      json: {
+        id: CLIENT_ID,
+        key: STATCORD_TOKEN,
+        servers,
+        users,
+        active: [],
+        commands: "0",
+        popular: [],
+        memactive: "0",
+        memload: "0",
+        cpuload: "0",
+        bandwidth: "0"
+      }
     }).catch(err => {
       console.error(`Unable to post stats to StatCord: ${err}`);
     });
