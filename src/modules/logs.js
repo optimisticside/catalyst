@@ -20,7 +20,7 @@ module.exports = class Logs extends Module {
     if (message.author.bot) return;
     const config = await GuildConfig.findOne({ id: message.guild.id })
       ?? await GuildConfig.create({ id: message.guild.id });
-    const channel = await this.getData('logDelete', message.guild, config);
+    const channel = await this.getData('logMessageDelete', message.guild, config);
     if (!channel) return;
 
     const username = `${message.author.username}#${message.author.discriminator}`;
@@ -37,7 +37,7 @@ module.exports = class Logs extends Module {
     if (newMessage.author.bot) return;
     const config = await GuildConfig.findOne({ id: newMessage.guild.id })
       ?? await GuildConfig.create({ id: newMessage.guild.id });
-    const channel = await this.getData('logEdit', newMessage.guild, config);
+    const channel = await this.getData('logMessageEdit', newMessage.guild, config);
     if (!channel) return;
 
     // Yes, this sometimes happens.
@@ -59,7 +59,7 @@ module.exports = class Logs extends Module {
   async onGuildMemberAdd(member) {
     const config = await GuildConfig.findOne({ id: member.guild.id })
       ?? await GuildConfig.create({ id: member.guild.id });
-    const channel = await this.getData('logJoin', member.guild, config);
+    const channel = await this.getData('logMemberJoin', member.guild, config);
     if (!channel) return;
 
     const username = `${member.user.username}#${member.user.discriminator}`;
@@ -78,7 +78,7 @@ module.exports = class Logs extends Module {
 
     const config = await GuildConfig.findOne({ id: guild.id })
       ?? await GuildConfig.create({ id: guild.id });
-    const channel = await this.getData('logLeave', member.guild, config);
+    const channel = await this.getData('logMemberLeave', member.guild, config);
     if (!channel) return;
 
     const username = `${user.username}#${user.discriminator}`;
