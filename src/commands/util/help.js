@@ -8,6 +8,7 @@ const OptionParser = require('../../util/optionParser.js');
 const permNames = require('../../util/permNames.js');
 const { warning } = require('../../util/formatter.js')('Invite Command');
 const { NAME, PREFIX, SUPPORT_SERVER, DEFAULT_COLOR } = require('../../config.json');
+const GuildConfig = require('../../models/guildConfig.js');
 
 module.exports = class HelpCommand extends Command {
   async argumentHelp(client, given, parser, command, argumentName) {
@@ -68,7 +69,9 @@ module.exports = class HelpCommand extends Command {
       return given.reply(warning('No command provided.'));
     }
 
-    const prefix = await client.database.getGuild(given.guild.id, 'prefix') ?? PREFIX;
+    const config = await GuildConfig.findOne({ id: given.guild.id })
+        ?? await GuildConfig.create({ id: given.guild.id });
+    const prefix = config.prefix ?? PREFIX;
     const embed = new MessageEmbed()
       .setTitle(`${NAME}`)
       .setColor(DEFAULT_COLOR)
