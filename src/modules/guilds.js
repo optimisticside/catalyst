@@ -3,6 +3,7 @@
 // See LICENSE for details
 
 const Module = require('../structs/module.js');
+const GuildConfig = require('../models/guildConfig.js');
 
 module.exports = class Guilds extends Module {
   async greetMember(member, config) {
@@ -25,8 +26,8 @@ module.exports = class Guilds extends Module {
     if (!config.goodbyeEnabled) return;
 
     const channel = guild.channels.cache.get(config.goodbyeChannel);
-    if (!channel || config.goodbyeMessage) return;
-
+    if (!channel || !config.goodbyeMessage) return;
+    
     const formatted = config.goodbyeMessage.replace('{user}', user.username)
       .replace('{guild}', guild.name)
       .replace('{count}', guild.memberCount);

@@ -14,7 +14,7 @@ const guildConfigSchema = new Schema({
 
   greetingEnabled: { type: Boolean, default: false },
   greetingChannel: { type: String },
-  greetingMessage: { type: String, default: '{mention} welcome to {guild}!' },
+  greetingMessage: { type: String, default: '{mention} has joined the server!' },
   
   goodbyeEnabled: { type: Boolean, default: false },
   goodbyeChannel: { type: String },
