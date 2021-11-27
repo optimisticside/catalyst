@@ -478,13 +478,13 @@ module.exports = class ConfigCommand extends Command {
                 name: 'Message Delete',
                 desc: 'Keeping track of when messages are deleted.',
                 emoji: '🗑️',
-                handler: this.boolSetting('Message Delete', 'Message deletes are whenever someone deletes a message.', 'logDelete')
+                handler: this.boolSetting('Message Delete', 'Message deletes are whenever someone deletes a message.', 'logMessageDelete')
               },
               {
                 name: 'Message Edit',
                 desc: 'Keeping track of when messages are edited.',
                 emoji: '✏️',
-                handler: this.boolSetting('Message Edit', 'Message edits are whenever someone edits a message.', 'logEdit')
+                handler: this.boolSetting('Message Edit', 'Message edits are whenever someone edits a message.', 'logMessageEdit')
               }
             ]
           },
@@ -510,13 +510,13 @@ module.exports = class ConfigCommand extends Command {
                 name: 'User Join',
                 desc: 'Keeping track of when users join the server.',
                 emoji: '📥',
-                handler: this.boolSetting('User Join', 'User Joins are whenever someone joins the server.', 'logJoin')
+                handler: this.boolSetting('User Join', 'User Joins are whenever someone joins the server.', 'logMemberJoin')
               },
               {
                 name: 'User Leave',
                 desc: 'Keeping track of when users leave the server.',
                 emoji: '📤',
-                handler: this.boolSetting('User Leave', 'Message edits are whenever someone leaves the server.', 'logLeave')
+                handler: this.boolSetting('User Leave', 'Message edits are whenever someone leaves the server.', 'logMemberLeave')
               },
               /*{
                 name: 'User Update',
