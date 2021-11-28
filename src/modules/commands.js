@@ -167,12 +167,9 @@ module.exports = class Commands extends Module {
     if (command.cooldown > COOLDOWN_PERSISTANCE_THRESHOLD) {
       const userConfig = await UserConfig.findOne({ id: user.id }) ??
         await UserConfig.create({ id: user.id });
-      const current = userConfig.cooldowns.find(cl => cl.command === command.name);
-      if (current) {
+      const current = userConfig.cooldowns.find(cl => cl.command === command.name) ??
+        userConfig.cooldowns.push({ command: command.name });
         current.since = now;
-      } else {
-        userConfig.cooldowns.push({ command: command.name, since: now });
-      }
       userConfig.markModified('cooldowns');
       await userConfig.save();
     } else {
