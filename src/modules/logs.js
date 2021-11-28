@@ -7,6 +7,7 @@ const { warning, denial, log, prompt } = require('../util/formatter.js')('Log Ha
 const { MessageEmbed } = require('discord.js');
 const Module = require('../structs/module.js');
 const GuildConfig = require('../models/guildConfig.js');
+const Serializer = require('../util/serializer.js');
 
 module.exports = class Logs extends Module {
   async getData(key, guild, config) {
@@ -159,29 +160,50 @@ module.exports = class Logs extends Module {
     if (!interaction.inGuild()) return;
     if (interaction.user.bot) return;
 
+    // TODO: This could be simpler if the `Serializer`
+    // library was better built.
+    const deserialize = async (given, option) => {
+      switch (option.type) {
+        case 'text': case 'raw': case 'string': default:
+          return given;
+        case 'integer':
+          return Serializer.serializeInt(given);
+        case 'number':
+          return Serializer.serializeFloat(given);
+        case 'boolean':
+          return Serializer.serializeBool(given);
+        case 'user': case 'member':
+          return Serializer.serializeUser(given);
+        case 'channel':
+          return Serializer.serializeChannel(given);
+        case 'role':
+          return Serializer.serializeRole(given);
+        case 'mentionable':
+          return Serializer.serializeMentionable(given);
+      };
+    }
+
     const config = await GuildConfig.findOne({ id: interaction.guild.id })
       ?? await GuildConfig.create({ id: interaction.guild.id });
     const channel = await this.getData('logCommands', interaction.guild, config);
     if (!channel) return;
 
-    let message = interaction.commandName;
-    /*
-    const subName = interaction.options.getSubcommand(false);;
+    let message = `/${interaction.commandName}`;
+    const subName = interaction.options.getSubcommand(false);
     const subGroupName = interaction.options.getSubcommandGroup(false);
     if (subGroupName) message = `${message} ${subGroupName}`;
     if (subName) message = `${message} ${subName}`;
-    command.options.map(option => {
+    await Promise.all(command.options.map(async option => {
       const given = interaction.options.get(option.name);
-      if (!given) return;
-      message = `${message} ${option.name} ${}`
-    });
-    */
+      if (!given || !given.value) return;
+      message = `${message} ${option.name}: ${await deserialize(given.value, option)}`
+    }));
 
     const username = `${interaction.user.username}#${interaction.user.discriminator}`;
     const embed = new MessageEmbed()
       .setAuthor(username, interaction.user.displayAvatarURL())
       .setColor(DEFAULT_COLOR)
-      .setDescription(`Used ${command.name} slash command in <#${interaction.channel.id}>\n${message.content}`)
+      .setDescription(`Used ${command.name} slash command in <#${interaction.channel.id}>\n${message}`)
       .setFooter(`ID: ${interaction.user.id}`)
       .setTimestamp(Date.now());
     channel.send({ embeds: [ embed ] });
