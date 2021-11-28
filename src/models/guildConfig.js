@@ -3,10 +3,29 @@
 // See LICENSE for details
 
 const { PREFIX } = require('../config.json');
-const { Schema, model, SchemaTypes } = require('mongoose');
-const UnmuteTimer = require('./unmuteTimer.js');
-const UnbanTimer = require('./unbanTimer.js');
-const ModerationCase = require('./moderationCase.js');
+const { Schema, model } = require('mongoose');
+
+const moderationActions = [ 'Ban', 'Block', 'Kick', 'Mute', 'SoftBan', 'Strike', 'Temp Ban', 'Temp Mute' ];
+
+const timerSchema = new Schema({
+  user: String,
+  date: Date
+});
+
+const moderationCaseSchema = new Schema({
+  id: { type: String, require: true, unique: true },
+  user: { type: String },
+  reason: { type: String },
+  moderator: { type: String },
+  isValid: { type: Boolean },
+  canEdit: { type: Boolean },
+  type: { type: String, enum: moderationActions }
+});
+
+const strikePolicyActionSchema = new Schema({
+  count: { type: Number, require: true },
+  action: { type: String, reqquire: true, enum: moderationActions }
+})
 
 const guildConfigSchema = new Schema({
   id: { type: String, require: true, unique: true },
@@ -48,22 +67,10 @@ const guildConfigSchema = new Schema({
   filterSelfBots: { type: Boolean, default: false },
 
   muteRole: { type: String },
-  unmuteTimers: { type: Array , of: { type: SchemaTypes.ObjectId, ref: UnmuteTimer }, default: [] },
-  unbanTimers: { type: Array, of: { type: SchemaTypes.ObjectId, ref: UnbanTimer }, default: [] },
-  moderationCases: { type: Array, of: { type: SchemaTypes.ObjectId, ref: ModerationCase }, default: [] },
-  strikePolicy: { type: Array, of: {
-    count: { type: String, unique: true },
-    action: { type: String, enum: [
-      'Ban',
-      'Block',
-      'Kick',
-      'Mute',
-      'SoftBan',
-      'Strike',
-      'Temp Ban',
-      'Temp Mute'
-    ] }
-  } },
+  unmuteTimers: { type: Array, of: timerSchema },
+  unbanTimers: { type: Array, of: timerSchema },
+  moderationCases: { type: Array, of: moderationCaseSchema },
+  strikePolicy: { type: Array, of: strikePolicyActionSchema },
 
   autoRoleEnabled: { type: Boolean, default: false },
   autoRoles: { type: Array, of: String, default: [] }
