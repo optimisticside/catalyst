@@ -10,6 +10,7 @@ const Command = require('../structs/command.js');
 const { CommandGroup, SubCommandGroup } = require('../structs/group.js');
 const Serializer = require('../util/serializer.js');
 const GuildConfig = require('../models/guildConfig.js');
+const UserConfig = require('../models/userConfig.js');
 const glob = require('glob');
 const path = require('path');
 
@@ -151,18 +152,29 @@ module.exports = class Commands extends Module {
     const key = `${user.id}:${command.name}`;
     const fromMap = this.cooldowns.get(key);
     if (fromMap) return fromMap;
-    return await this.database.get('cooldown', user.id, command.name); 
+    const userConfig = await UserConfig.findOne({ id: user.id });
+    const cooldown = userConfig?.cooldowns.find(cd => cd.command == command.name);
+    return cooldown?.since;
   }
 
   async saveCooldown(user, command) {
     if (!command) return;
-    if (command.cooldown) return;
+    if (!command.cooldown) return;
     const now = Date.now();
     
     // If the cooldown is longer than a certain threshold,
     // we will store it in Redis in case we have to restart.
     if (command.cooldown > COOLDOWN_PERSISTANCE_THRESHOLD) {
-      await this.database.set('cooldown', user.id, command.name, now);
+      const userConfig = await UserConfig.findOne({ id: user.id }) ??
+        await UserConfig.create({ id: user.id });
+      const current = userConfig.cooldowns.find(cl => cl.command === command.name);
+      if (current) {
+        current.since = now;
+      } else {
+        userConfig.cooldowns.push({ command: command.name, since: now });
+      }
+      userConfig.markModified('cooldowns');
+      await userConfig.save();
     } else {
       const key = `${user.id}:${command.name}`;
       this.cooldowns.set(key, now);
@@ -170,7 +182,7 @@ module.exports = class Commands extends Module {
   }
 
   async clearCooldown(user, command) {
-    // If statements fail if the value is 0,
+    // `if` statements fail if the value is 0,
     // which is used intentionally.
     if (!command) return;
     if (command.cooldown) return;
@@ -180,9 +192,11 @@ module.exports = class Commands extends Module {
       return;
     }
 
-    // I'm too lazy to create a delete function,
-    // so this will do for now.
-    await this.database.delete('cooldown', user.id, command.name);
+    const userConfig = await UserConfig.findOne({ id: user.id }) ??
+      await UserConfig.create({ id: user.id });
+    userConfig.cooldowns.filter(cl => cl.command === command.name);
+    userConfig.markModified('cooldowns');
+    await userConfig.save();
   }
 
   async handleStatement(message, statement, config) {
@@ -190,7 +204,7 @@ module.exports = class Commands extends Module {
     let args = content.match(/(?:[^\s"]+|"[^"]*")+/g);
     const commandCall = args.shift();
     const command = await this.findCommand(commandCall);
-    const lastRun = null// = await this.getCooldown(message.author, command);
+    const lastRun = await this.getCooldown(message.author, command);
 
     // Command execution requirements:
     // Blacklist/whitelist system must allow user.
