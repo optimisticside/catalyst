@@ -163,7 +163,7 @@ module.exports = class Commands extends Module {
     const now = Date.now();
     
     // If the cooldown is longer than a certain threshold,
-    // we will store it in Redis in case we have to restart.
+    // we will store it in MongoDB in case we have to restart.
     if (command.cooldown > COOLDOWN_PERSISTANCE_THRESHOLD) {
       const userConfig = await UserConfig.findOne({ id: user.id }) ??
         await UserConfig.create({ id: user.id });
