@@ -12,7 +12,7 @@ module.exports = class BanCommand extends Command {
     const parser = new OptionParser(this, given, args);
     const id = await parser.getOption('target');
 
-		given.guild.bans.remove(id).then(() => {
+		given.guild.bans.remove(id, `Unbanned by ${given.author.id}`).then(() => {
 		  given.reply(success(`Successfully unbanned user`));
     }).catch(err => {
       given.reply(alert(`Unable to ban user`));
