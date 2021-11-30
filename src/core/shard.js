@@ -6,8 +6,7 @@ const { TOKEN, REST_TIME_OFFSET, SHARD_LIFETIME } = require('../config.json');
 const { Client, Intents } = require('discord.js');
 const glob = require('glob');
 const path = require('path');
-const { promisify } = require('util');
-const requireAsync = async f => require(f); //promisify(require.bind(this));
+const requireAsync = async f => require(f);
 
 const modules = {};
 const client = new Client({
@@ -31,17 +30,6 @@ const loadModule = async file => {
   const object = new module(client);
   modules[object.name] = object;
   client[object.name] = object;
-  /*
-  let module;
-  try {
-    module = require(file);
-  } catch(err) {
-    console.error(`Unable to load module ${file}: ${err}`)
-  }
-  let object = new module(client);
-  modules[object.name] = object;
-  client[object.name] = object;
-  */
 }
 
 const updateStatus = () => {
@@ -49,10 +37,11 @@ const updateStatus = () => {
 }
 
 const initModules = async () => {
-  await Promise.all(Object.entries(modules).map(async ([ name, module ]) => {
+  const promises = Object.entries(modules).map(async ([ _, module ]) => {
     if (!module.load) return;
     module.load(modules, client);
-  }));
+  });
+  await Promise.all(promises);
 }
 
 process.on('message', async message => {
