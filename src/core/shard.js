@@ -32,16 +32,13 @@ const loadModule = async file => {
   client[object.name] = object;
 }
 
-const updateStatus = () => {
-  client.user.setActivity(`${client.guilds.cache.size} servers`, { type: 'WATCHING' });
+const initModule = async module => {
+  if (!module.load) return;
+  module.load(modules, client);
 }
 
-const initModules = async () => {
-  const promises = Object.entries(modules).map(async ([ _, module ]) => {
-    if (!module.load) return;
-    module.load(modules, client);
-  });
-  await Promise.all(promises);
+const updateStatus = () => {
+  client.user.setActivity(`${client.guilds.cache.size} servers`, { type: 'WATCHING' });
 }
 
 process.on('message', async message => {
@@ -54,10 +51,12 @@ let moduleFiles = glob.sync(path.join(__dirname + '/../modules/*.js'))
 
 (async () => {
   await Promise.all(moduleFiles.map(loadModule));
-  await initModules();
-  await client.login(TOKEN);
+  const moduleArray = Object.entries(modules).map(([ _, module ]) => module);
+  await Promise.all(moduleArray.map(initModule));
 
+  await client.login(TOKEN);
   console.log('Ready');
+
   updateStatus();
   setInterval(updateStatus, 5000);
 })();
