@@ -16,6 +16,8 @@ module.exports = class BanCommand extends Command {
     if (!target) return;
     const username = `${target.user.username}#${target.user.discriminator}`;
 
+    // We can remove this after slash command
+    // support is added.
     if (days && (days < 0 || days > 7)) {
       return given.reply(alert('Ban duration must be between 1 and 7 days'));
     }
@@ -53,6 +55,8 @@ module.exports = class BanCommand extends Command {
         {
           name: 'days',
           type: 'integer',
+          minimum: 1,
+          maximum: 7,
           desc: 'How long the user should be banned for.',
           prompt: 'How long should the user be banned for?',
           required: false,
