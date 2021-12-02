@@ -25,7 +25,16 @@ const moderationCaseSchema = new Schema({
 const strikePolicyActionSchema = new Schema({
   count: { type: Number, require: true },
   action: { type: String, reqquire: true, enum: moderationActions }
-})
+});
+
+const reactionRoleSchema = new Schema({
+  messageId: { type: String, require: true, unique: true },
+  multiSelect: { type: Boolean, default: false },
+  roleData: { type: Array, of: new Schema({
+    roleId: { type: String, require: true, unique: true },
+    name: { type: String, require: true }
+  }) }
+});
 
 const guildConfigSchema = new Schema({
   id: { type: String, require: true, unique: true },
@@ -71,6 +80,9 @@ const guildConfigSchema = new Schema({
   unbanTimers: { type: Array, of: timerSchema },
   moderationCases: { type: Array, of: moderationCaseSchema },
   strikePolicy: { type: Array, of: strikePolicyActionSchema },
+
+  reactionRoleEnabled: { type: Boolean, default: false },
+  reactionRoles: { type: Array, of: reactionRoleSchema },
 
   autoRoleEnabled: { type: Boolean, default: false },
   autoRoles: { type: Array, of: String, default: [] }
