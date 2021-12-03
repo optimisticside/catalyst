@@ -17,6 +17,7 @@ module.exports = class Logs extends Module {
     const channel = guild.channels.cache.get(config.logChannel);
     return channel;
   }
+
   async onMessageDelete(message) {
     if (message.author.bot) return;
     const config = await GuildConfig.findOne({ id: message.guild.id })
@@ -30,6 +31,23 @@ module.exports = class Logs extends Module {
       .setColor(DEFAULT_COLOR)
       .setDescription(`Message sent by <@${message.author.id}> deleted in <#${message.channel.id}>\n${message.content}`)
       .setFooter(`ID: ${message.id}`)
+      .setTimestamp(Date.now());
+    channel.send({ embeds: [ embed ] });
+  }
+
+  async onMessageBulkDelete(messages) {
+    const last = messages.last();
+    if (!last) return;
+    const config = await GuildConfig.findOne({ id: last.guild.id })
+      ?? await GuildConfig.create({ id: last.guild.id });
+    const channel = await this.getData('logMessageDelete', last.guild, config);
+    if (!channel) return;
+
+    const username = `${last.author.username}#${last.author.discriminator}`;
+    const embed = new MessageEmbed()
+      .setAuthor(username, message.author.displayAvatarURL())
+      .setColor(DEFAULT_COLOR)
+      .setDescription(`${messages.length} messages bulk-deleted in <#${last.channel.id}>`)
       .setTimestamp(Date.now());
     channel.send({ embeds: [ embed ] });
   }
@@ -229,6 +247,7 @@ module.exports = class Logs extends Module {
   load({ commandHandler, eventHandler, slashHandler, guardian, database }) {
     this.database = database;
     eventHandler.on('messageDelete', this.onMessageDelete.bind(this));
+    eventHandler.on('messageDeleteBulk', this.onMessageBulkDelete.bind(this));
     eventHandler.on('messageUpdate', this.onMessageEdit.bind(this));
     eventHandler.on('guildMemberAdd', this.onGuildMemberAdd.bind(this));
     eventHandler.on('guildMemberRemove', this.onGuildMemberRemove.bind(this));
