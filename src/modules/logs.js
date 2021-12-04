@@ -32,7 +32,7 @@ module.exports = class Logs extends Module {
       .setDescription(`Message sent by <@${message.author.id}> deleted in <#${message.channel.id}>\n${message.content}`)
       .setFooter(`ID: ${message.id}`)
       .setTimestamp(Date.now());
-    channel.send({ embeds: [ embed ] });
+    channel.send({ embeds: [ embed ], files: message.attachments.map(a => a.url) });
   }
 
   async onMessageBulkDelete(messages) {
