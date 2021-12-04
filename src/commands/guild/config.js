@@ -11,7 +11,7 @@ const OptionParser = require('../../util/optionParser.js');
 const emojiRegex = require('emoji-regex');
 const Serializer = require('../../util/serializer.js');
 const GuildConfig = require('../../models/guildConfig.js');
-const promisify = (fn) => async (...given) => await fn(...given);
+const promisify = (fn) => async (...given) => fn(...given);
 
 module.exports = class ConfigCommand extends Command {
   awaitCollection(collector) {
