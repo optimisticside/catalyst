@@ -18,10 +18,16 @@ module.exports = class SlashModule extends Module {
 
     await Promise.all(command.options.map(async option => {
       const loadOption = (o) => {
+        console.log(option);
         o
           .setName(option.name)
           .setDescription(option.desc)
           .setRequired(option.required);
+        // .setAutocomplete() and .addChoice sometimes
+        // do not exist when the option-type doesn't support it.
+        if (option.autoComplete) {
+          o.setAutocomplete(true);
+        }
         if (option.choices) {
           option.choices.map(choice => {
             o.addChoice(choice.name, choice.value ?? choice.name);
