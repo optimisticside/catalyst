@@ -10,11 +10,12 @@ const OptionParser = require('../../util/optionParser.js');
 module.exports = class BanCommand extends Command {
   async run(client, given, args) {
     const parser = new OptionParser(this, given, args);
-    const channel = await parser.getOption('channel');
+    const channelId = await parser.getOption('channel');
     const message = await parser.getOption('message');
-    if (!channel || !message) return;
+    if (!channelId || !message) return;
 
-    channel.send(message).then(() => {
+    const channel = given.guild.channels.cache.get(channelId);
+    channel?.send(message).then(() => {
       given.reply(success('Successfully sent message'));
     }).catch(err => {
       given.reply(alert('Unable to send message in channel'));
