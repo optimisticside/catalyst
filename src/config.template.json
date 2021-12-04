@@ -8,6 +8,7 @@
       
 	"PORT": "integer",
 	"PREFIX": "string",
+	"DEFAULT_COOLDOWN": "integer",
 	"REST_TIME_OFFSET": "integer",
       
 	"DEFAULT_COLOR": "string",

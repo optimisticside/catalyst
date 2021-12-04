@@ -2,6 +2,8 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
+const { DEFAULT_COOLDOWN } = require('../util/configParser.js');
+
 module.exports = class Command {
   async run() {
     throw new Error(`${this.name} doesn't have a run() method.`);
@@ -16,7 +18,7 @@ module.exports = class Command {
     this.subGroup = info.subGroup;
     this.groupMember = info.groupMember || info.name;
     this.desc = info.desc || 'No description';
-    this.cooldown = info.cooldown || 3000; // 1 second is just enough to prevent spam but not be annoying.
+    this.cooldown = info.cooldown || DEFAULT_COOLDOWN;
     this.tags = info.tags || [];
     this.examples = info.examples || [];
     this.authors = info.authors || [];
