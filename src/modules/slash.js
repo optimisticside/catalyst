@@ -221,6 +221,9 @@ module.exports = class SlashModule extends Module {
     }).then(() => {
       this.commandHandler.saveCooldown(interaction.user, command);
       this.emit('commandRun', interaction, command);
+      interaction.reply(success('The command completed execution.')).catch(err => {
+        // This will fail if the command replied to the interaction.
+      });
     });
   }
 
