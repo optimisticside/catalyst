@@ -2,7 +2,7 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const { DISCORDS_TOKEN, CLIENT_ID, STATS_UPDATE_INTERVAL } = require('../config.json');
+const { DISCORDS_TOKEN, CLIENT_ID, STATS_UPDATE_INTERVAL } = require('../util/configParser.js');
 const API_URL = `https://discords.com/bots/api/bot/${CLIENT_ID}`;
 const got = require('got');
 

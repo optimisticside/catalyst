@@ -6,7 +6,7 @@ const { MessageEmbed, Permissions } = require('discord.js');
 const Command = require('../../structs/command.js');
 const OptionParser = require('../../util/optionParser.js');
 const { warning } = require('../../util/formatter.js')('Invite Command');
-const { NAME, PREFIX, DEFAULT_COLOR } = require('../../config.json');
+const { NAME, PREFIX, DEFAULT_COLOR } = require('../../util/configParser.js');
 const process = require('process');
 const GIGA_BYTE = Math.pow(1024, 3);
 

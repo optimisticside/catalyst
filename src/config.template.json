@@ -1,0 +1,22 @@
+{
+	"NAME": "string",
+      
+	"CREATORS": { "type": "array", "of": "string" },
+	"CLIENT_ID": "string",
+	"TOKEN": "string",
+	"SUPPORT_SERVER": "string",
+      
+	"PORT": "integer",
+	"PREFIX": "string",
+	"REST_TIME_OFFSET": "integer",
+      
+	"DEFAULT_COLOR": "string",
+	"ALERT_COLOR": "string",
+	"WARNING_COLOR": "string",
+	"SUCCESS_COLOR": "string",
+      
+	"MONGODB_SRV": "string",
+	"COOLDOWN_PERSISTANCE_THRESHOLD": "integer",
+	"STATCORD_TOKEN": "string",
+	"STATS_UPDATE_INTERVAL": "integer"
+}

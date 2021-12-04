@@ -4,7 +4,7 @@
 
 const Module = require('../structs/module.js');
 const mongoose = require('mongoose');
-const { MONGODB_SRV } = require('../config.json');
+const { MONGODB_SRV } = require('../util/configParser.js');
 
 module.exports = class Database extends Module {
   load() {

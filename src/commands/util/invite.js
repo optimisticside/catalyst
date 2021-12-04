@@ -4,7 +4,7 @@
 
 const Command = require('../../structs/command.js');
 const { neutral } = require('../../util/formatter.js')('Invite Command');
-const { CLIENT_ID } = require('../../config.json');
+const { CLIENT_ID } = require('../../util/configParser.js');
 
 module.exports = class InviteCommand extends Command {
   async run(client, given, args) {

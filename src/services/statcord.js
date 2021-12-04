@@ -2,7 +2,7 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const { STATCORD_TOKEN, CLIENT_ID, STATS_UPDATE_INTERVAL } = require('../config.json');
+const { STATCORD_TOKEN, CLIENT_ID, STATS_UPDATE_INTERVAL } = require('../util/configParser.js');
 const API_URL = 'https://api.statcord.com/v3/stats';
 const got = require('got');
 

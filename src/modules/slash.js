@@ -5,7 +5,7 @@
 const { GuildChannel } = require('discord.js');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-const { TOKEN, CREATORS } = require('../config.json');
+const { TOKEN, CREATORS } = require('../util/configParser.js');
 const { warning, denial, prompt } = require('../util/formatter.js')('Slash Command Handler');
 const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandGroupBuilder } = require('@discordjs/builders');
 const Module = require('../structs/module.js');

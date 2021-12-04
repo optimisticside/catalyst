@@ -4,7 +4,7 @@
 
 const { Permissions, MessageEmbed } = require('discord.js');
 const { alert, success } = require('../../util/formatter.js')('Ban Command');
-const { DEFAULT_COLOR } = require('../../config.json');
+const { DEFAULT_COLOR } = require('../../util/configParser.js');
 const Command = require('../../structs/command.js');
 const OptionParser = require('../../util/optionParser.js');
 

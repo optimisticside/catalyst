@@ -2,7 +2,7 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const { TOKEN, REST_TIME_OFFSET, SHARD_LIFETIME } = require('../config.json');
+const { TOKEN, REST_TIME_OFFSET, SHARD_LIFETIME } = require('../util/configParser.js');
 const { Client, Intents } = require('discord.js');
 const glob = require('glob');
 const path = require('path');

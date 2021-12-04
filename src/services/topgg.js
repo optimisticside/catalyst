@@ -2,7 +2,7 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const { TOPGG_TOKEN, CLIENT_ID, STATS_UPDATE_INTERVAL } = require('../config.json');
+const { TOPGG_TOKEN, CLIENT_ID, STATS_UPDATE_INTERVAL } = require('../util/configParser.js');
 const API_URL = `https://top.gg/api/bots/${CLIENT_ID}/stats`;
 const got = require('got');
 
