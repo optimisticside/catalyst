@@ -4,7 +4,7 @@
 
 const { PREFIX, CREATORS, COOLDOWN_PERSISTANCE_THRESHOLD } = require('../util/configParser.js');
 const { warning, denial, log, prompt } = require('../util/formatter.js')('Command Handler');
-const { GuildChannel, Permissions } = require('discord.js');
+const { GuildChannel, Permissions, Message } = require('discord.js');
 const Module = require('../structs/module.js');
 const Command = require('../structs/command.js');
 const { CommandGroup, SubCommandGroup } = require('../structs/group.js');
@@ -113,17 +113,18 @@ module.exports = class Commands extends Module {
 
   promptArg(message, option) {
     return new Promise((resolve, reject) => {
-      message.channel.send(prompt(option.prompt ?? `Enter ${object.name} (${object.type}):`));
-      const filter = m => m.author === message.author;
-      const collector = message.channel.createMessageCollector({ filter, max: 1, time: 60000 });
-      collector.on('collect', m => resolve(m.content));
-      collector.on('end', reject);
+      message.channel.send(prompt(option.prompt ?? `Enter ${object.name} (${object.type}):`)).then(reply => {
+        const filter = m => m.author === message.author;
+        const collector = message.channel.createMessageCollector({ filter, max: 1, time: 60000 });
+        collector.on('collect', m => resolve(m.content, reply));
+        collector.on('end', () => reject(reply));
+      });
     });
   }
 
   async handleArgs(message, command, args) {
     let result = {};
-    const promises = command.options.map(async option => {
+    const handler = async option => {
       let given = args[command.options.indexOf(option)];
 
       // Ignore option if not given and not required.
@@ -133,7 +134,12 @@ module.exports = class Commands extends Module {
       //   Else, display syntax error to user.
       if (!given && !option.required) return;
       if (!given && option.required) {
-        given = await this.promptArg(message, option);
+        given = await this.promptArg(message, option).catch(reply => {
+          // This is done under the assumption that `promptArg` is
+          // rejecting because it timed out.
+          if (!reply instanceof Message) return;
+          reply.reply(alert('Prompt timed out'));
+        });
       }
       await this.parseArg(message, option, given).then(final => {
         result[option.name] = final;
@@ -141,9 +147,13 @@ module.exports = class Commands extends Module {
         message.channel.send(warning(`\`${given}\` is not a valid ${option.type}`));
         throw err;
       });
-    });
+    };
 
-    await Promise.all(promises);
+    // A for loop needs to be used since we want the
+    // handlers to be run sequentially but also be asynchronous.
+    for (let option of command.options) {
+      await handler(option);
+    }
     return result;
   }
 
