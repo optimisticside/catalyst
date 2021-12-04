@@ -101,7 +101,25 @@ module.exports = class SlashModule extends Module {
   }
 
   async createPerms(guild, command) {
-    
+    const perms = [];
+
+    guild.roles.cache.map(role => {
+      const missing = command.userPerms.filter(p => !role.permissions.has(p));
+      if (missing !== []) return;
+      perms.push({ id: role.id, type: 'ROLE', permission: true });
+    });
+
+    guild.members.cache.map(member => {
+      // We only want to add the user if they are not
+      // in any of the roles already addded but still have perms.
+      const sameRoles = perms.filter(r => member.roles.cache.get(r.id));
+      if (sameRoles !== []) return;
+      const missing = command.userPerms.filter(p => !member.permissions.has(p));
+      if (missing !== []) return;
+      perms.push({ id: member.user.id, type: 'USER', permission: true });
+    });
+
+    return perms;
   }
 
   async refreshCommands(guild, commands) {
@@ -123,9 +141,9 @@ module.exports = class SlashModule extends Module {
       const command = commands.find(c => c.name === slashCommand.name);
       perms.push({ id: slashCommand.id, permissions: await this.createPerms(guild, command) });
     }));
-
     await rest.put(permRoute, { body: perms });
     */
+
     return result;
   }
 
