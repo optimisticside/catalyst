@@ -2,7 +2,7 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const { TOKEN, PORT, TOTAL_SHARDS, LIFETIME } = require('./config.json');
+const { TOKEN, PORT, TOTAL_SHARDS, LIFETIME } = require('./util/configParser.js');
 const { ShardingManager } = require('discord.js');
 const requirePromise = async f => require(f);
 const glob = require('glob');

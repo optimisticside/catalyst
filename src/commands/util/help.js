@@ -7,7 +7,7 @@ const Command = require('../../structs/command.js');
 const OptionParser = require('../../util/optionParser.js');
 const permNames = require('../../util/permNames.js');
 const { warning } = require('../../util/formatter.js')('Invite Command');
-const { NAME, PREFIX, SUPPORT_SERVER, DEFAULT_COLOR } = require('../../config.json');
+const { NAME, PREFIX, SUPPORT_SERVER, DEFAULT_COLOR } = require('../../util/configParser.js');
 const GuildConfig = require('../../models/guildConfig.js');
 
 module.exports = class HelpCommand extends Command {

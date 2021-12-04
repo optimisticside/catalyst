@@ -2,7 +2,7 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const { DBL_TOKEN, CLIENT_ID, STATS_UPDATE_INTERVAL } = require('../config.json');
+const { DBL_TOKEN, CLIENT_ID, STATS_UPDATE_INTERVAL } = require('../util/configParser.js');
 const API_URL = `https://discordbotlist.com/api/v1/bots/${CLIENT_ID}/stats`;
 const got = require('got');
 

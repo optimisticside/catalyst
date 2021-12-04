@@ -2,7 +2,7 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const { PREFIX } = require('../config.json');
+const { PREFIX } = require('../util/configParser.js');
 const { Schema, model } = require('mongoose');
 
 const moderationActions = [ 'Ban', 'Block', 'Kick', 'Mute', 'SoftBan', 'Strike', 'Temp Ban', 'Temp Mute' ];

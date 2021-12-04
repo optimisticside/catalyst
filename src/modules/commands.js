@@ -2,7 +2,7 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const { PREFIX, CREATORS, COOLDOWN_PERSISTANCE_THRESHOLD } = require('../config.json');
+const { PREFIX, CREATORS, COOLDOWN_PERSISTANCE_THRESHOLD } = require('../util/configParser.js');
 const { warning, denial, log, prompt } = require('../util/formatter.js')('Command Handler');
 const { GuildChannel, Permissions } = require('discord.js');
 const Module = require('../structs/module.js');

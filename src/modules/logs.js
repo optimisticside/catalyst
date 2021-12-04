@@ -2,7 +2,7 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const { DEFAULT_COLOR } = require('../config.json');
+const { DEFAULT_COLOR } = require('../util/configParser.js');
 const { warning, denial, log, prompt } = require('../util/formatter.js')('Log Handler');
 const { MessageEmbed } = require('discord.js');
 const Module = require('../structs/module.js');
