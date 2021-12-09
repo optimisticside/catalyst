@@ -179,7 +179,7 @@ module.exports = class Commands extends Module {
         await UserConfig.create({ id: user.id });
       const current = userConfig.cooldowns.find(cl => cl.command === command.name) ??
         userConfig.cooldowns.push({ command: command.name });
-        current.since = now;
+      current.since = now;
       userConfig.markModified('cooldowns');
       await userConfig.save();
     } else {
