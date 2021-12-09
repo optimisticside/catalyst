@@ -17,13 +17,21 @@ const elemHandlers = {
   }
 };
 
+const readElem = (name, data, spec) => {
+  const type = spec.type ?? spec ?? 'string';
+  if (data == null) {
+    if (spec.default) return spec.default;
+    if (spec.require) throw new Error(`${name} is a required config entry`);
+  }
+  return elemHandlers[type](data, spec.of);
+}
+
 const parseConfig = (env, specs) => {
   let result = {};
   Object.entries(env).map(([ name, data ]) => {
     const spec = specs[name];
     if (!spec) return;
-    const type = spec.type ?? spec ?? 'string';
-    result[name] = elemHandlers[type](data, spec.of);
+    result[name] = readElem(name, data, spec)
   });
   return result;
 }
