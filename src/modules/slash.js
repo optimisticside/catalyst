@@ -18,7 +18,6 @@ module.exports = class SlashModule extends Module {
 
     await Promise.all(command.options.map(async option => {
       const loadOption = (o) => {
-        console.log(option);
         o
           .setName(option.name)
           .setDescription(option.desc)
