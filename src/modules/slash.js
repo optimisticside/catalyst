@@ -15,6 +15,7 @@ module.exports = class SlashModule extends Module {
     let builder = (isSubCommand ? new SlashCommandSubcommandBuilder() : new SlashCommandBuilder())
       .setName((isSubCommand && command.groupMember?.toLowerCase()) ?? command.name.toLowerCase())
       .setDescription(command.desc);
+      //.setDefaultPermission(false);
 
     await Promise.all(command.options.map(async option => {
       const loadOption = (o) => {
@@ -137,13 +138,13 @@ module.exports = class SlashModule extends Module {
     // all commands are cleared before new commands are added.
     // Edit: Upon further thought, I've realized how horrible
     // of an idea this is.
-    // await rest.put(commandRoute, { body: [] });
+    await rest.put(commandRoute, { body: [] });
     const result = await rest.put(commandRoute, { body: commands });
 
     /*
-    let perms = [];
-    await Promise.all(result.map(async slashCommand => {
-      const command = commands.find(c => c.name === slashCommand.name);
+    const perms = [];
+    await Promise.all(this.f(async command => {
+      const slashCommand = await this.findSlashCommand(command, commands);
       perms.push({ id: slashCommand.id, permissions: await this.createPerms(guild, command) });
     }));
     await rest.put(permRoute, { body: perms });
