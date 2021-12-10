@@ -9,7 +9,7 @@
   "PORT": { "type": "integer", "default": 80 },
   "PREFIX": { "type": "string", "default": "c!" },
   "DEFAULT_COOLDOWN": { "type": "integer", "default": 3000 },
-  "REST_TIME_OFFSET": "integer",
+  "REST_TIME_OFFSET": { "type": "integer", "default": 0 },
 
   "DEFAULT_COLOR": { "type": "string", "default": "#FBFBFD" },
   "ALERT_COLOR": { "type": "string", "default": "#C70039" },
