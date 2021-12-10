@@ -11,10 +11,10 @@
   "DEFAULT_COOLDOWN": { "type": "integer", "default": 3000 },
   "REST_TIME_OFFSET": "integer",
 
-  "DEFAULT_COLOR": { "type": "string", "default": true },
-  "ALERT_COLOR": { "type": "string", "default": true },
-  "WARNING_COLOR": { "type": "string", "default": true },
-  "SUCCESS_COLOR": { "type": "string", "default": true },
+  "DEFAULT_COLOR": { "type": "string", "default": "#FBFBFD" },
+  "ALERT_COLOR": { "type": "string", "default": "#C70039" },
+  "WARNING_COLOR": { "type": "string", "default": "#E9F224" },
+  "SUCCESS_COLOR": { "type": "string", "default": "#54F224" },
 
   "MONGODB_SRV": { "type": "string", "require": true },
   "COOLDOWN_PERSISTANCE_THRESHOLD": { "type": "integer", "default": 10000 },
