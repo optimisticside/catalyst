@@ -123,7 +123,7 @@ module.exports = class Commands extends Module {
   }
 
   async handleArgs(message, command, args) {
-    let result = {};
+    const result = {};
     const handler = async option => {
       let given = args[command.options.indexOf(option)];
 
@@ -208,7 +208,7 @@ module.exports = class Commands extends Module {
 
   async handleStatement(message, statement, config) {
     let content = statement.trim();
-    let args = content.match(/(?:[^\s"]+|"[^"]*")+/g);
+    const args = content.match(/(?:[^\s"]+|"[^"]*")+/g);
     const commandCall = args.shift();
     const command = await this.findCommand(commandCall);
     const lastRun = await this.getCooldown(message.author, command);
