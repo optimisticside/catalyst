@@ -12,7 +12,7 @@ const Module = require('../structs/module.js');
 
 module.exports = class SlashModule extends Module {
   async buildCommand(command, isSubCommand) {
-    let builder = (isSubCommand ? new SlashCommandSubcommandBuilder() : new SlashCommandBuilder())
+    const builder = (isSubCommand ? new SlashCommandSubcommandBuilder() : new SlashCommandBuilder())
       .setName(isSubCommand ? command.groupMember?.toLowerCase() : command.name.toLowerCase())
       .setDescription(command.desc);
       //.setDefaultPermission(false);
@@ -68,18 +68,18 @@ module.exports = class SlashModule extends Module {
   }
 
   async buildCommands() {
-    let commands = [];
-    let addedSubs = [];
+    const commands = [];
+    const addedSubs = [];
 
     await Promise.all(this.commandHandler.groups.map(async group => {
-      let builder = new SlashCommandBuilder()
+      const builder = new SlashCommandBuilder()
         .setName(group.name.toLowerCase())
         .setDescription(group.desc);
-      let subGroups = this.commandHandler.subGroups.filter(sg => sg.group === group.name);
-      let subCommands = this.commandHandler.commands.filter(c => c.group === group.name);
+      const subGroups = this.commandHandler.subGroups.filter(sg => sg.group === group.name);
+      const subCommands = this.commandHandler.commands.filter(c => c.group === group.name);
 
       await Promise.all(subGroups.map(async subGroup => {
-        let subBuilder = new SlashCommandSubcommandGroupBuilder()
+        const subBuilder = new SlashCommandSubcommandGroupBuilder()
           .setName(subGroup.name.toLowerCase())
           .setDescription(subGroup.desc);
         await Promise.all(subCommands.map(async subCommand => {
