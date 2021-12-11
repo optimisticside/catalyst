@@ -27,7 +27,7 @@ module.exports = class CommandsCommand extends Command {
       name: 'commands',
       desc: 'Lists all commands provided.',
       perms: [ Permissions.FLAGS.SEND_MESSAGES ],
-      tags: [ 'utilities' ],
+      tags: [ 'utilities', 'help' ],
       aliases: [ 'cmds' ],
       options: [
         {

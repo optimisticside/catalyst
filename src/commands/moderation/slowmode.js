@@ -13,10 +13,11 @@ module.exports = class BanCommand extends Command {
     const time = await parser.getOption('time');
     const username = `${given.member.user.username}#${given.member.user.discriminator}`;
 
-    given.channel.setRateLimitPerUser(time, `Changed by ${username}`).catch(err => {
-      given.reply(alert(`Unable to set slowmode to ${time} seconds.`));
-      console.log(`Unable to set rate limit to ${time} seconds: ${err}`);
-    });
+    given.channel.setRateLimitPerUser(time, `Changed by ${username}`)
+      .catch(err => {
+        given.reply(alert(`Unable to set slowmode to ${time} seconds.`));
+        console.log(`Unable to set rate limit to ${time} seconds: ${err}`);
+      });
   }
 
   constructor() {
@@ -36,6 +37,6 @@ module.exports = class BanCommand extends Command {
           required: true
         }
       ]
-    })
+    });
   }
 };

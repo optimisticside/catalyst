@@ -15,12 +15,14 @@ module.exports = class BanCommand extends Command {
     if (!channelId || !message) return;
 
     const channel = given.guild.channels.cache.get(channelId);
-    channel?.send(message).then(() => {
-      given.reply(success('Successfully sent message'));
-    }).catch(err => {
-      given.reply(alert('Unable to send message in channel'));
-      console.log(`Unable to send message ${message} in ${channel}: ${err}`);
-    });
+    channel?.send(message)
+      .then(() => {
+        given.reply(success('Successfully sent message'));
+      })
+      .catch(err => {
+        given.reply(alert('Unable to send message in channel'));
+        console.log(`Unable to send message ${message} in ${channel}: ${err}`);
+      });
   }
 
   constructor() {
@@ -37,17 +39,17 @@ module.exports = class BanCommand extends Command {
           name: 'channel',
           type: 'channel',
           desc: 'The channel to send the message in.',
-          prompt: 'Where do you want me to send the message?',
+          prompt: 'Where do you want to send the message?',
           required: true
         },
         {
           name: 'message',
           type: 'string',
           desc: 'The message to send.',
-          prompt: 'What message do you want me to send?',
+          prompt: 'What message do you want to send?',
           required: true
-        },
+        }
       ]
-    })
+    });
   }
 };

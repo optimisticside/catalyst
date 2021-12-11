@@ -13,12 +13,14 @@ module.exports = class PurgeCommand extends Command {
     const parser = new OptionParser(this, given, args);
     const amount = await parser.getOption('amount');
 
-    given.channel.bulkDelete(amount, true).then(messages => {
-      given.reply(success(`Successfully deleted ${messages.size} messages`));
-    }).catch(err => {
-      given.reply(alert(`Unable to delete messages.`));
-      console.log(`Unable to kick user: ${err}`);
-    });
+    given.channel.bulkDelete(amount, true)
+      .then(messages => {
+        given.reply(success(`Successfully deleted ${messages.size} messages`));
+      })
+      .catch(err => {
+        given.reply(alert(`Unable to delete messages.`));
+        console.log(`Unable to kick user: ${err}`);
+      });
   }
 
   constructor() {
@@ -36,8 +38,8 @@ module.exports = class PurgeCommand extends Command {
           desc: 'The number of messages to delete.',
           prompt: 'How many messages should I delete?',
           required: true
-        },
+        }
       ]
-    })
+    });
   }
 };
