@@ -10,7 +10,7 @@ module.exports = class Command {
   }
 
   constructor(info) {
-    this.name = info.name || 'Untitled';
+    this.name = info.name;
     this.type = info.type || 'default';
     this.aliases = info.aliases || [];
     this.options = info.options || [];
@@ -24,7 +24,7 @@ module.exports = class Command {
     this.authors = info.authors || [];
     this.userPerms = info.userPerms || info.perms || [];
     this.botPerms = info.botPerms || info.perms || [];
-    this.passive = Boolean(info.passive ?? true); // Is this really necessary?
+    this.passive = Boolean(info.passive ?? true);
     this.hidden = Boolean(info.hidden);
     this.guildOnly = Boolean(info.guildOnly);
     this.ownerOnly = Boolean(info.ownerOnly);

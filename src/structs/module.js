@@ -7,7 +7,7 @@ const EventEmitter = require('events');
 module.exports = class Module extends EventEmitter {
   constructor(info) {
     super({ captureRejections: false });
-    this.name = info.name || 'Untitled';
+    this.name = info.name;
     this.desc = info.desc || 'No description';
     this.type = info.type || 'default';
     this.client = info.client;
