@@ -13,7 +13,7 @@ const Module = require('../structs/module.js');
 module.exports = class SlashModule extends Module {
   async buildCommand(command, isSubCommand) {
     let builder = (isSubCommand ? new SlashCommandSubcommandBuilder() : new SlashCommandBuilder())
-      .setName((isSubCommand && command.groupMember?.toLowerCase()) ?? command.name.toLowerCase())
+      .setName(isSubCommand ? command.groupMember?.toLowerCase() : command.name.toLowerCase())
       .setDescription(command.desc);
       //.setDefaultPermission(false);
 
