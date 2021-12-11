@@ -3,9 +3,8 @@
 // See LICENSE for details
 
 const { Permissions, MessageEmbed } = require('discord.js');
-const { alert, success } = require('../../util/formatter.js')('Purge Command');
+const { alert, success } = require('../../util/formatter.js')('Cat Command');
 const Command = require('../../structs/command.js');
-const OptionParser = require('../../util/optionParser.js');
 const got = require('got');
 
 module.exports = class DogCommand extends Command {
@@ -26,6 +25,6 @@ module.exports = class DogCommand extends Command {
       desc: 'Sends a random picture of a cat.',
       perms: [ Permissions.FLAGS.SEND_MESSAGES ],
       tags: [ 'fun' ]
-    })
+    });
   }
 };
