@@ -4,8 +4,8 @@
 
 const { Permissions } = require('discord.js');
 const { alert, success } = require('../../util/formatter.js')('Kick Command');
-const Command = require('../../structs/command.js');
 const OptionParser = require('../../util/optionParser.js');
+const Command = require('../../structs/command.js');
 
 module.exports = class KickCommand extends Command {
   async run(client, given, args) {
@@ -13,14 +13,16 @@ module.exports = class KickCommand extends Command {
     const target = await parser.getOption('target');
     const reason = await parser.getOption('reason');
     if (!target) return;
-    const username = `${target.user.username}#${target.user.discriminator}`;
 
-    target.kick(reason).then(() => {
-      given.reply(success(`Successfully kicked ${username}`));
-    }).catch(err => {
-      given.reply(alert(`Unable to kick ${username}`));
-      console.log(`Unable to kick user: ${err}`);
-    });
+    const username = `${target.user.username}#${target.user.discriminator}`;
+    target.kick(reason)
+      .then(() => {
+        given.reply(success(`Successfully kicked ${username}`));
+      })
+      .catch(err => {
+        given.reply(alert(`Unable to kick ${username}`));
+        console.log(`Unable to kick user: ${err}`);
+      });
   }
 
   constructor() {
@@ -36,7 +38,7 @@ module.exports = class KickCommand extends Command {
           name: 'target',
           type: 'member',
           desc: 'The user to kick',
-          prompt: 'Who do you want me to kick?',
+          prompt: 'Who do you want to kick?',
           required: true
         },
         {
@@ -47,6 +49,6 @@ module.exports = class KickCommand extends Command {
           required: false
         }
       ]
-    })
+    });
   }
 };

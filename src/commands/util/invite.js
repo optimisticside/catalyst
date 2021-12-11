@@ -15,7 +15,8 @@ module.exports = class InviteCommand extends Command {
   constructor() {
     super({
       name: 'invite',
-      desc: 'Sends a link to invite the bot.'
-    })
+      desc: 'Sends a link to invite the bot.',
+      tags: [ 'help' ]
+    });
   }
 };

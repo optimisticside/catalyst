@@ -15,12 +15,13 @@ module.exports = class EchoCommand extends Command {
     super({
       name: 'echo',
       desc: 'Repeats whatever you tell it.',
+      hidden: true,
       options: [
         {
           name: 'message',
           type: 'text',
-          desc: 'What you want me to say',
-          prompt: 'What do you want me to say?',
+          desc: 'What you want to say',
+          prompt: 'What do you want to say?',
           required: true
         }
       ]

@@ -14,22 +14,23 @@ module.exports = class BanCommand extends Command {
     const reason = await parser.getOption('reason');
     const days = await parser.getOption('days');
     if (!target) return;
-    const username = `${target.user.username}#${target.user.discriminator}`;
+    
 
-    if (days && (days < 0 || days > 7)) {
-      return given.reply(alert('Ban duration must be between 1 and 7 days'));
-    }
-    target.ban({ days, reason }).then(() => {
-      given.guild.members.unban(target.user).then(() => {
-        given.reply(success(`Successfully soft-banned ${username}`));
-      }).catch(err => {
-        given.reply(alert(`Unable to unban ${username}`));
-        console.log(`Unable to unban user: ${err}`);
+    const username = `${target.user.username}#${target.user.discriminator}`;
+    target.ban({ days, reason })
+      .then(() => {
+        given.guild.members.unban(target.user).then(() => {
+           given.reply(success(`Successfully soft-banned ${username}`));
+        })
+        .catch(err => {
+          given.reply(alert(`Unable to unban ${username}`));
+          console.log(`Unable to unban user: ${err}`);
+        });
+      })
+      .catch(err => {
+        given.reply(alert(`Unable to ban ${username}`));
+        console.log(`Unable to ban user: ${err}`);
       });
-    }).catch(err => {
-      given.reply(alert(`Unable to ban ${username}`));
-      console.log(`Unable to ban user: ${err}`);
-    });
   }
 
   constructor() {
@@ -56,6 +57,6 @@ module.exports = class BanCommand extends Command {
           required: false
         }
       ]
-    })
+    });
   }
 };
