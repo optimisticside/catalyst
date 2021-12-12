@@ -113,13 +113,12 @@ module.exports = class Commands extends Module {
 
   promptArg(message, option) {
     return new Promise((resolve, reject) => {
-      message.channel.send(prompt(option.prompt ?? `Enter ${object.name} (${object.type}):`))
-        .then(reply => {
-          const filter = m => m.author === message.author;
-          const collector = message.channel.createMessageCollector({ filter, max: 1, time: 60000 });
-          collector.on('collect', m => resolve(m.content, reply));
-          collector.on('end', () => reject(reply));
-        });
+      message.channel.send(prompt(option.prompt ?? `Enter ${object.name} (${object.type}):`)).then(reply => {
+        const filter = m => m.author === message.author;
+        const collector = message.channel.createMessageCollector({ filter, max: 1, time: 60000 });
+        collector.on('collect', m => resolve(m.content, reply));
+        collector.on('end', () => reject(reply));
+      });
     });
   }
 
