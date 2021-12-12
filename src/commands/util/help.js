@@ -3,7 +3,7 @@
 // See LICENSE for details
 
 const { NAME, PREFIX, SUPPORT_SERVER, CLIENT_ID, DEFAULT_COLOR } = require('../../util/configParser.js');
-const { MessageEmbed, MessageActionRow, MessageButton, Permissions } = require('discord.js');
+const { MessageEmbed, MessageActionRow, MessageButton, InteractionCollector, Permissions } = require('discord.js');
 const { warning } = require('../../util/formatter.js')('Invite Command');
 const GuildConfig = require('../../models/guildConfig.js');
 const OptionParser = require('../../util/optionParser.js');
@@ -73,7 +73,7 @@ module.exports = class HelpCommand extends Command {
     const invite = `https://discord.com/oauth2/authorize?&client_id=${CLIENT_ID}&scope=bot%20applications.commands&permissions=2134207679`;
     const row = new MessageActionRow()
       .addComponents(
-        new MessageButton({ label: 'Commands', style: 'PRIMARY', customId: 'showCommands' }),
+        new MessageButton({ label: 'Commands', style: 'PRIMARY', customId: 'help:showCommands' }),
         new MessageButton({ label: 'Invite', style: 'LINK', url: invite }),
         new MessageButton({ label: 'Support Server', style: 'LINK', url: SUPPORT_SERVER })
       );
@@ -82,7 +82,13 @@ module.exports = class HelpCommand extends Command {
       .setTitle(`${NAME}`)
       .setColor(DEFAULT_COLOR)
       .setDescription(`:wave: Hello, I'm ${NAME}! You can use me to run commands, as long as they start with the prefix \`${prefix}\`.`);
+    
     given.reply({ embeds: [ embed ], components: [ row ] });
+    const filter = i => i.user.id === given.user.id && i.customId === 'help:showCommands';
+    const interactionCollector = given.channel.createMessageComponentCollector({ filter });
+    interactionCollector.on('collect', async i => {
+      
+    });
   }
 
   constructor() {
