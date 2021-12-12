@@ -2,13 +2,12 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const { MessageEmbed, Permissions } = require('discord.js');
-const Command = require('../../structs/command.js');
-const OptionParser = require('../../util/optionParser.js');
-const permNames = require('../../util/permNames.js');
+const { NAME, PREFIX, SUPPORT_SERVER, CLIENT_ID, DEFAULT_COLOR } = require('../../util/configParser.js');
+const { MessageEmbed, MessageActionRow, MessageButton, Permissions } = require('discord.js');
 const { warning } = require('../../util/formatter.js')('Invite Command');
-const { NAME, PREFIX, SUPPORT_SERVER, DEFAULT_COLOR } = require('../../util/configParser.js');
 const GuildConfig = require('../../models/guildConfig.js');
+const OptionParser = require('../../util/optionParser.js');
+const Command = require('../../structs/command.js');
 
 module.exports = class HelpCommand extends Command {
   async argumentHelp(client, given, parser, command, argumentName) {
@@ -37,23 +36,22 @@ module.exports = class HelpCommand extends Command {
       return await this.argumentHelp(client, given, parser, command, argumentName);
     }
     
-    let argumentInfo = [];
-    let usage = `${PREFIX}${command.name} `;
-    await Promise.all(command.options.map(async option => {
+    const argumentInfo = [];
+    let usage = `${PREFIX}${command.name}`;
+    for (let option of command.options) {
       argumentInfo.push(`**${option.name}${option.required ? '\\*' : ''}**  ${option.desc}`);
-      usage.concat(`<${option.name}>`);
-    }));
+      usage = usage.concat(` <${option.name}>`);
+    };
 
     const embed = new MessageEmbed()
       .setTitle(`${command.name} command`)
       .setColor(DEFAULT_COLOR)
       .setDescription(command.desc)
-      .addField('Usage', usage)
-      .addField('Aliases', (command.aliases?.length > 0 ? command.aliases.join(', ') : 'None'))
-      .addField('Arguments', (argumentInfo.length > 0 ? argumentInfo.join('\n') : 'None'));
-      // .addField('User Perms', (command.userPerms?.length > 0 ? command.userPerms.map(p => permNames(p)).join(', ') : 'None'))
-      // .addField('Bot Perms', (command.botPerms?.length > 0 ? command.botPerms.map(p => permNames(p)).join(', ') : 'None'))
-  
+      .addField('Usage', usage);
+    
+    if (argumentInfo.length > 0) {
+      embed.addField('Arguments', argumentInfo.join('\n'));
+    }
     given.reply({ embeds: [ embed ] });
   }
 
@@ -72,11 +70,19 @@ module.exports = class HelpCommand extends Command {
     const config = await GuildConfig.findOne({ id: given.guild.id })
         ?? await GuildConfig.create({ id: given.guild.id });
     const prefix = config.prefix ?? PREFIX;
+    const invite = `https://discord.com/oauth2/authorize?&client_id=${CLIENT_ID}&scope=bot%20applications.commands&permissions=2134207679`;
+    const row = new MessageActionRow()
+      .addComponents(
+        new MessageButton({ label: 'Commands', style: 'PRIMARY', customId: 'showCommands' }),
+        new MessageButton({ label: 'Invite', style: 'LINK', url: invite }),
+        new MessageButton({ label: 'Support Server', style: 'LINK', url: SUPPORT_SERVER })
+      );
+
     const embed = new MessageEmbed()
       .setTitle(`${NAME}`)
       .setColor(DEFAULT_COLOR)
-      .setDescription(`Hello! I'm ${NAME}. You can use me to run commands, as long as they start with the prefix \`${prefix}\`. For a list of commands, use the \`commands\` command, by doing \`${prefix}commands\`.${SUPPORT_SERVER ? ` For additional help, feel free to join my [support server](${SUPPORT_SERVER})` : ''}`)
-    given.reply({ embeds: [ embed ] });
+      .setDescription(`:wave: Hello, I'm ${NAME}! You can use me to run commands, as long as they start with the prefix \`${prefix}\`.`);
+    given.reply({ embeds: [ embed ], components: [ row ] });
   }
 
   constructor() {
