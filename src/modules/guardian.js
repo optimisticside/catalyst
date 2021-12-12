@@ -13,7 +13,7 @@ module.exports = class Guardian extends Module {
   async notify(message, reason) {
     message.reply(warning(this.messages[reason] ?? 'Your message(s) were blocked.')).then(reply => {
       // We do not want to yield the `notify` function.
-      wait(5000).then(() => reply.delete().catch(err => console.log(`${mhm}\n${err}`)));
+      wait(5000).then(() => reply.delete().catch(console.error));
     });
   }
 
@@ -22,7 +22,7 @@ module.exports = class Guardian extends Module {
     this.emit('messageDelete', message, this.reasons[reason] ?? reason);
     // This causes the shard to restart so
     // we will do this >:)
-    message.delete().catch(err => console.log(err));
+    message.delete().catch(console.error);
   }
 
   async handleMessage(message) {
@@ -33,19 +33,6 @@ module.exports = class Guardian extends Module {
     const config = await GuildConfig.findOne({ id: message.guild.id })
       ?? await GuildConfig.create({ id: message.guild.id });
     if (!config.guardianEnabled) return;
-    /*
-    const config = {
-      whitelist: JSON.parse(await this.database.getGuild(message.guild.id, 'guardianWhitelist')) || [],
-      blacklistedWords: JSON.parse(await this.database.getGuild(message.guild.id, 'blacklistedWords')) || [],
-      antiSpam: JSON.parse(await this.database.getGuild(message.guild.id, 'antiSpam')),
-      imageLimit: JSON.parse(await this.database.getGuild(message.guild.id, 'imageLimit')),
-      blockZalgo: JSON.parse(await this.database.getGuild(message.guild.id, 'blockZalgo')),
-      blockLinks: JSON.parse(await this.database.getGuild(message.guild.id, 'blockLinks')),
-      blockInvites: JSON.parse(await this.database.getGuild(message.guild.id, 'blockInvites')),
-      blockIps: JSON.parse(await this.database.getGuild(message.guild.id, 'blockIps')),
-      blockSelfBots: JSON.parse(await this.database.getGuild(message.guild.id, 'blockSelfBots')),
-    };
-    */
 
     // Anti spam pressure values.
     // For now, they are not changable by users.
@@ -100,7 +87,7 @@ module.exports = class Guardian extends Module {
           }
           message.channel.messages?.fetch({ limit: 20 }).then(messages => {
             messages.filter(m => m.author === message.author && message.createdAt > tracker.start)
-              .map(m => m.delete().catch(err => console.log(err)));
+              .map(m => m.delete().catch(console.error));
           });
         }
       } else {
