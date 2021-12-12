@@ -113,12 +113,13 @@ module.exports = class Commands extends Module {
 
   promptArg(message, option) {
     return new Promise((resolve, reject) => {
-      message.channel.send(prompt(option.prompt ?? `Enter ${object.name} (${object.type}):`)).then(reply => {
-        const filter = m => m.author === message.author;
-        const collector = message.channel.createMessageCollector({ filter, max: 1, time: 60000 });
-        collector.on('collect', m => resolve(m.content, reply));
-        collector.on('end', () => reject(reply));
-      });
+      message.channel.send(prompt(option.prompt ?? `Enter ${object.name} (${object.type}):`))
+        .then(reply => {
+          const filter = m => m.author === message.author;
+          const collector = message.channel.createMessageCollector({ filter, max: 1, time: 60000 });
+          collector.on('collect', m => resolve(m.content, reply));
+          collector.on('end', () => reject(reply));
+        });
     });
   }
 
@@ -141,12 +142,14 @@ module.exports = class Commands extends Module {
           reply.reply(alert('Prompt timed out'));
         });
       }
-      await this.parseArg(message, option, given).then(final => {
-        result[option.name] = final;
-      }).catch(err => {
-        message.channel.send(warning(`\`${given}\` is not a valid ${option.type}`));
-        throw err;
-      });
+      await this.parseArg(message, option, given)
+        .then(final => {
+          result[option.name] = final;
+        })
+        .catch(err => {
+          message.channel.send(warning(`\`${given}\` is not a valid ${option.type}`));
+          throw err;
+        });
     };
 
     // A for loop needs to be used since we want the
@@ -262,19 +265,23 @@ module.exports = class Commands extends Module {
        return message.reply(denial('Command validation failed.'));
     }
 
-    await this.handleArgs(message, command, args).then(finalArgs => {
-      this.executeCommand(command, this.client, message, finalArgs).catch(err => {
-        console.error(`Unable to run ${command.name} command: ${err}`);
-        message.reply(warning('An error occured during command execution.'));
-      }).then(() => {
-        this.saveCooldown(message.author, command);
-        this.emit('commandRun', message, command, finalArgs);
+    await this.handleArgs(message, command, args)
+      .then(finalArgs => {
+        this.executeCommand(command, this.client, message, finalArgs)
+          .then(() => {
+            this.saveCooldown(message.author, command);
+            this.emit('commandRun', message, command, finalArgs);
+          })
+          .catch(err => {
+            console.error(`Unable to run ${command.name} command: ${err}`);
+            message.reply(warning('An error occured during command execution.'));
+          });
+      })
+      .catch(err => {
+        // TODO: Fix this bad error handling.
+        // We don't have to do anything here.
+        // This is just to mute errors from handling arguments.
       });
-    }).catch(err => {
-      // TODO: Fix this bad error handling.
-      // We don't have to do anything here.
-      // This is just to mute errors from handling arguments.
-    });
   }
 
   async loadCommand(file) {

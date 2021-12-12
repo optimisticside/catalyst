@@ -239,15 +239,17 @@ module.exports = class SlashModule extends Module {
     }
 
     if (!interaction.client) interaction.client = this.client;
-    this.executeCommand(command, this.client, interaction).catch(err => {
-      console.error(`Unable to run ${command.name} command: ${err}`);
-      interaction.reply(warning('An error occured during command execution.'));
-    }).then(() => {
-      this.commandHandler.saveCooldown(interaction.user, command);
-      this.emit('commandRun', interaction, command);
-      interaction.reply(success('The command completed execution.')).catch(err => {
-        // This will fail if the command replied to the interaction.
-      });
+    this.executeCommand(command, this.client, interaction)
+      .then(() => {
+        this.commandHandler.saveCooldown(interaction.user, command);
+        this.emit('commandRun', interaction, command);
+        interaction.reply(success('The command completed execution.')).catch(err => {
+          // This will fail if the command replied to the interaction.
+        });
+      })
+      .catch(err => {
+        console.error(`Unable to run ${command.name} command: ${err}`);
+        interaction.reply(warning('An error occured during command execution.'));
     });
   }
 
