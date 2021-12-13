@@ -2,9 +2,7 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const { PREFIX } = require('../util/configParser.js');
 const { Schema, model } = require('mongoose');
-
 const moderationActions = [ 'Ban', 'Block', 'Kick', 'Mute', 'SoftBan', 'Strike', 'Temp Ban', 'Temp Mute' ];
 
 const timerSchema = new Schema({
@@ -14,12 +12,12 @@ const timerSchema = new Schema({
 
 const moderationCaseSchema = new Schema({
   id: { type: String, require: true, unique: true },
-  user: { type: String },
+  user: { type: String, require: true },
   reason: { type: String },
   moderator: { type: String },
   isValid: { type: Boolean },
   canEdit: { type: Boolean },
-  type: { type: String, enum: moderationActions }
+  type: { type: String, require: true, enum: moderationActions }
 });
 
 const strikePolicyActionSchema = new Schema({
@@ -78,6 +76,7 @@ const guildConfigSchema = new Schema({
   muteRole: { type: String },
   unmuteTimers: { type: Array, of: timerSchema },
   unbanTimers: { type: Array, of: timerSchema },
+  channelUnlockTimers: { type: Array, of: timerSchema },
   moderationCases: { type: Array, of: moderationCaseSchema },
   strikePolicy: { type: Array, of: strikePolicyActionSchema },
 
