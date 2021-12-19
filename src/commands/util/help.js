@@ -95,7 +95,7 @@ module.exports = class HelpCommand extends Command {
       const embed = new MessageEmbed()
         .setTitle(NAME)
         .setColor(DEFAULT_COLOR)
-        .setDescription(`:wave: Hello, I'm ${NAME}! I'm a Discord bot that runs commands.`);
+        .setDescription(`:wave: Hello, I'm ${NAME}! I'm a Discord bot that runs commands. You can run commands through the chat using the prefix \`${prefix}\`, or through slash commands.`);
 
       return {
         embeds: [ embed ],
