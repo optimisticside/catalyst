@@ -243,9 +243,11 @@ module.exports = class SlashModule extends Module {
       .then(() => {
         this.commandHandler.saveCooldown(interaction.user, command);
         this.emit('commandRun', interaction, command);
-        interaction.reply(success('The command completed execution.')).catch(err => {
-          // This will fail if the command replied to the interaction.
-        });
+        if (!interaction.replied) {
+          // This will be the default intearction reply message,
+          // for when the command does not reply.
+          interaction.reply(success('The command completed execution.'));
+        }
       })
       .catch(err => {
         console.error(`Unable to run ${command.name} command: ${err}`);
