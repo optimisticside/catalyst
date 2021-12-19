@@ -14,6 +14,9 @@ module.exports = class BanCommand extends Command {
     const username = `${given.member.user.username}#${given.member.user.discriminator}`;
 
     given.channel.setRateLimitPerUser(time, `Changed by ${username}`)
+      .then(() => {
+        given.reply(success(`Changed slowmode to ${time} seconds.`));
+      })
       .catch(err => {
         given.reply(alert(`Unable to set slowmode to ${time} seconds.`));
         console.log(`Unable to set rate limit to ${time} seconds: ${err}`);
