@@ -3,8 +3,8 @@
 // See LICENSE for details
 
 const { NAME, PREFIX, SUPPORT_SERVER, CLIENT_ID, DEFAULT_COLOR } = require('../../util/configParser.js');
-const { MessageEmbed, MessageActionRow, MessageButton, InteractionCollector, Permissions } = require('discord.js');
-const { warning } = require('../../util/formatter.js')('Invite Command');
+const { MessageEmbed, MessageActionRow, MessageButton, Permissions } = require('discord.js');
+const { warning, success } = require('../../util/formatter.js')('Invite Command');
 const GuildConfig = require('../../models/guildConfig.js');
 const OptionParser = require('../../util/optionParser.js');
 const Command = require('../../structs/command.js');
@@ -111,11 +111,7 @@ module.exports = class HelpCommand extends Command {
     });
 
     const helpMenu = new Fluid.Element(HelpComponent);
-    Fluid.mount(helpMenu, async data => {
-      const reply = await given.reply(data);
-      const filter = i => i.user.id === given.member.user.id;
-      return reply.createMessageComponentCollector({ filter, time: 15_000 })
-    });
+    Fluid.mount(helpMenu, given, { time: 15_000 });
   }
 
   constructor() {

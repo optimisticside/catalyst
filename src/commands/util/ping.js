@@ -8,7 +8,6 @@ const Command = require('../../structs/command.js');
 module.exports = class PingCommand extends Command {
   async run(client, given, args) {
     const reply = await given.reply('Pinging...');
-    console.log(given, reply);
     const deltaTime = (reply?.createdTimestamp ?? Date.now()) - given.createdTimestamp;
     const response = `:ping_pong: Pong! Took **${deltaTime}** ms (API latency: ${client.ws.ping} ms)`;
 
