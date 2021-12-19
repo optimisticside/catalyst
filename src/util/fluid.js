@@ -53,7 +53,7 @@ const genericMounter = async (element, given, options) => {
   } else {
     let reply = null;
     if (previous?.reply) {
-      await previous.reply.edit(built);
+      await given.update(built);
       reply = previous.reply;
     } else {
       reply = await given.reply(built);
