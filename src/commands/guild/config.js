@@ -286,16 +286,7 @@ module.exports = class ConfigCommand extends Command {
       userPerms: [ Permissions.FLAGS.MANAGE_GUILD ],
       botPerms: [ Permissions.FLAGS.SEND_MESSAGES ],
       guildOnly: true,
-      tags: [ 'guild' ],
-      options: [
-        /*{
-          name: 'path',
-          type: 'string',
-          desc: 'The setting you want to configure (split by colons)',
-          prompt: 'What path do you want to configure?',
-          required: false
-        }*/
-      ]
+      tags: [ 'guild' ]
     })
 
     this.settings = [
