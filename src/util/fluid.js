@@ -3,45 +3,67 @@
 // See LICENSE for details
 
 const { Interaction } = require('discord.js');
+const EventEmitter = require('events');
 const { v4: uuidv4 } = require('uuid');
 
-class Component {
-  constructor(creator) {
-    this.creator = creator;
-  }
-};
-
-class Element {
-  build(...given) {
-    return this.component.creator(this, ...given);
-  }
-
-  addListener(customId, callback) {
-    this.listeners.set(customId, callback);
-  }
-
-  handle(interaction) {
-    const callback = this.listeners.get(interaction.customId);
-    if (!callback) return;
-    callback(interaction);
-  }
-
-  constructor(component) {
+class Component extends EventEmitter {
+  constructor(props) {
+    super({ captureRejections: false });
     this.alive = true;
+    this.state = {};
+    this.props = props;
     this.listeners = new Map();
-    this.component = component;
+    if (this.defaultProps) {
+      const defaults = Object.entries(this.defaultProps);
+      // We cannot do [ name, default ] because `default` is
+      // a keyword in Javascript.
+      defaults.map(([ index, value ]) => {
+        this.props[index] = this.props[index] ?? value;
+      });
+    }
+  }
+
+  onInteraction(interaction) {
+    if (!this.alive) return;
+    this.emit('interaction', interaction);
+  }
+
+  render() {
+    // This will throw an error only if the component's sub-class
+    // does not have a render method.
+    throw new Error('No Render method provided');
+  }
+
+  componentDidUpdate(oldProps, oldState) {
+    return true;
+  }
+
+  setState(changes) {
+    const changesArray = Object.entries(changes);
+    let oldState = {};
+    Object.assign(oldState, this.state);
+    changesArray.map(([ index, change ]) => {
+      this.state[index] = change;
+    });
+    
+    this.emit('stateChange', oldState);
+    if (this.componentDidUpdate(this.props, oldState)) {
+      this.emit('update');
+    }
   }
 };
 
-const genericMounter = async (element, given, options) => {
+const genericMounter = async (component, given, options) => {
   const filter = i => i.user.id === (given.author?.id ?? given.user?.id);
   options = { ...options };
   options.filter = options.filter ?? filter;
 
-  const built = element.build();
-  const previous = element.previous;
+  const built = component.render();
+  const previous = component.previous;
+  component.renderOptions = options;
+  component.mountPoint = given;
   // Since buttons will be interactions, we need to check
-  // if there was a reply in the previous element to see if it was
+  // if there was a reply in the previous component to see if it was
   // a slash-command intearction or not.
   if (given instanceof Interaction && !previous?.reply) {
     if (previous) {
@@ -49,59 +71,83 @@ const genericMounter = async (element, given, options) => {
     } else {
       await given.reply(built);
     }
+    // Since the result of `given.reply()` is null and not a message,
+    // we cannot just call `message.createMessageComponentCollector`.
     return given.channel.createMessageComponentCollector(options);
   } else {
-    let reply = null;
-    if (previous?.reply) {
+    let reply = previous?.reply;
+    if (reply) {
       await given.update(built);
-      reply = previous.reply;
     } else {
       reply = await given.reply(built);
     }
-    element.reply = reply;
+    component.reply = reply;
     return reply.createMessageComponentCollector(options);
   }
 }
 
-const mount = async (element, mounter, options) => {
+const reload = async (oldComponent, newComponent, interaction) => {
+  // The old component is modified first it can also be 
+  // the new component.
+  oldComponent.alive = false;
+  oldComponent.collector?.stop();
+  newComponent.mounter = oldComponent.mounter;
+  if (oldComponent !== newComponent) {
+    newComponent.previous = oldComponent;
+  } else {
+    newComponent.previous = oldComponent.previous;
+  }
+  // We need to set the redirect to be alive explicitly, in case
+  // it was once alive but later removed.
+  newComponent.alive = true;
+
+  const mountPoint = oldComponent.mountPoint;
+  const collector = await newComponent.mounter(newComponent, interaction ?? mountPoint);
+  newComponent.collector = collector;
+  collector.on('collect', newComponent.onInteraction.bind(newComponent));
+}
+
+const mount = async (component, mounter, options) => {
   let args = [];
+  // The caller is given the option to not provide
+  // a custom mounter (since its only needed in niche cases).
   if (!(mounter instanceof Function)) {
     args = [ mounter, options ];
     mounter = genericMounter;
   }
 
-  const collector = await mounter(element, ...args);
-  element.mounter = mounter;
-  element.collector = collector;
+  const collector = await mounter(component, ...args);
+  component.mounter = mounter;
+  component.collector = collector;
+  component.on('update', () => {
+    if (!component.alive) return;
+    reload(component, component);
+  })
  
-  collector.on('collect', async i => {
-    if (!element.alive) return;
-    element.handle(i);
-  });
+  collector.on('collect', component.onInteraction.bind(component));
 };
 
-const redirect = (element, redirect) => {
+const action = (component, callback) => {
+  // Sometimes the callbacks will be optional
+  // props of the component.
+  if (!callback) return;
   const customId = uuidv4();
-  element.addListener(customId, async i => {
-    if (redirect instanceof Component) {
-      redirect = new Element(redirect);
-    }
 
+  const redirector = (interaction, redirect) => {
     if (!redirect) return;
-    element.alive = false;
-    redirect.mounter = element.mounter;
-    redirect.previous = element;
-    // We need to set the redirect to be alive explicitly, in case
-    // it is a redirect to a previous element.
-    redirect.alive = true;
+    reload(component, redirect, interaction);
+  }
 
-    const collector = await element.mounter(redirect, i);
-    collector.on('collect', async i => {
-      if (!redirect.alive) return;
-      redirect.handle(i);
-    });
+  component.on('interaction', async i => {
+    if (i.customId !== customId) return;
+    callback(redirect => redirector(i, redirect), i);
   });
+
   return customId;
 }
 
-module.exports = { Component, Element, mount, redirect };
+const redirect = (component, redirect) => {
+  return action(component, redirector => redirector(redirect));
+}
+
+module.exports = { Component, mount, redirect, action, reload };

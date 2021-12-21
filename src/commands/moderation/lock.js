@@ -13,8 +13,6 @@ module.exports = class BanCommand extends Command {
     const channel = await parser.getOption('channel');
     const time = await parser.getOption('time');
     const reason = await parser.getOption('reason');
-
-
   }
 
   constructor() {
