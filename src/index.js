@@ -23,8 +23,7 @@ shardingManager.on('shardCreate', async shard => {
 
 shardingManager.spawn({
   amount: TOTAL_SHARDS || 'auto',
-  delay: 8000,
-  timeout: -1
+  delay: 8000
 });
 
 if (LIFETIME) {
