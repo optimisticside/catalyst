@@ -20,7 +20,12 @@ shardingManager.on('shardCreate', async shard => {
     shard.send({ type: 'shardId', data: { shardId: shard.id } });
   });
 });
-shardingManager.spawn(TOTAL_SHARDS || 'auto', 8000, -1);
+
+shardingManager.spawn({
+  amount: TOTAL_SHARDS || 'auto',
+  delay: 8000,
+  timeout: -1
+});
 
 if (LIFETIME) {
   setTimeout(() => {
