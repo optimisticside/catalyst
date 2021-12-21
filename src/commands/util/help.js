@@ -9,6 +9,8 @@ const GuildConfig = require('../../models/guildConfig.js');
 const OptionParser = require('../../util/optionParser.js');
 const Command = require('../../structs/command.js');
 const Fluid = require('../../util/fluid.js');
+const HelpMenu = require('../../components/helpMenu.js');
+
 
 module.exports = class HelpCommand extends Command {
   async argumentHelp(client, given, parser, command, argumentName) {
@@ -72,45 +74,9 @@ module.exports = class HelpCommand extends Command {
         ?? await GuildConfig.create({ id: given.guild.id });
     const prefix = config.prefix ?? PREFIX;
     const invite = `https://discord.com/oauth2/authorize?&client_id=${CLIENT_ID}&scope=bot%20applications.commands&permissions=2134207679`;
-    
-    const CommandsComponent = new Fluid.Component(element => {
-      const commands = client.commandHandler.commands;
-      const embed = new MessageEmbed()
-        .setTitle('Commands')
-        .setColor(DEFAULT_COLOR)
-        .setDescription(commands.map(c => c.name).join('\n'));
 
-      return {
-        embeds: [ embed ],
-        components: [
-          new MessageActionRow()
-            .addComponents(
-              new MessageButton({ label: 'Back', style: 'SECONDARY', customId: Fluid.redirect(element, element.previous) }),
-            )
-        ]
-      };
-    });
-
-    const HelpComponent = new Fluid.Component(element => {
-      const embed = new MessageEmbed()
-        .setTitle(NAME)
-        .setColor(DEFAULT_COLOR)
-        .setDescription(`:wave: Hello, I'm ${NAME}! I'm a Discord bot that runs commands. You can run commands through the chat using the prefix \`${prefix}\`, or through slash commands.`);
-
-      return {
-        embeds: [ embed ],
-        components: [
-          new MessageActionRow()
-            .addComponents(
-              new MessageButton({ label: 'Commands', style: 'PRIMARY', customId: Fluid.redirect(element, CommandsComponent) }),
-              new MessageButton({ label: 'Invite', style: 'LINK', url: invite }),
-              new MessageButton({ label: 'Support Server', style: 'LINK', url: SUPPORT_SERVER })
-            )
-        ]
-      };
-    });
-
-    const helpMenu = new Fluid.Element(HelpComponent);
+    const commands = client.commandHandler.commands;
+    const helpMenu = new HelpMenu({ prefix, invite, commands, name: NAME, supportServer: SUPPORT_SERVER });
     Fluid.mount(helpMenu, given, { time: 15_000 });
   }
 
