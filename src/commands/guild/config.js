@@ -369,8 +369,8 @@ module.exports = class ConfigCommand extends Command {
                 name: 'Message',
                 desc: 'The message that users will be greeted with.',
                 emoji: '✉️',
-                handler: this.stringSetting('Greeting Message', 'The greeting channel is the message users will be greeted with.', null, null,
-                  'How would you like to greet messages. You can mention the user through {mention}, and access the user\'s name through `{user}`, the server name through `{guild}`, and the member count through `{count}`', 'greetingMessage')
+                handler: this.stringSetting('Greeting Message', 'The greeting message is the message users will be greeted with.', null, null,
+                  'How would you like to greet users? You can mention the user through {mention}, and access the user\'s name through `{user}`, the server name through `{guild}`, and the member count through `{count}`', 'greetingMessage')
               },
               {
                 name: 'Channel',
@@ -418,22 +418,14 @@ module.exports = class ConfigCommand extends Command {
                 name: 'Message',
                 desc: 'The message that users will be said goodbye with.',
                 emoji: '✉️',
-                handler: async (client, given, reply) => {
-                  const answer = await this.promptString(given, reply, 'goodbye message',
-                    'How would you like to say goodbye to people? You can access the user\'s name through `{user}`, the server name through `{guild}`, and the member count through `{count}`', null);
-                  if (!answer) return;
-    
-                  await client.database.setGuild(given.guild.id, 'goodbyeMessage', answer)
-                    .finally(() => reply.reactions.removeAll())
-                    .then(() => reply.edit(success('Successfully updated database', 'embed')))
-                    .catch(err => reply.edit(alert('Unable to update database', 'embed')));
-                }
+                handler: this.stringSetting('Goodbye Message', 'The goodbye message is how users will be said goodbye to.', null, null,
+                'How would you like to say goodbye to users? You can access the user\'s name through `{user}`, the server name through `{guild}`, and the member count through `{count}`', 'goodbyeMessage')
               },
               {
                 name: 'Channel',
                 desc: 'The channel that new users will be said goodbye on.',
                 emoji: '#️⃣',
-                handler: this.stringSetting('Greeting Channel', 'The greeting channel is the channel users will be greeted on.',
+                handler: this.stringSetting('Goodbye Channel', 'The goodbye channel is the channel where will be said goodbye to.',
                   promisify(Serializer.deserializeChannel), promisify(Serializer.serializeChannel), null, 'goodbyeChannel')
               }
             ]
