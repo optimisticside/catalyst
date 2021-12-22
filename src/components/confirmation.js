@@ -15,7 +15,7 @@ module.exports = class ConfirmationComponent extends Component {
     return true;
   }
 
-  render(element) {
+  render() {
     const embed = new MessageEmbed()
       .setTitle(this.props.header)
       .setColor(DEFAULT_COLOR)
@@ -26,12 +26,12 @@ module.exports = class ConfirmationComponent extends Component {
         new MessageButton({
           label: 'Confirm',
           style: 'SUCCESS',
-          customId: redirect(element, action(element, this.props.ifYes))
+          customId: action(this, this.props.ifYes)
         }),
         new MessageButton({
           label: 'Cancel',
           style: 'DANGER',
-          customId: redirect(element, this.props.ifNo)
+          customId: action(this, this.props.ifNo)
         }),
       );
 
