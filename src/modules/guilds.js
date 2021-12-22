@@ -14,9 +14,9 @@ module.exports = class Guilds extends Module {
     if (!channel || !config.greetingMessage) return;
 
     const formatted = config.greetingMessage.replace('{mention}', `<@${member.user.id}>`) 
-      .replace('{user}', member.username)
-      .replace('{guild}', member.guild.name)
-      .replace('{count}', member.guild.memberCount);
+      .replaceAll('{user}', member.username)
+      .replaceAll('{guild}', member.guild.name)
+      .replaceAll('{count}', member.guild.memberCount);
     channel.send(formatted);
   }
 
@@ -29,17 +29,17 @@ module.exports = class Guilds extends Module {
     if (!channel || !config.goodbyeMessage) return;
     
     const formatted = config.goodbyeMessage.replace('{user}', user.username)
-      .replace('{guild}', guild.name)
-      .replace('{count}', guild.memberCount);
+      .replaceAll('{guild}', guild.name)
+      .replaceAll('{count}', guild.memberCount);
     channel.send(formatted);
   }
 
   async joinDmMember(member, config) {
     if (!config.joinDmEnabled || !config.joinDmMessage) return;
     const formatted = config.joinDmMessage.replace('{mention}', `<@${member.user.id}>`) 
-      .replace('{user}', member.user.username)
-      .replace('{guild}', member.guild.name)
-      .replace('{count}', member.guild.memberCount);
+      .replaceAll('{user}', member.user.username)
+      .replaceAll('{guild}', member.guild.name)
+      .replaceAll('{count}', member.guild.memberCount);
 
     // TODO: Handle errors when creating a DM channel.
     // It can force the shard to restart.
