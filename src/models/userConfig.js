@@ -14,4 +14,4 @@ const userConfigSchema = new Schema({
   cooldowns: { type: Array, of: cooldownSchema, default: [] }
 });
 
-module.exports = model("UserConfigModels", userConfigSchema);
+module.exports = model('UserConfigModels', userConfigSchema);

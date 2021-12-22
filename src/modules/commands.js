@@ -75,14 +75,14 @@ module.exports = class Commands extends Module {
         if (option.choices) return this.handleArgChoices(option, given);
         const int = parseInt(given);
         if (isNaN(int)) throw 'Invalid integer';
-        if (option.minimum && int < minimum) throw 'Below minimum';
-        if (option.maximum && int > minimum) throw 'Below minimum';
+        if (option.minimum && int < minimum) throw new RangeError('Below minimum');
+        if (option.maximum && int > minimum) throw new RangeError('Below minimum');
         return int;
       case 'number':
         const num = parseFloat(given);
         if (isNaN(num)) throw 'Invalid number';
-        if (option.minimum && int < minimum) throw 'Below minimum';
-        if (option.maximum && int > minimum) throw 'Below minimum';
+        if (option.minimum && int < minimum) throw new RangeError('Below minimum');
+        if (option.maximum && int > minimum) throw new RangeError('Below minimum');
         return num;
       case 'boolean':
         return (given === 'yes' || given === 'true' || given === 'on');
@@ -134,12 +134,13 @@ module.exports = class Commands extends Module {
       //   Else, display syntax error to user.
       if (!given && !option.required) return;
       if (!given && option.required) {
-        given = await this.promptArg(message, option).catch(reply => {
-          // This is done under the assumption that `promptArg` is
-          // rejecting because it timed out.
-          if (!reply instanceof Message) return;
-          reply.reply(alert('Prompt timed out'));
-        });
+        given = await this.promptArg(message, option)
+          .catch(reply => {
+            // This is done under the assumption that `promptArg` is
+            // rejecting because it timed out.
+            if (!reply instanceof Message) return;
+            reply.reply(alert('Prompt timed out'));
+          });
       }
       await this.parseArg(message, option, given)
         .then(final => {

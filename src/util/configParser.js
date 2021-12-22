@@ -34,4 +34,5 @@ const parseConfig = (env, specs) => {
   });
   return result;
 }
+
 module.exports = parseConfig(process.env, template);

@@ -25,6 +25,6 @@ module.exports = class EchoCommand extends Command {
           required: true
         }
       ]
-    })
+    });
   }
 };

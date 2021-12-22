@@ -43,4 +43,4 @@ module.exports = class InfoCommand extends Command {
       perms: [ Permissions.FLAGS.SEND_MESSAGES ],
     });
   }
-}
+};

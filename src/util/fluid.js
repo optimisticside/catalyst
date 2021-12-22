@@ -51,7 +51,7 @@ class Component extends EventEmitter {
       this.emit('update');
     }
   }
-};
+}
 
 const genericMounter = async (component, given, options) => {
   const filter = i => i.user.id === (given.author?.id ?? given.user?.id);
