@@ -12,7 +12,7 @@ module.exports = async (shardingManager) => {
   const updateStats = async () => {
     const guildCounts = await shardingManager.fetchClientValues('guilds.cache.size');
     const guilds = guildCounts.reduce((acc, count) => acc + count, 0);
-		const shards = shardingManager.shards.size;
+    const shards = shardingManager.shards.size;
    
     return await got.post(API_URL, {
       headers: { authorization: DISCORD_LABS_TOKEN },
