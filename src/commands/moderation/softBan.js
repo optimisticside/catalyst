@@ -14,7 +14,6 @@ module.exports = class BanCommand extends Command {
     const reason = await parser.getOption('reason');
     const days = await parser.getOption('days');
     if (!target) return;
-    
 
     const username = `${target.user.username}#${target.user.discriminator}`;
     target.ban({ days, reason })
