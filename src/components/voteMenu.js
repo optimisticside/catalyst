@@ -16,13 +16,12 @@ module.exports = class VoteMenuComponent extends Component {
     return true;
   }
 
-  render(element) {
+  render() {
     const embed = new MessageEmbed()
       .setTitle(`Vote for ${this.props.name}`)
       .setColor(DEFAULT_COLOR)
       .setDescription(`Thanks for voting! Your vote helps other people discover ${this.props.name} and helps people maintain the bot and add new features.`);
 
-    console.log(this.props)
     const links = [];
     if (this.props.showTopgg) links.push([ 'Top.gg', `https://top.gg/bot/${this.props.clientId}` ]);
     if (this.props.showDiscords) links.push([ 'Discords', `https://discords.com/bots/bot/${this.props.clientId}` ]);
