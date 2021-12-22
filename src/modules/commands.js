@@ -210,7 +210,8 @@ module.exports = class Commands extends Module {
 
   async handleStatement(message, statement, config) {
     let content = statement.trim();
-    const args = content.match(/(?:[^\s"]+|"[^"]*")+/g);
+    const args = content.match(/(?:[^\s"]+|"[^"]*")+/g)
+      .map(a => a.replaceAll('"', ''));
     const commandCall = args.shift();
     const command = await this.findCommand(commandCall);
     const lastRun = await this.getCooldown(message.author, command);
