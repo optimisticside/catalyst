@@ -19,13 +19,14 @@ module.exports = class BanCommand extends Command {
     const username = `${target.user.username}#${target.user.discriminator}`;
     target.ban({ days, reason })
       .then(() => {
-        given.guild.members.unban(target.user).then(() => {
-           given.reply(success(`Successfully soft-banned ${username}`));
-        })
-        .catch(err => {
-          given.reply(alert(`Unable to unban ${username}`));
-          console.log(`Unable to unban user: ${err}`);
-        });
+        given.guild.members.unban(target.user)
+          .then(() => {
+            given.reply(success(`Successfully soft-banned ${username}`));
+          })
+          .catch(err => {
+            given.reply(alert(`Unable to unban ${username}`));
+            console.log(`Unable to unban user: ${err}`);
+          });
       })
       .catch(err => {
         given.reply(alert(`Unable to ban ${username}`));
