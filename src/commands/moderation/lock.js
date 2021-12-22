@@ -47,6 +47,6 @@ module.exports = class BanCommand extends Command {
           required: false
         }
       ]
-    })
+    });
   }
 };

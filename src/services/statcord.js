@@ -24,12 +24,12 @@ module.exports = async (shardingManager) => {
         servers,
         users,
         active: [],
-        commands: "0",
+        commands: '0',
         popular: [],
-        memactive: "0",
-        memload: "0",
-        cpuload: "0",
-        bandwidth: "0"
+        memactive: '0',
+        memload: '0',
+        cpuload: '0',
+        bandwidth: '0'
       }
     }).catch(err => {
       console.error(`Unable to post stats to StatCord: ${err}`);

@@ -29,4 +29,4 @@ module.exports = class HelpCommand extends Command {
       perms: [ Permissions.FLAGS.SEND_MESSAGES ],
     });
   }
-}
+};
