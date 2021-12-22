@@ -12,11 +12,10 @@ module.exports = class BanCommand extends Command {
     const parser = new OptionParser(this, given, args);
     const target = await parser.getOption('target');
     const reason = await parser.getOption('reason');
-    const days = await parser.getOption('days');
     if (!target) return;
 
     const username = `${target.user.username}#${target.user.discriminator}`;
-    target.ban({ days, reason })
+    target.ban({ reason })
       .then(() => {
         given.guild.members.unban(target.user)
           .then(() => {
