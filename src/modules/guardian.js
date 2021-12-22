@@ -90,7 +90,9 @@ module.exports = class Guardian extends Module {
             messages = messages
               .filter(m => m.author === message.author && message.createdAt > tracker.start);
               //.map(m => m.delete().catch(console.error));
-            message.channel.bulkDelete(messages).catch(console.error);
+            message.channel.bulkDelete(messages)
+              .then(() => this.emit('messageBulkDelete', messages, this.reasons.spam))
+              .catch(console.error);
           });
         }
       } else {
