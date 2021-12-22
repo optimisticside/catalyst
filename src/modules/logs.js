@@ -244,6 +244,25 @@ module.exports = class Logs extends Module {
     channel.send({ embeds: [ embed ] });
   }
 
+  async onGuardianBulkDelete(messages, reason) {
+    const last = messages.last();
+    if (!last) return;
+    const config = await GuildConfig.findOne({ id: last.guild.id })
+      ?? await GuildConfig.create({ id: last.guild.id });
+    const channel = await this.getData('logGuardian', last.guild, config);
+    if (!channel) return;
+
+    const username = `${last.author.username}#${last.author.discriminator}`;
+    const embed = new MessageEmbed()
+      .setAuthor(username, last.author.displayAvatarURL())
+      .setColor(DEFAULT_COLOR)
+      .setDescription(`Guardian bulk-deleted ${messages.size} sent by <@${last.author.id}> in <#${last.channel.id}>`)
+      .addField('Reason', reason)
+      .setFooter(`ID: ${last.author.id}`)
+      .setTimestamp(Date.now());
+    channel.send({ embeds: [ embed ] });
+  }
+
   load({ commandHandler, eventHandler, slashHandler, guardian, database }) {
     this.database = database;
     eventHandler.on('messageDelete', this.onMessageDelete.bind(this));
@@ -255,6 +274,7 @@ module.exports = class Logs extends Module {
     commandHandler.on('commandRun', this.onCommandRun.bind(this));
     slashHandler.on('commandRun', this.onSlashCommandRun.bind(this));
     guardian.on('messageDelete', this.onGuardianDelete.bind(this));
+    guardian.on('messageBulkDelete', this.onGuardianBulkDelete.bind(this));
   }
 
   constructor(client) {
