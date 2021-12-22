@@ -45,9 +45,9 @@ module.exports = class Logs extends Module {
 
     const username = `${last.author.username}#${last.author.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor(username, message.author.displayAvatarURL())
+      .setAuthor(username, last.author.displayAvatarURL())
       .setColor(DEFAULT_COLOR)
-      .setDescription(`${messages.length} messages bulk-deleted in <#${last.channel.id}>`)
+      .setDescription(`${messages.size} messages bulk-deleted in <#${last.channel.id}>`)
       .setTimestamp(Date.now());
     channel.send({ embeds: [ embed ] });
   }
