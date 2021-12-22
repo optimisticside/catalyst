@@ -11,10 +11,11 @@ const wait = require('timers/promises').setTimeout;
 
 module.exports = class Guardian extends Module {
   async notify(message, reason) {
-    message.reply(warning(this.messages[reason] ?? 'Your message(s) were blocked.')).then(reply => {
-      // We do not want to yield the `notify` function.
-      wait(5000).then(() => reply.delete().catch(console.error));
-    });
+    await message.reply(warning(this.messages[reason] ?? 'Your message(s) were blocked.'))
+      .then(reply => {
+        // We do not want to yield the `notify` function.
+        wait(5000).then(() => reply.delete().catch(console.error));
+      });
   }
 
   async delete(message, reason) {
@@ -86,8 +87,10 @@ module.exports = class Guardian extends Module {
             await this.notify(message, 'spam');
           }
           message.channel.messages?.fetch({ limit: 20 }).then(messages => {
-            messages.filter(m => m.author === message.author && message.createdAt > tracker.start)
-              .map(m => m.delete().catch(console.error));
+            messages = messages
+              .filter(m => m.author === message.author && message.createdAt > tracker.start);
+              //.map(m => m.delete().catch(console.error));
+            message.channel.bulkDelete(messages).catch(console.error);
           });
         }
       } else {
