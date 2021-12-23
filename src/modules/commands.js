@@ -50,25 +50,26 @@ module.exports = class Commands extends Module {
         return given;
       }
       case 'time':
-        // TODO: We need a better system to parse
-        // time intervals. It needs to be able to
-        // handle units longer than 1 character.
         const units = {
-          s: 1,
-          m: 1 * 60,
-          h: 1 * 60 * 60,
-          d: 1 * 60 * 60 * 24,
-          w: 1 * 60 * 60 * 24 * 7,
-          u: 1 * 60 * 60 * 24 * 30.5,
-          y: 1 * 60 * 60 * 24 * 30.5 * 365.25
+          seconds: 1,
+          minutes: 1 * 60,
+          hours: 1 * 60 * 60,
+          days: 1 * 60 * 60 * 24,
+          weeks: 1 * 60 * 60 * 24 * 7,
+          months: 1 * 60 * 60 * 24 * 30.5,
+          years: 1 * 60 * 60 * 24 * 30.5 * 365.25
         };
-        let lastChar = 0;
         let result = 0;
-        [ ...given ].map(char => {
-          if (!units[char]) return;
-          const raw = given.substring(lastChar, given.charAt(char));
-          const unit = units[char];
-          result += parseInt(raw) * unit;
+        const parts = given.match(/(\d+[A-Za-z]+)/g);
+        parts.map(part => {
+          const numPart = part.match(/\d+/g)[0];
+          const unitName = part.substring(numPart.length + 1);
+
+          // TODO: This code can be greatly improved.
+          const unitEntries = Object.entries(units);
+          const unit = unitEntries.find(([ name ]) => name.startsWith(unitName));
+          if (!unit) throw new TypeError('Invalid unit');
+          result += parseInt(numPart) * unit[1];
         });
         return result;
       case 'integer':
