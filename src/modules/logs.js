@@ -6,7 +6,7 @@ const { DEFAULT_COLOR } = require('../util/configParser.js');
 const { warning, denial, log, prompt } = require('../util/formatter.js')('Log Handler');
 const { MessageEmbed } = require('discord.js');
 const Module = require('../structs/module.js');
-const GuildConfig = require('../models/guildConfig.js');
+const GuildData = require('../models/guildData.js');
 const Serializer = require('../util/serializer.js');
 
 module.exports = class Logs extends Module {
@@ -20,8 +20,8 @@ module.exports = class Logs extends Module {
 
   async onMessageDelete(message) {
     if (message.author.bot) return;
-    const config = await GuildConfig.findOne({ id: message.guild.id })
-      ?? await GuildConfig.create({ id: message.guild.id });
+    const config = await GuildData.findOne({ id: message.guild.id })
+      ?? await GuildData.create({ id: message.guild.id });
     const channel = await this.getData('logMessageDelete', message.guild, config);
     if (!channel) return;
 
@@ -38,8 +38,8 @@ module.exports = class Logs extends Module {
   async onMessageBulkDelete(messages) {
     const last = messages.last();
     if (!last) return;
-    const config = await GuildConfig.findOne({ id: last.guild.id })
-      ?? await GuildConfig.create({ id: last.guild.id });
+    const config = await GuildData.findOne({ id: last.guild.id })
+      ?? await GuildData.create({ id: last.guild.id });
     const channel = await this.getData('logMessageDelete', last.guild, config);
     if (!channel) return;
 
@@ -54,8 +54,8 @@ module.exports = class Logs extends Module {
 
   async onMessageEdit(oldMessage, newMessage) {
     if (newMessage.author.bot) return;
-    const config = await GuildConfig.findOne({ id: newMessage.guild.id })
-      ?? await GuildConfig.create({ id: newMessage.guild.id });
+    const config = await GuildData.findOne({ id: newMessage.guild.id })
+      ?? await GuildData.create({ id: newMessage.guild.id });
     const channel = await this.getData('logMessageEdit', newMessage.guild, config);
     if (!channel) return;
 
@@ -76,8 +76,8 @@ module.exports = class Logs extends Module {
   }
 
   async onGuildMemberAdd(member) {
-    const config = await GuildConfig.findOne({ id: member.guild.id })
-      ?? await GuildConfig.create({ id: member.guild.id });
+    const config = await GuildData.findOne({ id: member.guild.id })
+      ?? await GuildData.create({ id: member.guild.id });
     const channel = await this.getData('logMemberJoin', member.guild, config);
     if (!channel) return;
 
@@ -95,8 +95,8 @@ module.exports = class Logs extends Module {
     const user = await this.client.users.fetch(member.id);
     const guild = await this.client.guilds.fetch(member.guild.id);
 
-    const config = await GuildConfig.findOne({ id: guild.id })
-      ?? await GuildConfig.create({ id: guild.id });
+    const config = await GuildData.findOne({ id: guild.id })
+      ?? await GuildData.create({ id: guild.id });
     const channel = await this.getData('logMemberLeave', member.guild, config);
     if (!channel) return;
 
@@ -111,8 +111,8 @@ module.exports = class Logs extends Module {
   }
 
   async onGuildMemberUpdate(oldMember, newMember) {
-    const config = await GuildConfig.findOne({ id: newMember.guild.id })
-      ?? await GuildConfig.create({ id: newMember.guild.id });
+    const config = await GuildData.findOne({ id: newMember.guild.id })
+      ?? await GuildData.create({ id: newMember.guild.id });
     const channel = await this.getData(newMember.guild, config);
     if (!channel) return;
     
@@ -157,8 +157,8 @@ module.exports = class Logs extends Module {
     if (command.tags?.find(t => t === 'fun')) return;
     if (message.author.bot) return;
 
-    const config = await GuildConfig.findOne({ id: message.guild.id })
-      ?? await GuildConfig.create({ id: message.guild.id });
+    const config = await GuildData.findOne({ id: message.guild.id })
+      ?? await GuildData.create({ id: message.guild.id });
     const channel = await this.getData('logCommmands', message.guild, config);
     if (!channel) return;
 
@@ -201,8 +201,8 @@ module.exports = class Logs extends Module {
       };
     }
 
-    const config = await GuildConfig.findOne({ id: interaction.guild.id })
-      ?? await GuildConfig.create({ id: interaction.guild.id });
+    const config = await GuildData.findOne({ id: interaction.guild.id })
+      ?? await GuildData.create({ id: interaction.guild.id });
     const channel = await this.getData('logCommands', interaction.guild, config);
     if (!channel) return;
 
@@ -228,8 +228,8 @@ module.exports = class Logs extends Module {
   }
 
   async onGuardianDelete(message, reason) {
-    const config = await GuildConfig.findOne({ id: message.guild.id })
-      ?? await GuildConfig.create({ id: message.guild.id });
+    const config = await GuildData.findOne({ id: message.guild.id })
+      ?? await GuildData.create({ id: message.guild.id });
     const channel = await this.getData('logGuardian', message.guild, config);
     if (!channel) return;
 
@@ -247,8 +247,8 @@ module.exports = class Logs extends Module {
   async onGuardianBulkDelete(messages, reason) {
     const last = messages.last();
     if (!last) return;
-    const config = await GuildConfig.findOne({ id: last.guild.id })
-      ?? await GuildConfig.create({ id: last.guild.id });
+    const config = await GuildData.findOne({ id: last.guild.id })
+      ?? await GuildData.create({ id: last.guild.id });
     const channel = await this.getData('logGuardian', last.guild, config);
     if (!channel) return;
 

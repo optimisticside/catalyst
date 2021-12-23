@@ -6,7 +6,7 @@ const { PREFIX, CREATORS } = require('../util/configParser.js');
 const { warning, denial, log, prompt } = require('../util/formatter.js')('Guardian');
 const { Collection, Permissions } = require('discord.js');
 const Module = require('../structs/module.js');
-const GuildConfig = require('../models/guildConfig.js');
+const GuildData = require('../models/guildData.js');
 const wait = require('timers/promises').setTimeout;
 
 module.exports = class Guardian extends Module {
@@ -31,8 +31,8 @@ module.exports = class Guardian extends Module {
     if (message.author.bot) return;
 
     const content = message.content;
-    const config = await GuildConfig.findOne({ id: message.guild.id })
-      ?? await GuildConfig.create({ id: message.guild.id });
+    const config = await GuildData.findOne({ id: message.guild.id })
+      ?? await GuildData.create({ id: message.guild.id });
     if (!config.guardianEnabled) return;
 
     // Anti spam pressure values.

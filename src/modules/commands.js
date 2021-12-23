@@ -9,8 +9,8 @@ const Module = require('../structs/module.js');
 const Command = require('../structs/command.js');
 const { CommandGroup, SubCommandGroup } = require('../structs/group.js');
 const Serializer = require('../util/serializer.js');
-const GuildConfig = require('../models/guildConfig.js');
-const UserConfig = require('../models/userConfig.js');
+const GuildData = require('../models/guildData.js');
+const UserData = require('../models/userData.js');
 const glob = require('glob');
 const path = require('path');
 
@@ -166,8 +166,8 @@ module.exports = class Commands extends Module {
     const key = `${user.id}:${command.name}`;
     const fromMap = this.cooldowns.get(key);
     if (fromMap) return fromMap;
-    const userConfig = await UserConfig.findOne({ id: user.id });
-    const cooldown = userConfig?.cooldowns.find(cd => cd.command == command.name);
+    const userData = await UserData.findOne({ id: user.id });
+    const cooldown = userData?.cooldowns.find(cd => cd.command == command.name);
     return cooldown?.since;
   }
 
@@ -179,13 +179,13 @@ module.exports = class Commands extends Module {
     // If the cooldown is longer than a certain threshold,
     // we will store it in MongoDB in case we have to restart.
     if (command.cooldown > COOLDOWN_PERSISTANCE_THRESHOLD) {
-      const userConfig = await UserConfig.findOne({ id: user.id }) ??
-        await UserConfig.create({ id: user.id });
-      const current = userConfig.cooldowns.find(cl => cl.command === command.name) ??
-        userConfig.cooldowns.push({ command: command.name });
+      const userData = await UserData.findOne({ id: user.id }) ??
+        await UserData.create({ id: user.id });
+      const current = userData.cooldowns.find(cl => cl.command === command.name) ??
+        userData.cooldowns.push({ command: command.name });
       current.since = now;
-      userConfig.markModified('cooldowns');
-      await userConfig.save();
+      userData.markModified('cooldowns');
+      await userData.save();
     } else {
       const key = `${user.id}:${command.name}`;
       this.cooldowns.set(key, now);
@@ -203,11 +203,11 @@ module.exports = class Commands extends Module {
       return;
     }
 
-    const userConfig = await UserConfig.findOne({ id: user.id }) ??
-      await UserConfig.create({ id: user.id });
-    userConfig.cooldowns.filter(cl => cl.command === command.name);
-    userConfig.markModified('cooldowns');
-    await userConfig.save();
+    const userData = await UserData.findOne({ id: user.id }) ??
+      await userData.create({ id: user.id });
+    userData.cooldowns.filter(cl => cl.command === command.name);
+    userData.markModified('cooldowns');
+    await userData.save();
   }
 
   async handleStatement(message, statement, config) {
@@ -306,8 +306,8 @@ module.exports = class Commands extends Module {
     let content = message.content.trim();
     let config, guildPrefix;
     if (message.guild) {
-      config = await GuildConfig.findOne({ id: message.guild.id })
-        ?? await GuildConfig.create({ id: message.guild.id });
+      config = await GuildData.findOne({ id: message.guild.id })
+        ?? await GuildData.create({ id: message.guild.id });
       guildPrefix = config.prefix;
     }
 

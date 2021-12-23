@@ -34,7 +34,7 @@ const reactionRoleSchema = new Schema({
   }) }
 });
 
-const guildConfigSchema = new Schema({
+const guildDataSchema = new Schema({
   id: { type: String, require: true, unique: true },
   prefix: { type: String },
 
@@ -87,4 +87,4 @@ const guildConfigSchema = new Schema({
   autoRoles: { type: Array, of: String, default: [] }
 });
 
-module.exports = model("GuildConfigModels", guildConfigSchema);
+module.exports = model('GuildDataModels', guildDataSchema);

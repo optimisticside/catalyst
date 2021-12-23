@@ -10,7 +10,7 @@ const Command = require('../../structs/command.js');
 const OptionParser = require('../../util/optionParser.js');
 const emojiRegex = require('emoji-regex');
 const Serializer = require('../../util/serializer.js');
-const GuildConfig = require('../../models/guildConfig.js');
+const GuildData = require('../../models/guildData.js');
 const promisify = (fn) => async (...given) => fn(...given);
 
 module.exports = class ConfigCommand extends Command {
@@ -84,8 +84,8 @@ module.exports = class ConfigCommand extends Command {
 
   boolSetting(name, desc, key) {
     return async (client, given, reply) => {
-      const config = await GuildConfig.findOne({ id: given.guild.id })
-        ?? await GuildConfig.create({ id: given.guild.id });
+      const config = await GuildData.findOne({ id: given.guild.id })
+        ?? await GuildData.create({ id: given.guild.id });
       const current = config[key];
       const newDesc = current != null ? `${desc}\nIt is currently ${current === true ? 'on' : 'off'}` : desc;
 
@@ -111,8 +111,8 @@ module.exports = class ConfigCommand extends Command {
 
   stringSetting(name, desc, encoder, decoder, promptMessage, key) {
     return async (client, given, reply) => {
-      const config = await GuildConfig.findOne({ id: given.guild.id })
-        ?? await GuildConfig.create({ id: given.guild.id });
+      const config = await GuildData.findOne({ id: given.guild.id })
+        ?? await GuildData.create({ id: given.guild.id });
       let current = config[key];
         if (current && decoder) current = await decoder(current);
       const shouldContinue = await this.promptBool(given, reply, name, `${desc}\nThe current ${name.toLowerCase()} is ${current}`,
@@ -143,8 +143,8 @@ module.exports = class ConfigCommand extends Command {
         desc: `Add a ${elementName} to the list.`,
         emoji: '✏️',
         handler: async (client, given, reply) => {
-          const config = await GuildConfig.findOne({ id: given.guild.id })
-            ?? await GuildConfig.create({ id: given.guild.id });
+          const config = await GuildData.findOne({ id: given.guild.id })
+            ?? await GuildData.create({ id: given.guild.id });
           const list = config[key];
           const answer = await this.promptString(given, reply, elementName, `What ${elementName} would you like to add`, encoder);
           if (!answer) return;
@@ -166,8 +166,8 @@ module.exports = class ConfigCommand extends Command {
         desc: `Remove a ${elementName} from the list.`,
         emoji: '🗑️',
         handler: async (client, given, reply) => {
-          const config = await GuildConfig.findOne({ id: given.guild.id })
-            ?? await GuildConfig.create({ id: given.guild.id });
+          const config = await GuildData.findOne({ id: given.guild.id })
+            ?? await GuildData.create({ id: given.guild.id });
           const list = config[key];
           const answer = await this.promptString(given, reply, 'word', `What ${elementName} would you like to remove`, encoder);
           if (!answer) return;
@@ -190,8 +190,8 @@ module.exports = class ConfigCommand extends Command {
         desc: `See the list of ${elementPlural} in your DMs.`,
         emoji: '👁️',
         handler: async (client, given, reply) => {
-          const config = await GuildConfig.findOne({ id: given.guild.id })
-            ?? await GuildConfig.create({ id: given.guild.id });
+          const config = await GuildData.findOne({ id: given.guild.id })
+            ?? await GuildData.create({ id: given.guild.id });
           const list = config[key];
           const data = await Promise.all(list.map(async e => {
             if (decoder) {
