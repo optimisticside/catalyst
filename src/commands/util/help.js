@@ -5,7 +5,7 @@
 const { NAME, PREFIX, SUPPORT_SERVER, CLIENT_ID, DEFAULT_COLOR } = require('../../util/configParser.js');
 const { MessageEmbed, MessageActionRow, MessageButton, Permissions } = require('discord.js');
 const { warning, success } = require('../../util/formatter.js')('Invite Command');
-const GuildConfig = require('../../models/guildConfig.js');
+const GuildData = require('../../models/guildData.js');
 const OptionParser = require('../../util/optionParser.js');
 const Command = require('../../structs/command.js');
 const Fluid = require('../../util/fluid.js');
@@ -70,8 +70,8 @@ module.exports = class HelpCommand extends Command {
       return given.reply(warning('No command provided.'));
     }
 
-    const config = await GuildConfig.findOne({ id: given.guild.id })
-        ?? await GuildConfig.create({ id: given.guild.id });
+    const config = await GuildData.findOne({ id: given.guild.id })
+        ?? await GuildData.create({ id: given.guild.id });
     const prefix = config.prefix ?? PREFIX;
     const invite = `https://discord.com/oauth2/authorize?&client_id=${CLIENT_ID}&scope=bot%20applications.commands&permissions=2134207679`;
 

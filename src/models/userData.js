@@ -9,9 +9,9 @@ const cooldownSchema = new Schema({
   since: { type: Date, require: true }
 });
 
-const userConfigSchema = new Schema({
+const userDataSchema = new Schema({
   id: { type: String, require: true, unique: true },
   cooldowns: { type: Array, of: cooldownSchema, default: [] }
 });
 
-module.exports = model('UserConfigModels', userConfigSchema);
+module.exports = model('UserDataModels', userDataSchema);

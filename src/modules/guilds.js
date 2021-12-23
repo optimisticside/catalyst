@@ -3,7 +3,7 @@
 // See LICENSE for details
 
 const Module = require('../structs/module.js');
-const GuildConfig = require('../models/guildConfig.js');
+const GuildData = require('../models/guildData.js');
 
 module.exports = class Guilds extends Module {
   async greetMember(member, config) {
@@ -55,16 +55,16 @@ module.exports = class Guilds extends Module {
   }
 
   async onMemberAdd(member) {
-    const config = await GuildConfig.findOne({ id: member.guild.id })
-      ?? await GuildConfig.create({ id: member.guild.id });
+    const config = await GuildData.findOne({ id: member.guild.id })
+      ?? await GuildData.create({ id: member.guild.id });
     await this.greetMember(member, config);
     await this.joinDmMember(member, config);
     await this.autoRole(member, config);
   }
 
   async onMemberRemove(member) {
-    const config = await GuildConfig.findOne({ id: member.guild.id })
-      ?? await GuildConfig.create({ id: member.guild.id });
+    const config = await GuildData.findOne({ id: member.guild.id })
+      ?? await GuildData.create({ id: member.guild.id });
     await this.goodbyeMember(member, config);
   }
 
