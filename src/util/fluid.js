@@ -92,7 +92,7 @@ const reload = async (oldComponent, newComponent, interaction) => {
   oldComponent.alive = false;
   oldComponent.collector?.stop();
   newComponent.mounter = oldComponent.mounter;
-  if (oldComponent !== newComponent) {
+  if (oldComponent !== newComponent && newComponent !== oldComponent.previous) {
     newComponent.previous = oldComponent;
   } else {
     newComponent.previous = oldComponent.previous;
