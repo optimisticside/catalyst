@@ -2,15 +2,17 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const { DEFAULT_COLOR } = require('../util/configParser.js');
-const { warning, denial, log, prompt } = require('../util/formatter.js')('Log Handler');
-const { MessageEmbed } = require('discord.js');
-const Module = require('../structs/module.js');
-const GuildData = require('../models/guildData.js');
-const Serializer = require('../util/serializer.js');
+import config from 'core/config';
+import { ColorResolvable, CommandInteraction, Guild, Message, MessageEmbed, Collection } from 'discord.js';
+import Module from 'structs/module';
+import GuildData from 'models/guildData';
+import Serializer from 'utils/serializer';
+import { CommandOption } from 'structs/command';
+
+const { DEFAULT_COLOR } = config;
 
 module.exports = class Logs extends Module {
-  async getData(key, guild, config) {
+  async getData(key: string, guild: Guild, config) {
     if (!guild || !config) return;
     if (!config.logsEnabled || !config[key]) return;
 
@@ -18,7 +20,7 @@ module.exports = class Logs extends Module {
     return channel;
   }
 
-  async onMessageDelete(message) {
+  async onMessageDelete(message: Message) {
     if (message.author.bot) return;
     const config = await GuildData.findOne({ id: message.guild.id })
       ?? await GuildData.create({ id: message.guild.id });
@@ -28,14 +30,14 @@ module.exports = class Logs extends Module {
     const username = `${message.author.username}#${message.author.discriminator}`;
     const embed = new MessageEmbed()
       .setAuthor(username, message.author.displayAvatarURL())
-      .setColor(DEFAULT_COLOR)
+      .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`Message sent by <@${message.author.id}> deleted in <#${message.channel.id}>\n${message.content}`)
       .setFooter(`ID: ${message.id}`)
       .setTimestamp(Date.now());
     channel.send({ embeds: [ embed ], files: message.attachments.map(a => a.url) });
   }
 
-  async onMessageBulkDelete(messages) {
+  async onMessageBulkDelete(messages: Collection<Message>) {
     const last = messages.last();
     if (!last) return;
     const config = await GuildData.findOne({ id: last.guild.id })
@@ -46,13 +48,13 @@ module.exports = class Logs extends Module {
     const username = `${last.author.username}#${last.author.discriminator}`;
     const embed = new MessageEmbed()
       .setAuthor(username, last.author.displayAvatarURL())
-      .setColor(DEFAULT_COLOR)
+      .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`${messages.size} messages bulk-deleted in <#${last.channel.id}>`)
       .setTimestamp(Date.now());
     channel.send({ embeds: [ embed ] });
   }
 
-  async onMessageEdit(oldMessage, newMessage) {
+  async onMessageEdit(oldMessage: Message, newMessage: Message) {
     if (newMessage.author.bot) return;
     const config = await GuildData.findOne({ id: newMessage.guild.id })
       ?? await GuildData.create({ id: newMessage.guild.id });
@@ -66,7 +68,7 @@ module.exports = class Logs extends Module {
     const username = `${newMessage.author.username}#${newMessage.author.discriminator}`;
     const embed = new MessageEmbed()
       .setAuthor(username, newMessage.author.displayAvatarURL())
-      .setColor(DEFAULT_COLOR)
+      .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription( `Message sent by <@${newMessage.author.id}> edited in <#${newMessage.channel.id}> [Jump to message](${url})`)
       .addField('Before', oldMessage.content)
       .addField('After', newMessage.content)
@@ -75,7 +77,7 @@ module.exports = class Logs extends Module {
     channel.send({ embeds: [ embed ] });
   }
 
-  async onGuildMemberAdd(member) {
+  async onGuildMemberAdd(member: GuildMember) {
     const config = await GuildData.findOne({ id: member.guild.id })
       ?? await GuildData.create({ id: member.guild.id });
     const channel = await this.getData('logMemberJoin', member.guild, config);
@@ -84,14 +86,14 @@ module.exports = class Logs extends Module {
     const username = `${member.user.username}#${member.user.discriminator}`;
     const embed = new MessageEmbed()
       .setAuthor(username, member.user.displayAvatarURL())
-      .setColor(DEFAULT_COLOR)
+      .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`<@${member.user.id}> joined the server`)
       .setFooter(`ID: ${member.user.id}`)
       .setTimestamp(Date.now());
     channel.send({ embeds: [ embed ] });
   }
 
-  async onGuildMemberRemove(member) {
+  async onGuildMemberRemove(member: GuildMember) {
     const user = await this.client.users.fetch(member.id);
     const guild = await this.client.guilds.fetch(member.guild.id);
 
@@ -103,14 +105,14 @@ module.exports = class Logs extends Module {
     const username = `${user.username}#${user.discriminator}`;
     const embed = new MessageEmbed()
       .setAuthor(username, user.displayAvatarURL())
-      .setColor(DEFAULT_COLOR)
+      .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`<@${user.id}> left the server`)
       .setFooter(`ID: ${user.id}`)
       .setTimestamp(Date.now());
     channel.send({ embeds: [ embed ] });
   }
 
-  async onGuildMemberUpdate(oldMember, newMember) {
+  async onGuildMemberUpdate(oldMember: GuildMember, newMember: GuildMember) {
     const config = await GuildData.findOne({ id: newMember.guild.id })
       ?? await GuildData.create({ id: newMember.guild.id });
     const channel = await this.getData(newMember.guild, config);
@@ -120,7 +122,7 @@ module.exports = class Logs extends Module {
     if (oldMember.nickname != newMember.nickname) {
       const embed = new MessageEmbed()
         .setAuthor(username, newMember.user.displayAvatarURL())
-        .setColor(DEFAULT_COLOR)
+        .setColor(DEFAULT_COLOR as ColorResolvable)
         .setDescription(`<@${newMember.user.id}> nickname changed`)
         .addField('Before', oldMember.nickname ?? oldMember.user.username)
         .addField('After', newMember.nickname ?? newMember.user.username)
@@ -133,7 +135,7 @@ module.exports = class Logs extends Module {
       if (newMember.roles.cache.has(role.id)) return;
       const embed = new MessageEmbed()
         .setAuthor(username, newMember.user.displayAvatarURL())
-        .setColor(DEFAULT_COLOR)
+        .setColor(DEFAULT_COLOR as ColorResolvable)
         .setDescription(`<@${newMember.user.id}> was removed from the \`${role.name}\` role`)
         .setFooter(`Author ID: ${newMember.user.id} | Role ID: ${role.id}`)
         .setTimestamp(Date.now());
@@ -144,7 +146,7 @@ module.exports = class Logs extends Module {
       if (oldMember.roles.cache.has(role.id)) return;
       const embed = new MessageEmbed()
         .setAuthor(username, newMember.user.displayAvatarURL())
-        .setColor(DEFAULT_COLOR)
+        .setColor(DEFAULT_COLOR as ColorResolvable)
         .setDescription(`<@${newMember.user.id}> was given the \`${role.name}\` role`)
         .setFooter(`Author ID: ${newMember.user.id} | Role ID: ${role.id}`)
         .setTimestamp(Date.now());
@@ -152,7 +154,7 @@ module.exports = class Logs extends Module {
     });
   }
 
-  async onCommandRun(message, command, args) {
+  async onCommandRun(message: Message, command: Command, args: CommandArgs) {
     if (command.passive) return;
     if (command.tags?.find(t => t === 'fun')) return;
     if (message.author.bot) return;
@@ -165,22 +167,22 @@ module.exports = class Logs extends Module {
     const username = `${message.author.username}#${message.author.discriminator}`;
     const embed = new MessageEmbed()
       .setAuthor(username, message.author.displayAvatarURL())
-      .setColor(DEFAULT_COLOR)
+      .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`Used ${command.name} command in <#${message.channel.id}>\n${message.content}`)
       .setFooter(`Author ID: ${message.author.id} | Message ID: ${message.id}`)
       .setTimestamp(Date.now());
     channel.send({ embeds: [ embed ] });
   }
 
-  async onSlashCommandRun(interaction, command) {
+  async onSlashCommandRun(interaction: CommandInteraction, command: Command) {
     if (command.passive) return;
-    if (command.tags?.find(t => t === 'fun')) return;
+    if (command.tags.find(t => t === 'fun')) return;
     if (!interaction.inGuild()) return;
     if (interaction.user.bot) return;
 
     // TODO: This could be simpler if the `Serializer`
     // library was better built.
-    const deserialize = async (given, option) => {
+    const deserialize = async (given: string, option: CommandOption) => {
       switch (option.type) {
         case 'text': case 'raw': case 'string': default:
           return given;
@@ -220,14 +222,14 @@ module.exports = class Logs extends Module {
     const username = `${interaction.user.username}#${interaction.user.discriminator}`;
     const embed = new MessageEmbed()
       .setAuthor(username, interaction.user.displayAvatarURL())
-      .setColor(DEFAULT_COLOR)
+      .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`Used ${command.name} slash command in <#${interaction.channel.id}>\n${message}`)
       .setFooter(`ID: ${interaction.user.id}`)
       .setTimestamp(Date.now());
     channel.send({ embeds: [ embed ] });
   }
 
-  async onGuardianDelete(message, reason) {
+  async onGuardianDelete(message: Message, reason: string) {
     const config = await GuildData.findOne({ id: message.guild.id })
       ?? await GuildData.create({ id: message.guild.id });
     const channel = await this.getData('logGuardian', message.guild, config);
@@ -236,7 +238,7 @@ module.exports = class Logs extends Module {
     const username = `${message.author.username}#${message.author.discriminator}`;
     const embed = new MessageEmbed()
       .setAuthor(username, message.author.displayAvatarURL())
-      .setColor(DEFAULT_COLOR)
+      .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`Guardian deleted a message sent by <@${message.author.id}> in <#${message.channel.id}>`)
       .addField('Reason', reason)
       .setFooter(`ID: ${message.author.id}`)
@@ -244,7 +246,7 @@ module.exports = class Logs extends Module {
     channel.send({ embeds: [ embed ] });
   }
 
-  async onGuardianBulkDelete(messages, reason) {
+  async onGuardianBulkDelete(messages: Collection<Message>, reason: string) {
     const last = messages.last();
     if (!last) return;
     const config = await GuildData.findOne({ id: last.guild.id })
@@ -255,7 +257,7 @@ module.exports = class Logs extends Module {
     const username = `${last.author.username}#${last.author.discriminator}`;
     const embed = new MessageEmbed()
       .setAuthor(username, last.author.displayAvatarURL())
-      .setColor(DEFAULT_COLOR)
+      .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`Guardian bulk-deleted ${messages.size} sent by <@${last.author.id}> in <#${last.channel.id}>`)
       .addField('Reason', reason)
       .setFooter(`ID: ${last.author.id}`)
@@ -263,8 +265,7 @@ module.exports = class Logs extends Module {
     channel.send({ embeds: [ embed ] });
   }
 
-  load({ commandHandler, eventHandler, slashHandler, guardian, database }) {
-    this.database = database;
+  load({ commandHandler, eventHandler, slashHandler, guardian }) {
     eventHandler.on('messageDelete', this.onMessageDelete.bind(this));
     eventHandler.on('messageDeleteBulk', this.onMessageBulkDelete.bind(this));
     eventHandler.on('messageUpdate', this.onMessageEdit.bind(this));
