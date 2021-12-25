@@ -299,7 +299,7 @@ export default class CommandHandler extends Module {
   }
 
   async loadCommand(file: string) {
-    const command = await resolveFile<Command>(file);
+    const command = await resolveFile<Command | CommandGroup | SubCommandGroup>(file);
     if (command instanceof Command) return this.commands.push(command);
     if (command instanceof CommandGroup) return this.groups.push(command);
     if (command instanceof SubCommandGroup) return this.subGroups.push(command);

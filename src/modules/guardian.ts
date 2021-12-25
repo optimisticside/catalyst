@@ -30,7 +30,7 @@ interface AntispamConfig {
   notifyInterval: number;
 };
 
-module.exports = class Guardian extends Module {
+export default class Guardian extends Module {
   messages: {[key: string]: string};
   reasons: {[key: string]: string};
   messageTrackers: Map<Snowflake, MessageTracker>;

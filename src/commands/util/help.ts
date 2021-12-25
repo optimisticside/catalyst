@@ -16,7 +16,7 @@ import CommandHandler from '@modules/commands';
 const { NAME, PREFIX, SUPPORT_SERVER, CLIENT_ID, DEFAULT_COLOR } = config;
 const { warning } = formatter('Help Command');
 
-module.exports = class HelpCommand extends Command {
+export default class HelpCommand extends Command {
   async argumentHelp(_client: CatalystClient,
     given: CommandGiven, _parser: OptionParser, command: Command, argumentName: string) {
     const option = command.options.find(o => o.name === argumentName);

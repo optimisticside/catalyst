@@ -12,7 +12,7 @@ import CatalystClient from 'core/client';
 const { NAME, CLIENT_ID, TOPGG_TOKEN, DBL_TOKEN, DISCORDS_TOKEN } = config;
 
 export default class HelpCommand extends Command {
-  async run(_client: CatalystClient, given: CommandGiven) {
+  async run(_client: CatalystClient, given: CommandGiven, _args: CommandArgs) {
     const voteMenu = new VoteMenu({
       clientId: CLIENT_ID,
       name: NAME,

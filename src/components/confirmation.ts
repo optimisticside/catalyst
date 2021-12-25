@@ -3,7 +3,7 @@
 // See LICENSE for details
 
 import { MessageEmbed, MessageActionRow, MessageButton, ColorResolvable } from 'discord.js';
-import { Component, ActionCallback } from 'libs/fluid';
+import { Component, ActionCallback, action } from 'libs/fluid';
 import config from 'core/config';
 
 const { DEFAULT_COLOR } = config;
@@ -28,18 +28,27 @@ export default class ConfirmationComponent extends Component {
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(this.props.body);
 
+    const components: Array<MessageButton> = [];
+    const yesAction = action(this, this.props.ifYes);
+    const noAction = action(this, this.props.ifNo);
+    if (yesAction) {
+      components.push(new MessageButton({
+        label: 'Confirm',
+        style: 'SUCCESS',
+        customId: yesAction
+      }));
+    }
+    if (noAction) {
+      components.push(new MessageButton({
+        label: 'Cancel',
+        style: 'DANGER',
+         customId: noAction
+      }));
+    }
+
     const actionRow = new MessageActionRow()
       .addComponents(
-        new MessageButton({
-          label: 'Confirm',
-          style: 'SUCCESS',
-          customId: action(this, this.props.ifYes)
-        }),
-        new MessageButton({
-          label: 'Cancel',
-          style: 'DANGER',
-           customId: action(this, this.props.ifNo)
-        }),
+        components
       );
 
     return {

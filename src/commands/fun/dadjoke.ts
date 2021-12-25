@@ -10,7 +10,7 @@ import formatter from 'utils/formatter';
 
 const { neutral } = formatter('Dadjoke Command');
 
-module.exports = class DogCommand extends Command {
+export default class DadJokeCommand extends Command {
   async run(_client: CatalystClient, given: CommandGiven, _args: CommandArgs) {
     const res = await fetch('https://icanhazdadjoke.com/', { headers: { 'Accept': 'application/json' } });
     const joke = (await res.json())?.joke;

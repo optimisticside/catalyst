@@ -7,11 +7,12 @@ import { ColorResolvable, CommandInteraction, Guild, Message, MessageEmbed, Coll
 import Module from 'structs/module';
 import GuildData, { GuildDocument } from 'models/guildData';
 import Serializer from 'utils/serializer';
-import Command, { CommandOption } from 'structs/command';
+import Command, { CommandArgs, CommandOption } from 'structs/command';
+import CatalystClient from 'core/client';
 
 const { DEFAULT_COLOR } = config;
 
-module.exports = class Logs extends Module {
+export default class Logs extends Module {
   async getData(key: string, guild: Guild, config: GuildDocument) {
     if (!guild || !config) return;
     if (!config.logsEnabled || !config[key]) return;
@@ -39,7 +40,7 @@ module.exports = class Logs extends Module {
 
   async onMessageBulkDelete(messages: Collection<Snowflake, Message>) {
     const last = messages.last();
-    if (!last) return;
+    if (!last || !last.guild) return;
     const config = await GuildData.findOne({ id: last.guild.id })
       ?? await GuildData.create({ id: last.guild.id });
     const channel = await this.getData('logMessageDelete', last.guild, config);
@@ -81,7 +82,7 @@ module.exports = class Logs extends Module {
     const config = await GuildData.findOne({ id: member.guild.id })
       ?? await GuildData.create({ id: member.guild.id });
     const channel = await this.getData('logMemberJoin', member.guild, config);
-    if (!channel) return;
+    if (!channel || !(channel instanceof TextChannel)) return;
 
     const username = `${member.user.username}#${member.user.discriminator}`;
     const embed = new MessageEmbed()
@@ -115,7 +116,7 @@ module.exports = class Logs extends Module {
   async onGuildMemberUpdate(oldMember: GuildMember, newMember: GuildMember) {
     const config = await GuildData.findOne({ id: newMember.guild.id })
       ?? await GuildData.create({ id: newMember.guild.id });
-    const channel = await this.getData(newMember.guild, config);
+    const channel = await this.getData('logMemberUpdate', newMember.guild, config);
     if (!channel || !(channel instanceof TextChannel)) return;
     
     const username = `${newMember.user.username}#${newMember.user.discriminator}`;
@@ -154,7 +155,7 @@ module.exports = class Logs extends Module {
     });
   }
 
-  async onCommandRun(message: Message, command: Command, args: CommandArgs) {
+  async onCommandRun(message: Message, command: Command, _args: CommandArgs) {
     if (command.passive) return;
     if (command.tags?.find(t => t === 'fun')) return;
     if (message.author.bot || !message.guild) return;
@@ -190,8 +191,8 @@ module.exports = class Logs extends Module {
           return Serializer.serializeInt(given);
         case 'number':
           return Serializer.serializeFloat(given);
-        case 'boolean':
-          return Serializer.serializeBool(given);
+        //case 'boolean':
+          //return Serializer.serializeBool(given);
         case 'user': case 'member':
           return Serializer.serializeUser(given);
         case 'channel':
@@ -249,7 +250,7 @@ module.exports = class Logs extends Module {
 
   async onGuardianBulkDelete(messages: Collection<Snowflake, Message>, reason: string) {
     const last = messages.last();
-    if (!last || !message.guild) return;
+    if (!last || !last.guild) return;
     const config = await GuildData.findOne({ id: last.guild.id })
       ?? await GuildData.create({ id: last.guild.id });
     const channel = await this.getData('logGuardian', last.guild, config);

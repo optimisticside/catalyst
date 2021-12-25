@@ -55,20 +55,24 @@ export default class ListComponent extends Component {
     const components = this.props.body
       .filter(c => c.action)
       .map(({ name, action: callback }) => {
+        const customId = callback && action(this, callback);
+        if (!customId) return;
         return new MessageButton({
           label: name,
           style: 'SECONDARY',
-          customId: action(this, callback as ActionCallback)
+          customId
         });
-      });
+      })
+      .filter(mb => mb !== undefined);
 
     // We cannot exceed the limit of buttons, which is 5.
     // TODO: This should be a constant.
-    if (this.previous && components.length < 5) {
+    const backRedirect = this.previous && redirect(this, this.previous);
+    if (backRedirect && components.length < 5) {
       components.push(new MessageButton({
         label: 'Back',
         style: 'DANGER',
-        customId: redirect(this, this.previous)
+        customId: backRedirect
       }));
     }
 

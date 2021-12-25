@@ -10,7 +10,7 @@ import CatalystClient from 'core/client';
 
 const { alert, success } = formatter('Purge Command');
 
-module.exports = class PurgeCommand extends Command {
+export default class PurgeCommand extends Command {
   async run(_client: CatalystClient, given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
     const amount = await parser.getOption('amount') as number;
