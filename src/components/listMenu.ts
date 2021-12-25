@@ -63,7 +63,7 @@ export default class ListComponent extends Component {
           customId
         });
       })
-      .filter(mb => mb !== undefined);
+      .filter(mb => mb !== undefined) as Array<MessageButton>;
 
     // We cannot exceed the limit of buttons, which is 5.
     // TODO: This should be a constant.
