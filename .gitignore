@@ -4,5 +4,6 @@ redis.conf
 redis-stable.tar.gz
 dump.rdb
 src/config.json
+dist
 .npm
 .env
