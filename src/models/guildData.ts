@@ -118,7 +118,7 @@ export interface GuildDocument extends Document {
   unbanTimers: Array<TimerDocument>;
   channelUnlockTimers: Array<TimerDocument>;
   moderationCases: Array<ModerationCaseDocument>;
-  strikePolicy: Array<ModerationCaseActionDocument>;
+  strikePolicy: Array<StrikePolicyActionDocument>;
 
   reactionRoleEnabled: boolean;
   reactionRoles: Array<ReactionRoleDocument>
