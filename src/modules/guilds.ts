@@ -9,7 +9,7 @@ import GuildData, { GuildDocument } from 'models/guildData';
 export default class Guilds extends Module {
   async greetMember(member: GuildMember, config: GuildDocument) {
     if (member.partial) member = await member.fetch();
-    if (!config.greetingEnabled) return;
+    if (!config.greetingEnabled || !config.greetingChannel) return;
 
     const channel = member.guild.channels.cache.get(config.greetingChannel);
     if (!channel || !config.greetingMessage || !(channel instanceof TextChannel)) return;
@@ -17,7 +17,7 @@ export default class Guilds extends Module {
     const formatted = config.greetingMessage.replace('{mention}', `<@${member.user.id}>`) 
       .replaceAll('{user}', member.user.username)
       .replaceAll('{guild}', member.guild.name)
-      .replaceAll('{count}', member.guild.memberCount);
+      .replaceAll('{count}', member.guild.memberCount.toString());
     channel.send(formatted);
   }
 
@@ -31,7 +31,7 @@ export default class Guilds extends Module {
     
     const formatted = config.goodbyeMessage.replace('{user}', user.username)
       .replaceAll('{guild}', guild.name)
-      .replaceAll('{count}', guild.memberCount);
+      .replaceAll('{count}', guild.memberCount.toString());
     channel.send(formatted);
   }
 
@@ -40,7 +40,7 @@ export default class Guilds extends Module {
     const formatted = config.joinDmMessage.replace('{mention}', `<@${member.user.id}>`) 
       .replaceAll('{user}', member.user.username)
       .replaceAll('{guild}', member.guild.name)
-      .replaceAll('{count}', member.guild.memberCount);
+      .replaceAll('{count}', member.guild.memberCount.toString());
 
     // TODO: Handle errors when creating a DM channel.
     // It can force the shard to restart.
@@ -52,7 +52,7 @@ export default class Guilds extends Module {
   async autoRole(member: GuildMember, config: GuildDocument) {
     if (!config.autoRoleEnabled || !config.autoRoles) return;
     const roles = config.autoRoles.map(r => member.guild.roles.cache.get(r));
-    await Promise.all(roles.map(r => member.roles.add(r)));
+    await Promise.all(roles.map(async r => r && await member.roles.add(r)));
   }
 
   async onMemberAdd(member: GuildMember) {

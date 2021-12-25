@@ -10,7 +10,7 @@ import CatalystClient from 'core/client';
 
 const { alert, success } = formatter('Slowmode Command');
 
-module.exports = class BanCommand extends Command {
+export default class SlowmodeCommand extends Command {
   async run(_client: CatalystClient, given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
     const time = await parser.getOption('time');
@@ -18,7 +18,7 @@ module.exports = class BanCommand extends Command {
     const member = given.member;
     const channel = given.channel;
     if (!member || !(channel instanceof TextChannel)) return;
-    const username = `${given.member.user.username}#${given.member.user.discriminator}`;
+    const username = `${member.user.username}#${member.user.discriminator}`;
 
     channel.setRateLimitPerUser(time, `Changed by ${username}`)
       .then(() => {

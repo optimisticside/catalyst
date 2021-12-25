@@ -10,7 +10,7 @@ import OptionParser from 'utils/optionParser';
 
 const { success, alert } = formatter('Announce Command');
 
-module.exports = class BanCommand extends Command {
+export default class AnnounceCommand extends Command {
   async run(_client: CatalystClient, given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
     const channelId = await parser.getOption('channel') as string;

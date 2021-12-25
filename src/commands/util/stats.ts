@@ -13,7 +13,7 @@ const GIGA_BYTE = Math.pow(1024, 3);
 const { NAME, DEFAULT_COLOR } = config;
 //const { warning } = formatter('Stats Command');
 
-module.exports = class InfoCommand extends Command {
+export default class InfoCommand extends Command {
   async run(client: CatalystClient, given: CommandGiven) {
     const memoryUsage = process.memoryUsage();
     const usedMem = Math.round((memoryUsage.heapUsed / GIGA_BYTE) * 1000) / 1000;
