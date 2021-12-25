@@ -4,7 +4,7 @@
 
 import { ApplicationCommandOptionChoice, AutocompleteInteraction, CommandInteraction, Guild, GuildChannel, Interaction, TextChannel } from 'discord.js';
 import { REST } from '@discordjs/rest';
-import { Routes, ApplicationCommandPermissionType } from 'discord-api-types/v9';
+import { Routes } from 'discord-api-types/v9';
 import config from 'core/config';
 import formatter from 'utils/formatter';
 import { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandGroupBuilder } from '@discordjs/builders';

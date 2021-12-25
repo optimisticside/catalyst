@@ -6,11 +6,22 @@ import config from 'core/config';
 import { MessageEmbed, MessageActionRow, MessageButton, ColorResolvable } from 'discord.js';
 import { Component, redirect } from 'libs/fluid';
 import ListMenu from '@components/listMenu';
+import Command from 'structs/command';
 
 const { DEFAULT_COLOR } = config;
 
+export interface HelpMenuProps {
+  name: string;
+  supportServer: string;
+  invite: string;
+  prefix: string;
+  commands: Array<Command>;
+};
+
 export default class HelpMenuComponent extends Component {
-  constructor(props) {
+  declare props: HelpMenuProps;
+
+  constructor(props: HelpMenuProps) {
     super(props);
   }
 
@@ -27,12 +38,15 @@ export default class HelpMenuComponent extends Component {
       }),
     });
 
+    const commandsRedirect = redirect(this, commandsList);
+    if (!commandsRedirect) throw new Error('Invalid redirect');
+
     return {
       embeds: [ embed ],
       components: [
         new MessageActionRow()
           .addComponents(
-            new MessageButton({ label: 'Commands', style: 'PRIMARY', customId: redirect(this, commandsList) }),
+            new MessageButton({ label: 'Commands', style: 'PRIMARY', customId: commandsRedirect }),
             new MessageButton({ label: 'Invite', style: 'LINK', url: this.props.invite }),
             new MessageButton({ label: 'Support Server', style: 'LINK', url: this.props.supportServer })
           )
