@@ -2,7 +2,7 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-import { Schema, model } from 'mongoose';
+import { Schema, Document, model } from 'mongoose';
 const moderationActions = [ 'Ban', 'Block', 'Kick', 'Mute', 'SoftBan', 'Strike', 'Temp Ban', 'Temp Mute' ];
 
 const timerSchema = new Schema({

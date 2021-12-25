@@ -2,31 +2,32 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const Module = require('../structs/module.js');
-const GuildData = require('../models/guildData.js');
+import { GuildMember, TextChannel } from 'discord.js';
+import Module from 'structs/module';
+import GuildData from 'models/guildData';
 
-module.exports = class Guilds extends Module {
-  async greetMember(member, config) {
+export default class Guilds extends Module {
+  async greetMember(member: GuildMember, config: GuildData) {
     if (member.partial) member = await member.fetch();
     if (!config.greetingEnabled) return;
 
     const channel = member.guild.channels.cache.get(config.greetingChannel);
-    if (!channel || !config.greetingMessage) return;
+    if (!channel || !config.greetingMessage || !(channel instanceof TextChannel)) return;
 
     const formatted = config.greetingMessage.replace('{mention}', `<@${member.user.id}>`) 
-      .replaceAll('{user}', member.username)
+      .replaceAll('{user}', member.user.username)
       .replaceAll('{guild}', member.guild.name)
       .replaceAll('{count}', member.guild.memberCount);
     channel.send(formatted);
   }
 
-  async goodbyeMember(member, config) {
+  async goodbyeMember(member: GuildMember, config: GuildData) {
     const user = await this.client.users.fetch(member.id);
     const guild = await this.client.guilds.fetch(member.guild.id);
     if (!config.goodbyeEnabled) return;
 
     const channel = guild.channels.cache.get(config.goodbyeChannel);
-    if (!channel || !config.goodbyeMessage) return;
+    if (!channel || !config.goodbyeMessage || !(channel instanceof TextChannel)) return;
     
     const formatted = config.goodbyeMessage.replace('{user}', user.username)
       .replaceAll('{guild}', guild.name)
@@ -34,7 +35,7 @@ module.exports = class Guilds extends Module {
     channel.send(formatted);
   }
 
-  async joinDmMember(member, config) {
+  async joinDmMember(member: GuildMember, config: GuildData) {
     if (!config.joinDmEnabled || !config.joinDmMessage) return;
     const formatted = config.joinDmMessage.replace('{mention}', `<@${member.user.id}>`) 
       .replaceAll('{user}', member.user.username)
@@ -48,13 +49,13 @@ module.exports = class Guilds extends Module {
     dmChannel.send(formatted);
   }
 
-  async autoRole(member, config) {
+  async autoRole(member: GuildMember, config: GuildData) {
     if (!config.autoRoleEnabled || !config.autoRoles) return;
     const roles = config.autoRoles.map(r => member.guild.roles.cache.get(r));
     await Promise.all(roles.map(r => member.roles.add(r)));
   }
 
-  async onMemberAdd(member) {
+  async onMemberAdd(member: GuildMember) {
     const config = await GuildData.findOne({ id: member.guild.id })
       ?? await GuildData.create({ id: member.guild.id });
     await this.greetMember(member, config);
@@ -62,7 +63,7 @@ module.exports = class Guilds extends Module {
     await this.autoRole(member, config);
   }
 
-  async onMemberRemove(member) {
+  async onMemberRemove(member: GuildMember) {
     const config = await GuildData.findOne({ id: member.guild.id })
       ?? await GuildData.create({ id: member.guild.id });
     await this.goodbyeMember(member, config);
@@ -115,8 +116,7 @@ module.exports = class Guilds extends Module {
     });
   }*/
 
-  load({ eventHandler, database }) {
-    this.database = database;
+  load({ eventHandler }) {
     eventHandler.on('guildMemberAdd', this.onMemberAdd.bind(this));
     eventHandler.on('guildMemberRemove', this.onMemberRemove.bind(this));
     // eventHandler.on('messageReactionAdd', this.onReactionAdd.bind(this));
