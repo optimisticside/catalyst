@@ -4,10 +4,10 @@
 
 import { GuildMember, TextChannel } from 'discord.js';
 import Module from 'structs/module';
-import GuildData from 'models/guildData';
+import GuildData, { GuildDocument } from 'models/guildData';
 
 export default class Guilds extends Module {
-  async greetMember(member: GuildMember, config: GuildData) {
+  async greetMember(member: GuildMember, config: GuildDocument) {
     if (member.partial) member = await member.fetch();
     if (!config.greetingEnabled) return;
 
@@ -21,7 +21,7 @@ export default class Guilds extends Module {
     channel.send(formatted);
   }
 
-  async goodbyeMember(member: GuildMember, config: GuildData) {
+  async goodbyeMember(member: GuildMember, config: GuildDocument) {
     const user = await this.client.users.fetch(member.id);
     const guild = await this.client.guilds.fetch(member.guild.id);
     if (!config.goodbyeEnabled) return;
@@ -35,7 +35,7 @@ export default class Guilds extends Module {
     channel.send(formatted);
   }
 
-  async joinDmMember(member: GuildMember, config: GuildData) {
+  async joinDmMember(member: GuildMember, config: GuildDocument) {
     if (!config.joinDmEnabled || !config.joinDmMessage) return;
     const formatted = config.joinDmMessage.replace('{mention}', `<@${member.user.id}>`) 
       .replaceAll('{user}', member.user.username)
@@ -49,7 +49,7 @@ export default class Guilds extends Module {
     dmChannel.send(formatted);
   }
 
-  async autoRole(member: GuildMember, config: GuildData) {
+  async autoRole(member: GuildMember, config: GuildDocument) {
     if (!config.autoRoleEnabled || !config.autoRoles) return;
     const roles = config.autoRoles.map(r => member.guild.roles.cache.get(r));
     await Promise.all(roles.map(r => member.roles.add(r)));

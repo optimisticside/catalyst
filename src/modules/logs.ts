@@ -3,16 +3,16 @@
 // See LICENSE for details
 
 import config from 'core/config';
-import { ColorResolvable, CommandInteraction, Guild, Message, MessageEmbed, Collection } from 'discord.js';
+import { ColorResolvable, CommandInteraction, Guild, Message, MessageEmbed, Collection, GuildMember, TextChannel, Snowflake } from 'discord.js';
 import Module from 'structs/module';
-import GuildData from 'models/guildData';
+import GuildData, { GuildDocument } from 'models/guildData';
 import Serializer from 'utils/serializer';
-import { CommandOption } from 'structs/command';
+import Command, { CommandOption } from 'structs/command';
 
 const { DEFAULT_COLOR } = config;
 
 module.exports = class Logs extends Module {
-  async getData(key: string, guild: Guild, config) {
+  async getData(key: string, guild: Guild, config: GuildDocument) {
     if (!guild || !config) return;
     if (!config.logsEnabled || !config[key]) return;
 
@@ -21,11 +21,11 @@ module.exports = class Logs extends Module {
   }
 
   async onMessageDelete(message: Message) {
-    if (message.author.bot) return;
+    if (message.author.bot || !message.guild) return;
     const config = await GuildData.findOne({ id: message.guild.id })
       ?? await GuildData.create({ id: message.guild.id });
     const channel = await this.getData('logMessageDelete', message.guild, config);
-    if (!channel) return;
+    if (!channel || !(channel instanceof TextChannel)) return;
 
     const username = `${message.author.username}#${message.author.discriminator}`;
     const embed = new MessageEmbed()
@@ -37,13 +37,13 @@ module.exports = class Logs extends Module {
     channel.send({ embeds: [ embed ], files: message.attachments.map(a => a.url) });
   }
 
-  async onMessageBulkDelete(messages: Collection<Message>) {
+  async onMessageBulkDelete(messages: Collection<Snowflake, Message>) {
     const last = messages.last();
     if (!last) return;
     const config = await GuildData.findOne({ id: last.guild.id })
       ?? await GuildData.create({ id: last.guild.id });
     const channel = await this.getData('logMessageDelete', last.guild, config);
-    if (!channel) return;
+    if (!channel || !(channel instanceof TextChannel)) return;
 
     const username = `${last.author.username}#${last.author.discriminator}`;
     const embed = new MessageEmbed()
@@ -55,11 +55,11 @@ module.exports = class Logs extends Module {
   }
 
   async onMessageEdit(oldMessage: Message, newMessage: Message) {
-    if (newMessage.author.bot) return;
+    if (newMessage.author.bot || !newMessage.guild) return;
     const config = await GuildData.findOne({ id: newMessage.guild.id })
       ?? await GuildData.create({ id: newMessage.guild.id });
     const channel = await this.getData('logMessageEdit', newMessage.guild, config);
-    if (!channel) return;
+    if (!channel || !(channel instanceof TextChannel)) return;
 
     // Yes, this sometimes happens.
     if (oldMessage.content === newMessage.content) return;
@@ -100,7 +100,7 @@ module.exports = class Logs extends Module {
     const config = await GuildData.findOne({ id: guild.id })
       ?? await GuildData.create({ id: guild.id });
     const channel = await this.getData('logMemberLeave', member.guild, config);
-    if (!channel) return;
+    if (!channel || !(channel instanceof TextChannel)) return;
 
     const username = `${user.username}#${user.discriminator}`;
     const embed = new MessageEmbed()
@@ -116,7 +116,7 @@ module.exports = class Logs extends Module {
     const config = await GuildData.findOne({ id: newMember.guild.id })
       ?? await GuildData.create({ id: newMember.guild.id });
     const channel = await this.getData(newMember.guild, config);
-    if (!channel) return;
+    if (!channel || !(channel instanceof TextChannel)) return;
     
     const username = `${newMember.user.username}#${newMember.user.discriminator}`;
     if (oldMember.nickname != newMember.nickname) {
@@ -157,12 +157,12 @@ module.exports = class Logs extends Module {
   async onCommandRun(message: Message, command: Command, args: CommandArgs) {
     if (command.passive) return;
     if (command.tags?.find(t => t === 'fun')) return;
-    if (message.author.bot) return;
+    if (message.author.bot || !message.guild) return;
 
     const config = await GuildData.findOne({ id: message.guild.id })
       ?? await GuildData.create({ id: message.guild.id });
     const channel = await this.getData('logCommmands', message.guild, config);
-    if (!channel) return;
+    if (!channel || !(channel instanceof TextChannel)) return;
 
     const username = `${message.author.username}#${message.author.discriminator}`;
     const embed = new MessageEmbed()
@@ -178,11 +178,11 @@ module.exports = class Logs extends Module {
     if (command.passive) return;
     if (command.tags.find(t => t === 'fun')) return;
     if (!interaction.inGuild()) return;
-    if (interaction.user.bot) return;
+    if (interaction.user.bot || !interaction.guild) return;
 
     // TODO: This could be simpler if the `Serializer`
     // library was better built.
-    const deserialize = async (given: string, option: CommandOption) => {
+    const deserialize = async (given: any, option: CommandOption) => {
       switch (option.type) {
         case 'text': case 'raw': case 'string': default:
           return given;
@@ -206,7 +206,7 @@ module.exports = class Logs extends Module {
     const config = await GuildData.findOne({ id: interaction.guild.id })
       ?? await GuildData.create({ id: interaction.guild.id });
     const channel = await this.getData('logCommands', interaction.guild, config);
-    if (!channel) return;
+    if (!channel || !(channel instanceof TextChannel)) return;
 
     let message = `/${interaction.commandName}`;
     const subName = interaction.options.getSubcommand(false);
@@ -223,17 +223,18 @@ module.exports = class Logs extends Module {
     const embed = new MessageEmbed()
       .setAuthor(username, interaction.user.displayAvatarURL())
       .setColor(DEFAULT_COLOR as ColorResolvable)
-      .setDescription(`Used ${command.name} slash command in <#${interaction.channel.id}>\n${message}`)
+      .setDescription(`Used ${command.name} slash command in <#${interaction.channel?.id}>\n${message}`)
       .setFooter(`ID: ${interaction.user.id}`)
       .setTimestamp(Date.now());
     channel.send({ embeds: [ embed ] });
   }
 
   async onGuardianDelete(message: Message, reason: string) {
+    if (!message.guild) return;
     const config = await GuildData.findOne({ id: message.guild.id })
       ?? await GuildData.create({ id: message.guild.id });
     const channel = await this.getData('logGuardian', message.guild, config);
-    if (!channel) return;
+    if (!channel || !(channel instanceof TextChannel)) return;
 
     const username = `${message.author.username}#${message.author.discriminator}`;
     const embed = new MessageEmbed()
@@ -246,13 +247,13 @@ module.exports = class Logs extends Module {
     channel.send({ embeds: [ embed ] });
   }
 
-  async onGuardianBulkDelete(messages: Collection<Message>, reason: string) {
+  async onGuardianBulkDelete(messages: Collection<Snowflake, Message>, reason: string) {
     const last = messages.last();
-    if (!last) return;
+    if (!last || !message.guild) return;
     const config = await GuildData.findOne({ id: last.guild.id })
       ?? await GuildData.create({ id: last.guild.id });
     const channel = await this.getData('logGuardian', last.guild, config);
-    if (!channel) return;
+    if (!channel || !(channel instanceof TextChannel)) return;
 
     const username = `${last.author.username}#${last.author.discriminator}`;
     const embed = new MessageEmbed()
@@ -278,7 +279,7 @@ module.exports = class Logs extends Module {
     guardian.on('messageBulkDelete', this.onGuardianBulkDelete.bind(this));
   }
 
-  constructor(client) {
+  constructor(client: CatalystClient) {
     super({
       name: 'logHandler',
       client: client
