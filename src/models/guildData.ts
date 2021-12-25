@@ -5,10 +5,36 @@
 import { Schema, Document, model } from 'mongoose';
 const moderationActions = [ 'Ban', 'Block', 'Kick', 'Mute', 'SoftBan', 'Strike', 'Temp Ban', 'Temp Mute' ];
 
+export enum ModerationAction {
+  BAN = 'Ban',
+  BLOCK = 'Block',
+  KICK = 'Kick',
+  MUTE = 'Mute',
+  SOFT_BAN = 'SoftBan',
+  STRIKE = 'Strike',
+  TEMP_BAN = 'Temp Ban',
+  TEMP_MUTE = 'Temp Mute'
+};
+
+export interface TimerDocument {
+  user: string;
+  date: Date;
+};
+
 const timerSchema = new Schema({
   user: String,
   date: Date
 });
+
+export interface ModerationCaseDocument {
+  id: string;
+  user: string;
+  reason: string;
+  moderator: string;
+  isValid: boolean;
+  canEdit: boolean;
+  types: ModerationAction;
+};
 
 const moderationCaseSchema = new Schema({
   id: { type: String, require: true, unique: true },
@@ -20,10 +46,24 @@ const moderationCaseSchema = new Schema({
   type: { type: String, require: true, enum: moderationActions }
 });
 
+export interface StrikePolicyActionDocument {
+  count: number;
+  action: ModerationAction;
+};
+
 const strikePolicyActionSchema = new Schema({
   count: { type: Number, require: true },
   action: { type: String, reqquire: true, enum: moderationActions }
 });
+
+export interface ReactionRoleDocument {
+  messageId: string;
+  multiSelect: boolean;
+  roleData: {
+    roleId: string;
+    name: string;
+  }
+};
 
 const reactionRoleSchema = new Schema({
   messageId: { type: String, require: true, unique: true },
@@ -33,6 +73,59 @@ const reactionRoleSchema = new Schema({
     name: { type: String, require: true }
   }) }
 });
+
+export interface GuildDocument extends Document {
+  id: string;
+  prefix?: string;
+
+  greetingEnabled: boolean;
+  greetingChannel?: string;
+  greetingMessage: string;
+
+  goodbyeEnabled: boolean;
+  goodbyeChannel: string;
+  goodbyeMessage: string;
+
+  joinDmEnabled: boolean;
+  joinDmMessage: string;
+
+  boostMessageEnabled: boolean;
+  boostMessageChannel: string;
+  boostMessage: string;
+
+  logsEnabled: boolean;
+  logChannel: string;
+  logMemberJoin: boolean;
+  logMemberLeave: boolean;
+  logMemberUpdate: boolean;
+  logCommands: boolean;
+  logGuardian: boolean;
+  logMessageEdit: boolean;
+  logMessageDelete: boolean;
+
+  guardianEnabled: boolean;
+  blacklistedWords: Array<string>;
+  guardianWhitelist: Array<string>;
+  antiSpamEnabled: boolean;
+  filterZalgo: boolean;
+  filterLinks: boolean;
+  filterInvites: boolean;
+  filterIps: boolean;
+  filterSelfBots: boolean;
+
+  muteRole: string;
+  unmuteTimers: Array<TimerDocument>;
+  unbanTimers: Array<TimerDocument>;
+  channelUnlockTimers: Array<TimerDocument>;
+  moderationCases: Array<ModerationCaseDocument>;
+  strikePolicy: Array<ModerationCaseActionDocument>;
+
+  reactionRoleEnabled: boolean;
+  reactionRoles: Array<ReactionRoleDocument>
+
+  autoRoleEnabled: boolean;
+  autoRoles: Array<string>;
+};
 
 const guildDataSchema = new Schema({
   id: { type: String, require: true, unique: true },
