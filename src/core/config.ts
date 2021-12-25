@@ -68,7 +68,7 @@ const readElem = (name: string, data: any, spec: string | ElementSpec) => {
   const isString = typeof spec === 'string';
   const type = isString ? spec : spec.type ?? 'string';
   if (!data && !isString) {
-    if (spec.default !== null) return spec.default;
+    if (spec.default !== undefined) return spec.default;
     if (spec.require) throw new Error(`${name} is a required config entry`);
   }
   return elemHandlers[type](data, !isString && spec.of);

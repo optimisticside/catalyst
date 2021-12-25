@@ -4,7 +4,7 @@
 
 import { ApplicationCommandOptionChoice, AutocompleteInteraction, CommandInteraction, Guild, GuildChannel, Interaction, TextChannel } from 'discord.js';
 import { REST } from '@discordjs/rest';
-import { Routes, APIApplicationCommandPermission, ApplicationCommandPermissionType } from 'discord-api-types/v9';
+import { Routes, ApplicationCommandPermissionType } from 'discord-api-types/v9';
 import config from 'core/config';
 import formatter from 'utils/formatter';
 import { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandGroupBuilder } from '@discordjs/builders';
@@ -116,12 +116,12 @@ export default class SlashModule extends Module {
   }
 
   async createPerms(guild: Guild, command: Command) {
-    const perms: Array<APIApplicationCommandPermission> = [];
+    const perms: Array<any> = [];
 
     guild.roles.cache.map(role => {
       const missing = command.userPerms.filter(p => !role.permissions.has(p));
       if (missing !== []) return;
-      perms.push({ id: role.id, type: ApplicationCommandPermissionType.Role, permission: true });
+      perms.push({ id: role.id, type: 'ROLE', permission: true });
     });
 
     guild.members.cache.map(member => {
