@@ -4,10 +4,10 @@
 
 const PATH_DELIM = ':';
 const { Permissions, MessageEmbed, Interaction } = require('discord.js');
-const { alert, success, warning, prompt, neutral, denial } = require('../../util/formatter.js')('Set-Prefix Command');
-const { NAME, DEFAULT_COLOR } = require('../../util/configParser.js');
+const { alert, success, warning, prompt, neutral, denial } = require('../../utils/formatter.js')('Set-Prefix Command');
+const { NAME, DEFAULT_COLOR } = require('../../core/config.js');
 const Command = require('../../structs/command.js');
-const OptionParser = require('../../util/optionParser.js');
+const OptionParser = require('../../utils/optionParser.js');
 const emojiRegex = require('emoji-regex');
 const Serializer = require('../../util/serializer.js');
 const GuildData = require('../../models/guildData.js');
