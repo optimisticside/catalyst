@@ -10,7 +10,8 @@ import {
   MessageComponentInteraction,
   InteractionCollector,
   InteractionReplyOptions,
-  CommandInteraction
+  CommandInteraction,
+  ReplyMessageOptions
 } from 'discord.js';
 import { EventEmitter } from 'events';
 import { v4 as uuidv4 } from 'uuid';
@@ -21,7 +22,7 @@ export type Mounter = (
   component: Component,
   given: MountPoint,
   options?: RenderOptions
-) => Promise<InteractionCollector<MessageComponentInteraction>>;
+) => Promise<InteractionCollector<MessageComponentInteraction> | undefined>;
 
 export type ComponentState = {[key: string]: any};
 export type ComponentProps = {[key: string]: any};
@@ -115,8 +116,8 @@ const genericMounter  = async (component: Component, given: MountPoint, options?
     let reply = previous?.reply;
     if (reply && given instanceof MessageComponentInteraction) {
       await given.update(built);
-    } else if (reply instanceof Message) {
-      reply = await given.reply(built);
+    } else if (given instanceof Message) {
+      reply = await given.reply(built as ReplyMessageOptions);
     }
     component.reply = reply;
     return reply?.createMessageComponentCollector(options);
