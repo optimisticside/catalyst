@@ -65,13 +65,16 @@ const elemHandlers: {[key: string]: ElemHandler} = {
 };
 
 const readElem = (name: string, data: any, spec: string | ElementSpec) => {
+  // Because typescript does not recognize `typeof` to be
+  // type narrowing, we have to use some hacky workarounds.
   const isString = typeof spec === 'string';
-  const type = isString ? spec : spec.type ?? 'string';
+  const asObject = spec as ElementSpec;
+  const type = isString ? spec : asObject.type ?? 'string';
   if (!data && !isString) {
-    if (spec.default !== undefined) return spec.default;
-    if (spec.require) throw new Error(`${name} is a required config entry`);
+    if (asObject.default !== undefined) return spec.default;
+    if (asObject.require) throw new Error(`${name} is a required config entry`);
   }
-  return elemHandlers[type](data, !isString && spec.of);
+  return elemHandlers[type](data, isString ? undefined : asObject.of);
 }
 
 const parseConfig = (env: NodeJS.ProcessEnv, specs: ConfigTemplate): ParsedConfig => {
