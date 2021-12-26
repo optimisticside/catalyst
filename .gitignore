@@ -4,7 +4,8 @@ redis.conf
 redis-stable.tar.gz
 dump.rdb
 src/config.json
-dist
+dist/
+tsconfig.tsbuildinfo
 .tsbuildinfo
 .npm
 .env
