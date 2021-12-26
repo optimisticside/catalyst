@@ -4,13 +4,13 @@
 
 const PATH_DELIM = ':';
 const { Permissions, MessageEmbed, Interaction } = require('discord.js');
-const { alert, success, warning, prompt, neutral, denial } = require('../../utils/formatter.js')('Set-Prefix Command');
-const { NAME, DEFAULT_COLOR } = require('../../core/config.js');
-const Command = require('../../structs/command.js');
-const OptionParser = require('../../utils/optionParser.js');
+const { alert, success, warning, prompt, neutral, denial } = require('utils/formatter.js')('Set-Prefix Command');
+const { NAME, DEFAULT_COLOR } = require('core/config.js');
+const Command = require('structs/command.js');
+const OptionParser = require('utils/optionParser.js');
 const emojiRegex = require('emoji-regex');
-const Serializer = require('../../util/serializer.js');
-const GuildData = require('../../models/guildData.js');
+const Serializer = require('utils/serializer.js');
+const GuildData = require('models/guildData.js');
 const promisify = (fn) => async (...given) => fn(...given);
 
 module.exports = class ConfigCommand extends Command {
