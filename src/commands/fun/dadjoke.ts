@@ -13,7 +13,7 @@ const { neutral } = formatter('Dadjoke Command');
 export default class DadJokeCommand extends Command {
   async run(_client: CatalystClient, given: CommandGiven, _args: CommandArgs) {
     const res = await fetch('https://icanhazdadjoke.com/', { headers: { 'Accept': 'application/json' } });
-    const joke = (await res.json())?.joke;
+    const joke = (await res.json() as any)?.joke;
 
     given.reply(neutral(joke));
   }
