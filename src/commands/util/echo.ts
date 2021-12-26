@@ -2,13 +2,14 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const Command = require('../../structs/command.js');
-const OptionParser = require('../../util/optionParser.js');
+import CatalystClient from 'core/client';
+import Command, { CommandArgs, CommandGiven } from 'structs/command';
+import OptionParser from 'utils/optionParser';
 
-module.exports = class EchoCommand extends Command {
-  async run(client, given, args) {
+export default class EchoCommand extends Command {
+  async run(_client: CatalystClient, given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
-    given.reply(await parser.getOption('message'));
+    given.reply(await parser.getOption('message') as string);
   }
 
   constructor() {
