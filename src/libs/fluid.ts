@@ -123,7 +123,7 @@ const genericMounter  = async (component: Component, given: MountPoint, options?
   }
 }
 
-export const reload = async (oldComponent: Component, newComponent: Component, interaction: MessageComponentInteraction) => {
+export const reload = async (oldComponent: Component, newComponent: Component, interaction?: MessageComponentInteraction) => {
   // The old component is modified first it can also be 
   // the new component.
   oldComponent.alive = false;
@@ -139,8 +139,9 @@ export const reload = async (oldComponent: Component, newComponent: Component, i
   newComponent.alive = true;
 
   if (newComponent.mounter === undefined) return;
-  const mountPoint = oldComponent.mountPoint;
-  const collector = await newComponent.mounter(newComponent, interaction ?? mountPoint);
+  const mountPoint = interaction ?? oldComponent.mountPoint;
+  if (!mountPoint) return;
+  const collector = await newComponent.mounter(newComponent, mountPoint);
   newComponent.collector = collector;
   collector?.on('collect', newComponent.onInteraction.bind(newComponent));
 }

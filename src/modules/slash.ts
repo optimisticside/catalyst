@@ -203,6 +203,7 @@ export default class SlashModule extends Module {
     const commandHandler = this.client.modules.commandHandler as unknown as CommandHandler;
     const command = await this.findCommand(interaction);
     const lastRun = command && await commandHandler.getCooldown(interaction.user, command);
+    const member = await interaction.guild?.members.cache.get(interaction.user.id);
 
     // Command execution requirements:
     // Command must support slash commands.
@@ -230,8 +231,8 @@ export default class SlashModule extends Module {
     if (command.nsfw && (!interaction.guild || !interaction.channel?.nsfw)) {
       return interaction.reply(denial('NSFW commands can only be run in NSFW channels.'));
     }
-    if (interaction.member && !await commandHandler.checkPerms(command.userPerms, interaction.member,
-        interaction.channel instanceof GuildChannel && interaction.channel)) {
+    if (member && !await commandHandler.checkPerms(command.userPerms, member,
+        (interaction.channel instanceof GuildChannel) ? interaction.channel : undefined)) {
       return interaction.reply(denial('You do not have the permissions required by this command.'));
     }
     if (interaction.guild?.me && !await commandHandler.checkPerms(command.botPerms, interaction.guild.me, interaction.channel)) {
