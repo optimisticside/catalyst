@@ -69,9 +69,9 @@ const readElem = (name: string, data: any, spec: string | ElementSpec) => {
   // type narrowing, we have to use some hacky workarounds.
   const isString = typeof spec === 'string';
   const asObject = spec as ElementSpec;
-  const type = isString ? spec : asObject.type ?? 'string';
+  const type = isString ? spec as string : asObject.type ?? 'string';
   if (!data && !isString) {
-    if (asObject.default !== undefined) return spec.default;
+    if (asObject.default !== undefined) return asObject.default;
     if (asObject.require) throw new Error(`${name} is a required config entry`);
   }
   return elemHandlers[type](data, isString ? undefined : asObject.of);
