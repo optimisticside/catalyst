@@ -7,6 +7,7 @@ import { Client, Intents } from 'discord.js';
 import Module from 'structs/module';
 import * as glob from 'glob';
 import * as path from 'path';
+import { resolveFile } from 'utils/file';
 
 const { REST_TIME_OFFSET } = config;
 
@@ -15,14 +16,13 @@ export default class CatalystClient extends Client {
   shardId?: number;
 
   async loadModule(file: string) {
-    const requireAsync = async (f: string) => import(f);
-    const module = await requireAsync(file)
+    const module = await resolveFile<Module>(file, this)
       .catch((err: Error) => {
         const fileName = path.basename(file, path.extname(file));
         console.error(`Unable to load ${fileName} module: ${err}`);
       });
-    const object = new module(this);
-    this.modules[object.name] = object;
+    if (!module) return;
+    this.modules[module.name] = module;
   }
 
   async initModule(module: Module) {
