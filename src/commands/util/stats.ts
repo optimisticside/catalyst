@@ -13,12 +13,26 @@ const GIGA_BYTE = Math.pow(1024, 3);
 const { NAME, DEFAULT_COLOR } = config;
 //const { warning } = formatter('Stats Command');
 
+const fixedDigits = (num: number, count: number) => {
+  let string = num.toString();
+  const current = [ ...string ].filter(c => c !== '.').length;
+  if (current >= count) return string;
+  return '0'.repeat(count - current) + string;
+}
+
+const toHrMinSec = (time: number) => {
+  const seconds = Math.floor((time / 1000) % 60);
+  const minutes = Math.floor((time / 1000 / 60) % 60);
+  const hours = Math.floor((time / 1000 / 60 / 60) % 60);
+  return `${fixedDigits(hours, 2)}:${fixedDigits(minutes, 2)}:${fixedDigits(seconds, 2)}`;
+}
+
 export default class InfoCommand extends Command {
   async run(client: CatalystClient, given: CommandGiven) {
     const memoryUsage = process.memoryUsage();
     const usedMem = Math.round((memoryUsage.heapUsed / GIGA_BYTE) * 1000) / 1000;
     const totalMem = Math.round((memoryUsage.heapTotal / GIGA_BYTE) * 1000) / 1000;
-    const uptime = new Date(process.uptime() * 1000).toISOString().substr(11, 8);
+    const uptime = toHrMinSec(process.uptime() * 1000);
 
     const result = await Promise.all([
       client.shard?.fetchClientValues('guilds.cache.size'),
