@@ -2,20 +2,18 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-const PATH_DELIM = ':';
+Object.defineProperty(exports, "__esModule", { value: true });
 const tslib = require('tslib');
 const { Permissions, MessageEmbed, Interaction } = require('discord.js');
 const formatter = tslib.__importDefault(require('utils/formatter.js')).default;
-const config = tslib.__importDefault(require('core/config.js')).default;
+const { NAME, DEFAULT_COLOR } = tslib.__importDefault(require('core/config.js')).default;
 const Command = tslib.__importDefault(require('structs/command.js')).default;
 const OptionParser = tslib.__importDefault(require('utils/optionParser.js')).default;
 const Serializer = tslib.__importDefault(require('utils/serializer.js')).default;
 const GuildData = tslib.__importDefault(require('models/guildData.js')).default;
 const promisify = (fn) => async (...given) => fn(...given);
-const { NAME, DEFAULT_COLOR } = config;
 const { alert, success, warning, prompt, neutral, denial } = formatter('Config Command');
 
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = class ConfigCommand extends Command {
   awaitCollection(collector) {
     return new Promise((resolve, reject) => {
