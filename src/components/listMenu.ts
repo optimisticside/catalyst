@@ -15,6 +15,7 @@ export interface ListElement {
 
 export interface ListProps {
   header: string;
+  desc?: string;
   body: Array<ListElement>
 };
 
@@ -23,6 +24,7 @@ export default class ListComponent extends Component {
 
   constructor(props: ListProps) {
     super(props);
+    this.state.body = this.props.body;
   }
 
   componentDidUpdate(oldProps: ComponentProps, _oldState: ComponentState) {
@@ -31,15 +33,24 @@ export default class ListComponent extends Component {
     return true;
   }
 
+  addElement(element: ListElement) {
+    const newBody = this.state.body.concat([ element ]);
+    return this.setState({ body: newBody });
+  }
+
   render() {
     const embed = new MessageEmbed()
       .setTitle(this.props.header)
       .setColor(DEFAULT_COLOR as ColorResolvable);
-    
+
+    if (this.props.desc) {
+      embed.setDescription(this.props.desc);
+    }
+
     // We use fields only if we have names and values,
     // Otherwise, we just add it to the description.
     const description: Array<string> = [];
-    this.props.body.map(({ name, desc }) => {
+    this.state.body.map(({ name, desc }) => {
       if (desc) {
         embed.addField(name, desc);
       } else {
@@ -52,7 +63,7 @@ export default class ListComponent extends Component {
 
     // Components will only be added if the body-element
     // has a callback.
-    const components = this.props.body
+    const components = this.state.body
       .filter(c => c.action)
       .map(({ name, action: callback }) => {
         const customId = callback && action(this, callback);
