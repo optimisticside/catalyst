@@ -30,7 +30,7 @@ export default class Logs extends Module {
 
     const username = `${message.author.username}#${message.author.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor(username, message.author.displayAvatarURL())
+      .setAuthor({ name: username, iconURL: message.author.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`Message sent by <@${message.author.id}> deleted in <#${message.channel.id}>\n${message.content}`)
       .setFooter(`ID: ${message.id}`)
@@ -48,7 +48,7 @@ export default class Logs extends Module {
 
     const username = `${last.author.username}#${last.author.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor(username, last.author.displayAvatarURL())
+      .setAuthor({ name: username, iconURL: last.author.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`${messages.size} messages bulk-deleted in <#${last.channel.id}>`)
       .setTimestamp(Date.now());
@@ -68,7 +68,7 @@ export default class Logs extends Module {
     const url = `https://discordapp.com/channels/${newMessage.guild.id}/${newMessage.channel.id}/${newMessage.id}`;
     const username = `${newMessage.author.username}#${newMessage.author.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor(username, newMessage.author.displayAvatarURL())
+      .setAuthor({ name: username, iconURL: newMessage.author.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription( `Message sent by <@${newMessage.author.id}> edited in <#${newMessage.channel.id}> [Jump to message](${url})`)
       .addField('Before', oldMessage.content)
@@ -86,7 +86,7 @@ export default class Logs extends Module {
 
     const username = `${member.user.username}#${member.user.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor(username, member.user.displayAvatarURL())
+      .setAuthor({ name: username, iconURL: member.user.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`<@${member.user.id}> joined the server`)
       .setFooter(`ID: ${member.user.id}`)
@@ -105,7 +105,7 @@ export default class Logs extends Module {
 
     const username = `${user.username}#${user.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor(username, user.displayAvatarURL())
+      .setAuthor({ name: username, iconURL: user.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`<@${user.id}> left the server`)
       .setFooter(`ID: ${user.id}`)
@@ -122,7 +122,7 @@ export default class Logs extends Module {
     const username = `${newMember.user.username}#${newMember.user.discriminator}`;
     if (oldMember.nickname != newMember.nickname) {
       const embed = new MessageEmbed()
-        .setAuthor(username, newMember.user.displayAvatarURL())
+        .setAuthor({ name: username, iconURL: newMember.user.displayAvatarURL() })
         .setColor(DEFAULT_COLOR as ColorResolvable)
         .setDescription(`<@${newMember.user.id}> nickname changed`)
         .addField('Before', oldMember.nickname ?? oldMember.user.username)
@@ -135,7 +135,7 @@ export default class Logs extends Module {
     oldMember.roles.cache.forEach(role => {
       if (newMember.roles.cache.has(role.id)) return;
       const embed = new MessageEmbed()
-        .setAuthor(username, newMember.user.displayAvatarURL())
+        .setAuthor({ name: username, iconURL: newMember.user.displayAvatarURL() })
         .setColor(DEFAULT_COLOR as ColorResolvable)
         .setDescription(`<@${newMember.user.id}> was removed from the \`${role.name}\` role`)
         .setFooter(`Author ID: ${newMember.user.id} | Role ID: ${role.id}`)
@@ -146,7 +146,7 @@ export default class Logs extends Module {
     newMember.roles.cache.forEach(role => {
       if (oldMember.roles.cache.has(role.id)) return;
       const embed = new MessageEmbed()
-        .setAuthor(username, newMember.user.displayAvatarURL())
+        .setAuthor({ name: username, iconURL: newMember.user.displayAvatarURL() })
         .setColor(DEFAULT_COLOR as ColorResolvable)
         .setDescription(`<@${newMember.user.id}> was given the \`${role.name}\` role`)
         .setFooter(`Author ID: ${newMember.user.id} | Role ID: ${role.id}`)
@@ -167,7 +167,7 @@ export default class Logs extends Module {
 
     const username = `${message.author.username}#${message.author.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor(username, message.author.displayAvatarURL())
+      .setAuthor({ name: username, iconURL: message.author.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`Used ${command.name} command in <#${message.channel.id}>\n${message.content}`)
       .setFooter(`Author ID: ${message.author.id} | Message ID: ${message.id}`)
@@ -222,7 +222,7 @@ export default class Logs extends Module {
 
     const username = `${interaction.user.username}#${interaction.user.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor(username, interaction.user.displayAvatarURL())
+      .setAuthor({ name: username, iconURL: interaction.user.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`Used ${command.name} slash command in <#${interaction.channel?.id}>\n${message}`)
       .setFooter(`ID: ${interaction.user.id}`)
@@ -239,7 +239,7 @@ export default class Logs extends Module {
 
     const username = `${message.author.username}#${message.author.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor(username, message.author.displayAvatarURL())
+      .setAuthor({ name: username, iconURL: message.author.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`Guardian deleted a message sent by <@${message.author.id}> in <#${message.channel.id}>`)
       .addField('Reason', reason)
@@ -258,7 +258,7 @@ export default class Logs extends Module {
 
     const username = `${last.author.username}#${last.author.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor(username, last.author.displayAvatarURL())
+      .setAuthor({ name: username, iconURL: last.author.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`Guardian bulk-deleted ${messages.size} sent by <@${last.author.id}> in <#${last.channel.id}>`)
       .addField('Reason', reason)
