@@ -3,17 +3,20 @@
 // See LICENSE for details
 
 const PATH_DELIM = ':';
+const tslib = require('tslib');
 const { Permissions, MessageEmbed, Interaction } = require('discord.js');
-const { alert, success, warning, prompt, neutral, denial } = require('utils/formatter.js')('Set-Prefix Command');
-const { NAME, DEFAULT_COLOR } = require('core/config.js');
-const Command = require('structs/command.js');
-const OptionParser = require('utils/optionParser.js');
-const emojiRegex = require('emoji-regex');
-const Serializer = require('utils/serializer.js');
-const GuildData = require('models/guildData.js');
+const formatter = tslib.__importDefault(require('utils/formatter.js')).default;
+const config = tslib.__importDefault(require('core/config.js')).default;
+const Command = tslib.__importDefault(require('structs/command.js')).default;
+const OptionParser = tslib.__importDefault(require('utils/optionParser.js')).default;
+const Serializer = tslib.__importDefault(require('utils/serializer.js')).default;
+const GuildData = tslib.__importDefault(require('models/guildData.js')).default;
 const promisify = (fn) => async (...given) => fn(...given);
+const { NAME, DEFAULT_COLOR } = config;
+const { alert, success, warning, prompt, neutral, denial } = formatter('Config Command');
 
-module.exports = class ConfigCommand extends Command {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = class ConfigCommand extends Command {
   awaitCollection(collector) {
     return new Promise((resolve, reject) => {
       collector.on('collect', resolve);
