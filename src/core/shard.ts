@@ -9,6 +9,15 @@ import CatalystClient from './client';
 const { SHARD_LIFETIME, TOKEN } = config;
 
 const client = new CatalystClient(TOKEN);
+const updateStatus = () => {
+  client.user?.setActivity(`${client.guilds.cache.size} servers`, { type: 'WATCHING' });
+}
+
+client.on('ready', async () => {
+  updateStatus();
+  setInterval(updateStatus, 5000);
+})
+
 process.on('message', async (message: any) => {
   if (message.type !== 'shardId') return;
   client.shardId = message.data.shardId;
