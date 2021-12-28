@@ -168,8 +168,8 @@ export default class Guardian extends Module {
       selfBot: 'Flagged as self-bot.'
     };
 
-    const basePressure = 2.5;
-    const maxPressure = 10;
+    const basePressure = 10;
+    const maxPressure = 60;
     const pressureRange = maxPressure - basePressure;
     this.antispam = {
       pressureDecay: 2.5,
