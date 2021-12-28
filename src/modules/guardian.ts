@@ -172,11 +172,11 @@ export default class Guardian extends Module {
     const maxPressure = 60;
     const pressureRange = maxPressure - basePressure;
     this.antispam = {
-      pressureDecay: 2.5,
-      basePressure: 10,
-      maxPressure: 60,
-      notifyInterval: 7500,
+      basePressure,
+      maxPressure,
       pressureRange,
+      pressureDecay: 2.5,
+      notifyInterval: 7500,
       imagePressure: pressureRange / 6,
       lengthPressure: pressureRange / 8000,
       linePressure: pressureRange / 70,
