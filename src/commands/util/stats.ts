@@ -4,14 +4,12 @@
 
 import { ColorResolvable, MessageEmbed, Permissions } from 'discord.js';
 import Command, { CommandGiven } from 'structs/command';
-//import formatter from 'utils/formatter';
 import config from 'core/config';
 import * as process from 'process';
 import CatalystClient from 'core/client';
 
 const GIGA_BYTE = Math.pow(1024, 3);
 const { NAME, DEFAULT_COLOR } = config;
-//const { warning } = formatter('Stats Command');
 
 const fixedDigits = (num: number, count: number) => {
   let string = num.toString();
@@ -27,7 +25,7 @@ const toHrMinSec = (time: number) => {
   return `${fixedDigits(hours, 2)}:${fixedDigits(minutes, 2)}:${fixedDigits(seconds, 2)}`;
 }
 
-export default class InfoCommand extends Command {
+export default class StatsCommand extends Command {
   async run(client: CatalystClient, given: CommandGiven) {
     const memoryUsage = process.memoryUsage();
     const usedMem = Math.round((memoryUsage.heapUsed / GIGA_BYTE) * 1000) / 1000;
