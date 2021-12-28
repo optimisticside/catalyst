@@ -9,6 +9,8 @@ const { DEFAULT_COLOR } = config;
 
 export interface ListElement {
   name: string;
+  buttonName?: string;
+  emoji?: string;
   desc?: string;
   action?: ActionCallback;
 };
@@ -19,8 +21,13 @@ export interface ListProps {
   body: Array<ListElement>
 };
 
+export interface ListState {
+  body: Array<ListElement>;
+};
+
 export default class ListComponent extends Component {
   declare props: ListProps;
+  declare state: ListState;
 
   constructor(props: ListProps) {
     super(props);
@@ -63,33 +70,38 @@ export default class ListComponent extends Component {
 
     // Components will only be added if the body-element
     // has a callback.
-    const components = this.state.body
+    const buttons = this.state.body
       .filter(c => c.action)
-      .map(({ name, action: callback }) => {
+      .map(({ buttonName, name, action: callback }) => {
         const customId = callback && action(this, callback);
         if (!customId) return;
         return new MessageButton({
-          label: name,
+          label: buttonName ?? name,
           style: 'SECONDARY',
           customId
         });
       })
-      .filter(mb => mb !== undefined) as Array<MessageButton>;
+      .filter(mb => mb) as Array<MessageButton>;
 
     // We cannot exceed the limit of buttons, which is 5.
     // TODO: This should be a constant.
     const backRedirect = this.previous && redirect(this, this.previous);
-    if (backRedirect && components.length < 5) {
-      components.push(new MessageButton({
+    if (backRedirect && buttons.length < 5) {
+      buttons.push(new MessageButton({
         label: 'Back',
         style: 'DANGER',
         customId: backRedirect
       }));
     }
 
+    const components: Array<MessageActionRow> = [];
+    if (buttons.length > 0) {
+      components.push(new MessageActionRow().addComponents(buttons));
+    }
+
     return {
       embeds: [ embed ],
-      components: [ new MessageActionRow().addComponents(components) ]
+      components
     }
   }
 }
