@@ -176,7 +176,7 @@ export default class Guardian extends Module {
       basePressure: 10,
       maxPressure: 60,
       notifyInterval: 7500,
-      pressureRange: maxPressure - basePressure,
+      pressureRange,
       imagePressure: pressureRange / 6,
       lengthPressure: pressureRange / 8000,
       linePressure: pressureRange / 70,
