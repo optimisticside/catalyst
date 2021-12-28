@@ -38,7 +38,7 @@ export default class HelpMenuComponent extends Component {
       }),
     });
 
-    const commandsRedirect = redirect(this, commandsList);
+    const commandsRedirect = redirect(this, commandsList as Component);
     if (!commandsRedirect) throw new Error('Invalid redirect');
 
     return {
