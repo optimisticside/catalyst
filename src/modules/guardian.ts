@@ -97,7 +97,6 @@ export default class Guardian extends Module {
          + this.antispam.pingPressure * [ ...content.matchAll(/<@!?&?(\d+)>/g) ].length;
 
         tracker.last = createdAt;
-        console.log(tracker.pressure)
         const tolerance = this.antispam.basePressure + this.antispam.toleranceEpsilon;
         if (tracker.pressure > tolerance && lastPressure <= tolerance) {
           tracker.start = tracker.last;
