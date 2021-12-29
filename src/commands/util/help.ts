@@ -18,7 +18,7 @@ const { warning } = formatter('Help Command');
 
 export default class HelpCommand extends Command {
   async argumentHelp(_client: CatalystClient,
-    given: CommandGiven, _parser: OptionParser, command: Command, argumentName: string) {
+    given: CommandGiven, command: Command, argumentName: string) {
     const option = command.options.find(o => o.name === argumentName);
     if (!option) {
       return given.reply(warning('Unable to find argument.'));
@@ -42,7 +42,7 @@ export default class HelpCommand extends Command {
 
     const argumentName = await parser.getOption('argument');
     if (argumentName) {
-      return await this.argumentHelp(client, given, parser, command, argumentName);
+      return await this.argumentHelp(client, given, command, argumentName);
     }
     
     const argumentInfo: Array<string> = [];
