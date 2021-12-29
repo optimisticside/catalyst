@@ -184,7 +184,6 @@ export default class Guardian extends Module {
       lengthPressure: pressureRange / 8000,
       linePressure: pressureRange / 70,
       pingPressure: pressureRange / 20,
-    };
-    
+    }; 
   }
 };
