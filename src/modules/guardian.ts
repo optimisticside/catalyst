@@ -23,6 +23,7 @@ interface AntispamConfig {
   basePressure: number;
   maxPressure: number;
   pressureRange: number;
+  toleranceEpsilon: number;
   lengthPressure: number;
   imagePressure: number;
   linePressure: number;
@@ -96,7 +97,9 @@ export default class Guardian extends Module {
          + this.antispam.pingPressure * [ ...content.matchAll(/<@!?&?(\d+)>/g) ].length;
 
         tracker.last = createdAt;
-        if (tracker.pressure > this.antispam.basePressure && lastPressure <= this.antispam.basePressure) {
+        console.log(tracker.pressure)
+        const tolerance = this.antispam.basePressure + this.antispam.toleranceEpsilon;
+        if (tracker.pressure > tolerance && lastPressure <= tolerance) {
           tracker.start = tracker.last;
         }
         if (tracker.pressure > this.antispam.maxPressure) {
@@ -177,6 +180,7 @@ export default class Guardian extends Module {
       pressureRange,
       pressureDecay: 2.5,
       notifyInterval: 7500,
+      toleranceEpsilon: basePressure + (pressureRange * 0.175),
       imagePressure: pressureRange / 6,
       lengthPressure: pressureRange / 8000,
       linePressure: pressureRange / 70,
