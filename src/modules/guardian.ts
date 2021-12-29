@@ -84,7 +84,7 @@ export default class Guardian extends Module {
     if (config.antiSpamEnabled) {
       const tracker = this.messageTrackers.get(message.author.id);
       if (tracker !== undefined) {
-        const wasZero = tracker.pressure === 0;
+        const lastPressure = tracker.pressure;
         tracker.pressure -= this.antispam.basePressure
          * (createdAt - tracker.last) / (this.antispam.pressureDecay * 1000);
         tracker.pressure = Math.max(tracker.pressure, 0)
@@ -96,7 +96,7 @@ export default class Guardian extends Module {
          + this.antispam.pingPressure * [ ...content.matchAll(/<@!?&?(\d+)>/g) ].length;
 
         tracker.last = createdAt;
-        if (tracker.pressure !== 0 && wasZero) {
+        if (tracker.pressure > this.antispam.basePressure && lastPressure <= this.antispam.basePressure) {
           tracker.start = tracker.last;
         }
         if (tracker.pressure > this.antispam.maxPressure) {
@@ -110,7 +110,7 @@ export default class Guardian extends Module {
           message.channel.messages?.fetch({ limit: 20 }).then(messages => {
             if (tracker.start === undefined || !channel.bulkDelete) return;
             messages = messages.filter(m =>
-              tracker.start !== undefined && m.author === message.author && createdAt > tracker.start);
+              tracker.start !== undefined && m.author === message.author && m.createdTimestamp > tracker.start);
               //.map(m => m.delete().catch(console.error));
             channel.bulkDelete(messages)
               .then(() => this.emit('messageBulkDelete', messages, this.reasons.spam))
