@@ -59,7 +59,7 @@ export default class Guardian extends Module {
 
     const content = message.content;
     const channel = message.channel;
-    const createdAt = message.createdAt.getTime();
+    const createdAt = message.createdTimestamp;
     const config = await GuildData.findOne({ id: message.guild.id })
       ?? await GuildData.create({ id: message.guild.id });
     if (!config.guardianEnabled || !(channel instanceof TextChannel)) return;
