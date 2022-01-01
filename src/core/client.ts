@@ -5,7 +5,7 @@
 import config from 'core/config';
 import { Client, Intents } from 'discord.js';
 import Module from 'structs/module';
-import * as glob from 'glob';
+import glob from 'glob-promise';
 import * as path from 'path';
 import { resolveFile } from 'utils/file';
 
@@ -45,7 +45,7 @@ export default class CatalystClient extends Client {
     });
 
     (async () => {
-      let moduleFiles = glob.sync(path.join(__dirname + '/../../dist/modules/**/*.js'));
+      let moduleFiles = await glob(path.join(__dirname + '/../modules/**/*.js'));
       await Promise.all(moduleFiles.map(this.loadModule.bind(this)));
       const moduleArray = Object.entries(this.modules).map(([ _, module ]) => module);
       await Promise.all(moduleArray.map(this.initModule.bind(this)));
