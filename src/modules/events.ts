@@ -5,7 +5,7 @@
 import Module from 'structs/module';
 import { resolveFile } from 'utils/file';
 import * as path from 'path';
-import * as glob from 'glob';
+import glob from 'glob-promise';
 import CatalystClient from 'core/client';
 
 export type EventCallback = (...args: any[]) => void | Promise<void>;
@@ -26,12 +26,14 @@ export default class Events extends Module {
   }
 
   load() {
-    let files = glob.sync(path.join(__dirname, '../events/**/*.js'));
-    files.map(async (file: string) => {
-      const handler = await resolveFile<EventHandler>(file);
-      if (!handler) return;
-      this.registerHandler(handler);
-    });
+    glob(path.join(__dirname, '../events/**/*.js'))
+      .then(files => {
+        files.map(async (file: string) => {
+          const handler = await resolveFile<EventHandler>(file);
+          if (!handler) return;
+          this.registerHandler(handler);
+        });
+      });
   }
 
   constructor(client: CatalystClient) {

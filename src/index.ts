@@ -5,7 +5,7 @@
 import 'module-alias/register';
 import config from 'core/config';
 import { ShardingManager, Shard } from 'discord.js';
-import * as glob from 'glob';
+import glob from 'glob-promise';
 import * as path from 'path';
 import { resolveFile } from 'utils/file';
 
@@ -37,8 +37,8 @@ if (LIFETIME) {
   }, LIFETIME * 1000);
 }
 
-const serviceFiles = glob.sync(path.join(__dirname, 'services/**/*.js'));
 (async () => {
+  const serviceFiles = await glob(path.join(__dirname, 'services/**/*.js'));
   await Promise.all(serviceFiles.map(async file => {
     const fileName = path.basename(file, path.extname(file));
     const result = await resolveFile<Service>(file).catch(err => {

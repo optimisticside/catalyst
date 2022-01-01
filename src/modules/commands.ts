@@ -11,7 +11,7 @@ import { CommandGroup, SubCommandGroup } from 'structs/group';
 import Serializer from 'utils/serializer';
 import GuildData from 'models/guildData';
 import UserData from 'models/userData';
-import * as glob from 'glob';
+import glob from 'glob-promise';
 import * as path from 'path';
 import CatalystClient from 'core/client';
 import { resolveFile } from 'utils/file';
@@ -306,7 +306,7 @@ export default class CommandHandler extends Module {
   }
 
   async loadCommands() {
-    const files = glob.sync(path.join(__dirname, '/../commands/**/*.js'));
+    const files = await glob(path.join(__dirname, '/../commands/**/*.js'));
     await Promise.all(files.map(this.loadCommand.bind(this)));
     console.log('Commands loaded');
     this.emit('commandsLoad');
