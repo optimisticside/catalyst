@@ -5,7 +5,7 @@
 import formatter from 'utils/formatter';
 import { Message, Snowflake, TextChannel } from 'discord.js';
 import Module from 'structs/module';
-import GuildData from 'models/guildData';
+import GuildData, { GuildDocument } from 'models/guildData';
 import { setTimeout as wait } from 'timers/promises';
 import CatalystClient from 'core/client';
 
@@ -62,7 +62,7 @@ export default class Guardian extends Module {
     const content = message.content;
     const channel = message.channel;
     const createdAt = message.createdTimestamp;
-    const config =
+    const config: GuildDocument =
       (await GuildData.findOne({ id: message.guild.id })) ??
       (await GuildData.create({ id: message.guild.id }));
     if (!config.guardianEnabled || !(channel instanceof TextChannel)) return;
@@ -83,8 +83,8 @@ export default class Guardian extends Module {
     const isBlacklisted = config.blacklistedWords?.find(w => content.includes(w));
 
     //if (message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) return;
-    if (config.whitelist?.find(id => message.author.id === id)) return;
-    if (config.ignoredChannels?.find(c => channel.name === c)) return;
+    if (config.guardianWhitelist?.find(id => message.author.id === id)) return;
+    //if (config.ignoredChannels?.find(c => channel.name === c)) return;
 
     if (config.antiSpamEnabled) {
       const tracker = this.messageTrackers.get(message.author.id);
@@ -140,7 +140,7 @@ export default class Guardian extends Module {
 
     // TODO: Ban user instead of deleting when detecting self-bot.
     // if (config.filterSelfBots && hasEmbeds) await this.delete(message, 'selfBot');
-    if (config.blockDuplicates && hasDuplicates) await this.delete(message, 'duplicate');
+    if (config.filterDuplicates && hasDuplicates) await this.delete(message, 'duplicate');
     if (config.filterZalgo && hasZalgo) await this.delete(message, 'zalgo');
     if (config.filterInvites && hasInvite) await this.delete(message, 'invite');
     if (config.filterLinks && hasLink) await this.delete(message, 'link');

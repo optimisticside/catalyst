@@ -5,7 +5,7 @@
 import config from 'core/config';
 import { MessageEmbed, Permissions, ColorResolvable } from 'discord.js';
 import formatter from 'utils/formatter';
-import GuildData from 'models/guildData';
+import GuildData, { GuildDocument } from 'models/guildData';
 import OptionParser from 'utils/optionParser';
 import Command, { CommandArgs, CommandGiven } from 'structs/command';
 import * as Fluid from 'libs/fluid';
@@ -86,7 +86,7 @@ export default class HelpCommand extends Command {
       return given.reply(warning('No command provided.'));
     }
 
-    const config =
+    const config: GuildDocument =
       (await GuildData.findOne({ id: given.guild?.id })) ??
       (await GuildData.create({ id: given.guild?.id }));
     const prefix = config.prefix ?? PREFIX;
