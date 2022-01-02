@@ -4,12 +4,7 @@
 
 import config from 'core/config';
 import CatalystClient from 'core/client';
-import {
-  ApplicationCommandOptionChoice,
-  AutocompleteInteraction,
-  CommandInteraction,
-  Message
-} from 'discord.js';
+import { ApplicationCommandOptionChoice, AutocompleteInteraction, CommandInteraction, Message } from 'discord.js';
 const { DEFAULT_COOLDOWN } = config;
 
 export type CommandGiven = CommandInteraction | Message;
@@ -25,9 +20,7 @@ export interface CommandOption {
   choices?: Array<ApplicationCommandOptionChoice>;
   minimum?: any;
   maximum?: any;
-  autoComplete?: (
-    current: AutocompleteInteraction
-  ) => Promise<Array<ApplicationCommandOptionChoice>>;
+  autoComplete?: (current: AutocompleteInteraction) => Promise<Array<ApplicationCommandOptionChoice>>;
 }
 
 export interface CommandInfo {

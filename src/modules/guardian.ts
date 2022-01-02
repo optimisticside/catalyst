@@ -38,12 +38,10 @@ export default class Guardian extends Module {
   antispam: AntispamConfig;
 
   async notify(message: Message, reason: string) {
-    await message
-      .reply(warning(this.messages[reason] ?? 'Your message(s) were blocked.'))
-      .then(reply => {
-        // We do not want to yield the `notify` function.
-        wait(5000).then(() => reply.delete().catch(console.error));
-      });
+    await message.reply(warning(this.messages[reason] ?? 'Your message(s) were blocked.')).then(reply => {
+      // We do not want to yield the `notify` function.
+      wait(5000).then(() => reply.delete().catch(console.error));
+    });
   }
 
   async delete(message: Message, reason: string) {
@@ -63,8 +61,7 @@ export default class Guardian extends Module {
     const channel = message.channel;
     const createdAt = message.createdTimestamp;
     const config: GuildDocument =
-      (await GuildData.findOne({ id: message.guild.id })) ??
-      (await GuildData.create({ id: message.guild.id }));
+      (await GuildData.findOne({ id: message.guild.id })) ?? (await GuildData.create({ id: message.guild.id }));
     if (!config.guardianEnabled || !(channel instanceof TextChannel)) return;
 
     // Anti spam pressure values.
@@ -75,9 +72,7 @@ export default class Guardian extends Module {
     const hasDuplicates = /^(.+)(?: +\1){3}/.test(content);
     const hasZalgo = /%CC%/g.test(encodeURIComponent(content));
     const hasInvite = content.includes('discord.gg/') || content.includes('discordapp.com/invite/');
-    const hasLink = /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/.test(
-      content
-    );
+    const hasLink = /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/.test(content);
     const hasIp = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$/.test(content);
     //const hasEmbeds = message.embeds.length > 0;
     const isBlacklisted = config.blacklistedWords?.find(w => content.includes(w));
@@ -91,8 +86,7 @@ export default class Guardian extends Module {
       if (tracker !== undefined) {
         const lastPressure = tracker.pressure;
         tracker.pressure -=
-          (this.antispam.basePressure * (createdAt - tracker.last)) /
-          (this.antispam.pressureDecay * 1000);
+          (this.antispam.basePressure * (createdAt - tracker.last)) / (this.antispam.pressureDecay * 1000);
         tracker.pressure =
           Math.max(tracker.pressure, 0) +
           this.antispam.basePressure +
@@ -118,10 +112,7 @@ export default class Guardian extends Module {
           message.channel.messages?.fetch({ limit: 20 }).then(messages => {
             if (tracker.start === undefined || !channel.bulkDelete) return;
             messages = messages.filter(
-              m =>
-                tracker.start !== undefined &&
-                m.author === message.author &&
-                m.createdTimestamp > tracker.start
+              m => tracker.start !== undefined && m.author === message.author && m.createdTimestamp > tracker.start
             );
             //.map(m => m.delete().catch(console.error));
             channel

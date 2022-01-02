@@ -6,12 +6,7 @@ import config from 'core/config';
 import formatter from 'utils/formatter';
 import { Permissions, Message, User, GuildMember, TextChannel } from 'discord.js';
 import Module from 'structs/module.js';
-import Command, {
-  CommandArgs,
-  CommandGiven,
-  CommandOption,
-  CommandValidator
-} from 'structs/command';
+import Command, { CommandArgs, CommandGiven, CommandOption, CommandValidator } from 'structs/command';
 import { CommandGroup, SubCommandGroup } from 'structs/group';
 import Serializer from 'utils/serializer';
 import GuildData from 'models/guildData';
@@ -96,19 +91,15 @@ export default class CommandHandler extends Module {
         if (option.choices) return this.handleArgChoices(option, given);
         const int = parseInt(given);
         if (isNaN(int)) throw 'Invalid integer';
-        if (option.minimum && int < (option.minimum as number))
-          throw new RangeError('Below minimum');
-        if (option.maximum && int > (option.maximum as number))
-          throw new RangeError('Below minimum');
+        if (option.minimum && int < (option.minimum as number)) throw new RangeError('Below minimum');
+        if (option.maximum && int > (option.maximum as number)) throw new RangeError('Below minimum');
         return int;
       }
       case 'number': {
         const float = parseFloat(given);
         if (isNaN(float)) throw 'Invalid number';
-        if (option.minimum && float < (option.minimum as number))
-          throw new RangeError('Below minimum');
-        if (option.maximum && float > (option.minimum as number))
-          throw new RangeError('Below minimum');
+        if (option.minimum && float < (option.minimum as number)) throw new RangeError('Below minimum');
+        if (option.maximum && float > (option.minimum as number)) throw new RangeError('Below minimum');
         return float;
       }
       case 'boolean':
@@ -140,18 +131,16 @@ export default class CommandHandler extends Module {
 
   promptArg(message: Message, option: CommandOption): Promise<string> {
     return new Promise((resolve, reject) => {
-      message.channel
-        .send(prompt(option.prompt ?? `Enter ${option.name} (${option.type}):`))
-        .then((reply: Message) => {
-          const filter = (m: Message) => m.author === message.author;
-          const collector = message.channel.createMessageCollector({
-            filter,
-            max: 1,
-            time: 60000
-          });
-          collector.on('collect', m => resolve(m.content));
-          collector.on('end', () => reject(reply));
+      message.channel.send(prompt(option.prompt ?? `Enter ${option.name} (${option.type}):`)).then((reply: Message) => {
+        const filter = (m: Message) => m.author === message.author;
+        const collector = message.channel.createMessageCollector({
+          filter,
+          max: 1,
+          time: 60000
         });
+        collector.on('collect', m => resolve(m.content));
+        collector.on('end', () => reject(reply));
+      });
     });
   }
 
@@ -211,8 +200,7 @@ export default class CommandHandler extends Module {
     // If the cooldown is longer than a certain threshold,
     // we will store it in MongoDB in case we have to restart.
     if (command.cooldown > COOLDOWN_PERSISTANCE_THRESHOLD) {
-      const userData =
-        (await UserData.findOne({ id: user.id })) ?? (await UserData.create({ id: user.id }));
+      const userData = (await UserData.findOne({ id: user.id })) ?? (await UserData.create({ id: user.id }));
       const current =
         userData.cooldowns.find(cl => cl.command === command.name) ??
         userData.cooldowns.push({ command: command.name });
@@ -236,8 +224,7 @@ export default class CommandHandler extends Module {
       return;
     }
 
-    const userData =
-      (await UserData.findOne({ id: user.id })) ?? (await UserData.create({ id: user.id }));
+    const userData = (await UserData.findOne({ id: user.id })) ?? (await UserData.create({ id: user.id }));
     userData.cooldowns.filter(cl => cl.command === command.name);
     userData.markModified('cooldowns');
     await userData.save();
@@ -278,16 +265,10 @@ export default class CommandHandler extends Module {
     if (command.nsfw && (!message.guild || !message.channel.nsfw)) {
       return message.reply(denial('NSFW commands can only be run in NSFW channels.'));
     }
-    if (
-      message.member &&
-      !(await this.checkPerms(command.userPerms, message.member, message.channel))
-    ) {
+    if (message.member && !(await this.checkPerms(command.userPerms, message.member, message.channel))) {
       return message.reply(denial('You do not have the permissions required by this command.'));
     }
-    if (
-      message.guild?.me &&
-      !(await this.checkPerms(command.botPerms, message.guild.me, message.channel))
-    ) {
+    if (message.guild?.me && !(await this.checkPerms(command.botPerms, message.guild.me, message.channel))) {
       return message.reply(denial('I do not have the permissions required to run this command.'));
     }
     if (lastRun) {
@@ -295,11 +276,7 @@ export default class CommandHandler extends Module {
       if (deltaTime <= command.cooldown) {
         const timeLeft = command.cooldown - deltaTime;
         return message.reply(
-          denial(
-            `You're on cooldown. Please wait ${Math.ceil(
-              timeLeft / 1000
-            )} seconds before trying again.`
-          )
+          denial(`You're on cooldown. Please wait ${Math.ceil(timeLeft / 1000)} seconds before trying again.`)
         );
       } else {
         this.clearCooldown(message.author, command);
@@ -351,15 +328,12 @@ export default class CommandHandler extends Module {
     let config, guildPrefix;
     if (message.guild) {
       config =
-        (await GuildData.findOne({ id: message.guild.id })) ??
-        (await GuildData.create({ id: message.guild.id }));
+        (await GuildData.findOne({ id: message.guild.id })) ?? (await GuildData.create({ id: message.guild.id }));
       guildPrefix = config.prefix;
     }
 
     if (!this.client.user) return;
-    const prefixes = [`<@${this.client.user.id}>`, `<@!${this.client.user.id}>`].concat(
-      guildPrefix ?? PREFIX
-    );
+    const prefixes = [`<@${this.client.user.id}>`, `<@!${this.client.user.id}>`].concat(guildPrefix ?? PREFIX);
     const prefix = prefixes.find(p => content.startsWith(p));
     if (!prefix) return;
     content = content.slice(prefix.length);

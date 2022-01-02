@@ -16,9 +16,7 @@ export default class StatcordService extends Service {
     const updateStats = async () => {
       const result = (await Promise.all([
         shardingManager.fetchClientValues('guilds.cache.size'),
-        shardingManager.broadcastEval(c =>
-          c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0)
-        )
+        shardingManager.broadcastEval(c => c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0))
       ])) as Array<Array<number>>;
       const servers = result[0].reduce((acc, count) => acc + count, 0);
       const users = result[1].reduce((acc, count) => acc + count, 0);

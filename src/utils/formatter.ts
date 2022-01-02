@@ -5,8 +5,7 @@
 import { ColorResolvable, MessageEmbed, MessageOptions } from 'discord.js';
 import config from 'core/config';
 
-const { DEFAULT_COLOR, SUCCESS_COLOR, ALERT_COLOR, WARNING_COLOR, PROMPT_COLOR, DENIAL_COLOR } =
-  config;
+const { DEFAULT_COLOR, SUCCESS_COLOR, ALERT_COLOR, WARNING_COLOR, PROMPT_COLOR, DENIAL_COLOR } = config;
 const DEFAULT_FORMATTER = 'plain';
 
 type Formatter = (message: string, type?: string) => MessageOptions | string;
