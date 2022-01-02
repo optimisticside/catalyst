@@ -56,7 +56,7 @@ export default class HelpCommand extends Command {
 
     const argumentInfo: Array<string> = [];
     let usage = `${PREFIX}${command.name}`;
-    for (let option of command.options) {
+    for (const option of command.options) {
       argumentInfo.push(`**${option.name}${option.required ? '\\*' : ''}**  ${option.desc}`);
       usage = usage.concat(` <${option.name}>`);
     }

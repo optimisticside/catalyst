@@ -12,7 +12,7 @@ const GIGA_BYTE = Math.pow(1024, 3);
 const { NAME, DEFAULT_COLOR } = config;
 
 const fixedDigits = (num: number, count: number) => {
-  let string = num.toString();
+  const string = num.toString();
   const current = [...string].filter(c => c !== '.').length;
   if (current >= count) return string;
   return '0'.repeat(count - current) + string;

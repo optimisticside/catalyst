@@ -14,7 +14,7 @@ interface ModuleOptions {
 
 export default class Module extends EventEmitter {
   name: string;
-  desc: string = 'No description';
+  desc = 'No description';
   authors: Array<string> = [];
   client: CatalystClient;
 
