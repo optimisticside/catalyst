@@ -14,13 +14,15 @@ export default class StatcordService extends Service {
     if (!STATCORD_TOKEN) return;
 
     const updateStats = async () => {
-      const result = await Promise.all([
+      const result = (await Promise.all([
         shardingManager.fetchClientValues('guilds.cache.size'),
-        shardingManager.broadcastEval(c => c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0))
-      ]) as Array<Array<number>>;
+        shardingManager.broadcastEval(c =>
+          c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0)
+        )
+      ])) as Array<Array<number>>;
       const servers = result[0].reduce((acc, count) => acc + count, 0);
       const users = result[1].reduce((acc, count) => acc + count, 0);
-    
+
       return await fetch(API_URL, {
         method: 'POST',
         body: JSON.stringify({

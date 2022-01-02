@@ -12,15 +12,14 @@ import { resolveFile } from 'utils/file';
 const { REST_TIME_OFFSET } = config;
 
 export default class CatalystClient extends Client {
-  modules: {[key: string]: Module} = {};
+  modules: { [key: string]: Module } = {};
   shardId?: number;
 
   async loadModule(file: string) {
-    const module = await resolveFile<Module>(file, this)
-      .catch((err: Error) => {
-        const fileName = path.basename(file, path.extname(file));
-        console.error(`Unable to load ${fileName} module: ${err}`);
-      });
+    const module = await resolveFile<Module>(file, this).catch((err: Error) => {
+      const fileName = path.basename(file, path.extname(file));
+      console.error(`Unable to load ${fileName} module: ${err}`);
+    });
     if (!module) return;
     this.modules[module.name] = module;
   }
@@ -40,18 +39,18 @@ export default class CatalystClient extends Client {
         Intents.FLAGS.GUILD_INVITES,
         Intents.FLAGS.GUILD_MEMBERS
       ],
-      partials: [ 'GUILD_MEMBER', 'REACTION' ],
+      partials: ['GUILD_MEMBER', 'REACTION'],
       restTimeOffset: REST_TIME_OFFSET ?? 500
     });
 
     (async () => {
       let moduleFiles = await glob(path.join(__dirname + '/../modules/**/*.js'));
       await Promise.all(moduleFiles.map(this.loadModule.bind(this)));
-      const moduleArray = Object.entries(this.modules).map(([ _, module ]) => module);
+      const moduleArray = Object.entries(this.modules).map(([_, module]) => module);
       await Promise.all(moduleArray.map(this.initModule.bind(this)));
 
       await this.login(token);
       console.log('Ready');
     })();
   }
-};
+}

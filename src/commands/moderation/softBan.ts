@@ -13,15 +13,17 @@ const { alert, success } = formatter('Soft-ban Command');
 export default class SoftbanCommand extends Command {
   async run(_client: CatalystClient, given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
-    const target = await parser.getOption('target') as GuildMember;
-    const reason = await parser.getOption('reason') as string | undefined;
+    const target = (await parser.getOption('target')) as GuildMember;
+    const reason = (await parser.getOption('reason')) as string | undefined;
     const guild = given.guild;
     if (!target || !guild) return;
 
     const username = `${target.user.username}#${target.user.discriminator}`;
-    target.ban({ reason })
+    target
+      .ban({ reason })
       .then(() => {
-        guild.members.unban(target.user)
+        guild.members
+          .unban(target.user)
           .then(() => {
             given.reply(success(`Successfully soft-banned ${username}`));
           })
@@ -40,8 +42,8 @@ export default class SoftbanCommand extends Command {
     super({
       name: 'softBan',
       desc: 'Bans and unbans the provided user to delete messages.',
-      perms: [ Permissions.FLAGS.BAN_MEMBERS ],
-      tags: [ 'moderation' ],
+      perms: [Permissions.FLAGS.BAN_MEMBERS],
+      tags: ['moderation'],
       guildOnly: true,
       passive: false,
       options: [
@@ -62,4 +64,4 @@ export default class SoftbanCommand extends Command {
       ]
     });
   }
-};
+}

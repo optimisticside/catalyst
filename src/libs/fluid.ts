@@ -4,7 +4,7 @@
 
 import {
   Interaction,
-  Message, 
+  Message,
   MessageComponentCollectorOptions,
   MessageEditOptions,
   MessageComponentInteraction,
@@ -24,19 +24,22 @@ export type Mounter = (
   options?: RenderOptions
 ) => Promise<InteractionCollector<MessageComponentInteraction> | undefined>;
 
-export type ComponentState = {[key: string]: any};
-export type ComponentProps = {[key: string]: any};
+export type ComponentState = { [key: string]: any };
+export type ComponentProps = { [key: string]: any };
 export type ComponentListener = (interaction: MessageComponentInteraction) => void;
 
 export type Redirector = (redirect: Component) => void;
-export type ActionCallback = (redirector: Redirector, interaction: MessageComponentInteraction) => void;
+export type ActionCallback = (
+  redirector: Redirector,
+  interaction: MessageComponentInteraction
+) => void;
 
 export abstract class Component extends EventEmitter {
   alive: boolean;
   state: ComponentState;
   props: ComponentProps;
   defaultProps?: ComponentProps;
-  
+
   collector?: InteractionCollector<MessageComponentInteraction>;
   mounter?: Mounter;
   previous?: Component;
@@ -54,7 +57,7 @@ export abstract class Component extends EventEmitter {
       const defaults = Object.entries(this.defaultProps);
       // We cannot do [ name, default ] because `default` is
       // a keyword in Javascript.
-      defaults.map(([ index, value ]) => {
+      defaults.map(([index, value]) => {
         this.props[index] = this.props[index] ?? value;
       });
     }
@@ -79,10 +82,10 @@ export abstract class Component extends EventEmitter {
     const changesArray = Object.entries(changes);
     let oldState = {};
     Object.assign(oldState, this.state);
-    changesArray.map(([ index, change ]) => {
+    changesArray.map(([index, change]) => {
       this.state[index] = change;
     });
-    
+
     this.emit('stateChange', oldState);
     if (this.componentDidUpdate(this.props, oldState)) {
       this.emit('update');
@@ -90,7 +93,7 @@ export abstract class Component extends EventEmitter {
   }
 }
 
-const genericMounter  = async (component: Component, given: MountPoint, options?: RenderOptions) => {
+const genericMounter = async (component: Component, given: MountPoint, options?: RenderOptions) => {
   const filter = (i: MessageComponentInteraction) =>
     i.user.id === (given instanceof Message ? given.author.id : given.user.id);
   options = { ...options };
@@ -122,10 +125,14 @@ const genericMounter  = async (component: Component, given: MountPoint, options?
     component.reply = reply;
     return reply?.createMessageComponentCollector(options);
   }
-}
+};
 
-export const reload = async (oldComponent: Component, newComponent: Component, interaction?: MessageComponentInteraction) => {
-  // The old component is modified first it can also be 
+export const reload = async (
+  oldComponent: Component,
+  newComponent: Component,
+  interaction?: MessageComponentInteraction
+) => {
+  // The old component is modified first it can also be
   // the new component.
   oldComponent.alive = false;
   oldComponent.collector?.stop();
@@ -145,7 +152,7 @@ export const reload = async (oldComponent: Component, newComponent: Component, i
   const collector = await newComponent.mounter(newComponent, mountPoint);
   newComponent.collector = collector;
   collector?.on('collect', newComponent.onInteraction.bind(newComponent));
-}
+};
 
 export const mount = async (component: Component, point: MountPoint, options?: RenderOptions) => {
   const mounter = genericMounter;
@@ -155,8 +162,8 @@ export const mount = async (component: Component, point: MountPoint, options?: R
   component.on('update', () => {
     if (!component.alive) return;
     reload(component, component);
-  })
- 
+  });
+
   collector?.on('collect', component.onInteraction.bind(component));
 };
 
@@ -169,7 +176,7 @@ export const action = (component: Component, callback: ActionCallback) => {
   const redirector = (interaction: MessageComponentInteraction, redirect: Component) => {
     if (!redirect) return;
     reload(component, redirect, interaction);
-  }
+  };
 
   component.on('interaction', async (i: MessageComponentInteraction) => {
     if (i.customId !== customId) return;
@@ -177,8 +184,8 @@ export const action = (component: Component, callback: ActionCallback) => {
   });
 
   return customId;
-}
+};
 
 export const redirect = (component: Component, redirect: Component) => {
   return action(component, redirector => redirector(redirect));
-}
+};

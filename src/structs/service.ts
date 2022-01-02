@@ -15,4 +15,4 @@ export default class Service extends EventEmitter {
     super({ captureRejections: false });
     console.log(`${this.name} service loaded.`);
   }
-};
+}

@@ -17,8 +17,12 @@ const { NAME, PREFIX, SUPPORT_SERVER, CLIENT_ID, DEFAULT_COLOR } = config;
 const { warning } = formatter('Help Command');
 
 export default class HelpCommand extends Command {
-  async argumentHelp(_client: CatalystClient,
-    given: CommandGiven, command: Command, argumentName: string) {
+  async argumentHelp(
+    _client: CatalystClient,
+    given: CommandGiven,
+    command: Command,
+    argumentName: string
+  ) {
     const option = command.options.find(o => o.name === argumentName);
     if (!option) {
       return given.reply(warning('Unable to find argument.'));
@@ -29,11 +33,16 @@ export default class HelpCommand extends Command {
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(option.desc)
       .addField('Type', option.type ?? 'string')
-      .addField('Required', (option.required ? 'yes' : 'no'));
-    given.reply({ embeds: [ embed ] });
+      .addField('Required', option.required ? 'yes' : 'no');
+    given.reply({ embeds: [embed] });
   }
 
-  async commandHelp(client: CatalystClient, given: CommandGiven, parser: OptionParser, commandName: string) {
+  async commandHelp(
+    client: CatalystClient,
+    given: CommandGiven,
+    parser: OptionParser,
+    commandName: string
+  ) {
     const commandHandler = client.modules.commandHandler as unknown as CommandHandler;
     const command = await commandHandler.findCommand(commandName);
     if (!command) {
@@ -44,31 +53,31 @@ export default class HelpCommand extends Command {
     if (argumentName) {
       return await this.argumentHelp(client, given, command, argumentName);
     }
-    
+
     const argumentInfo: Array<string> = [];
     let usage = `${PREFIX}${command.name}`;
     for (let option of command.options) {
       argumentInfo.push(`**${option.name}${option.required ? '\\*' : ''}**  ${option.desc}`);
       usage = usage.concat(` <${option.name}>`);
-    };
+    }
 
     const embed = new MessageEmbed()
       .setTitle(`${command.name} command`)
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(command.desc)
       .addField('Usage', usage);
-    
+
     if (argumentInfo.length > 0) {
       embed.addField('Arguments', argumentInfo.join('\n'));
     }
-    given.reply({ embeds: [ embed ] });
+    given.reply({ embeds: [embed] });
   }
 
   async run(client: CatalystClient, given: CommandGiven, args: CommandArgs) {
     const commandHandler = client.modules.commandHandler as unknown as CommandHandler;
     const parser = new OptionParser(this, given, args);
-    const commandName = await parser.getOption('command') as string | undefined;
-    const argumentName = await parser.getOption('argument') as string | undefined;
+    const commandName = (await parser.getOption('command')) as string | undefined;
+    const argumentName = (await parser.getOption('argument')) as string | undefined;
 
     if (commandName) {
       return await this.commandHelp(client, given, parser, commandName);
@@ -77,13 +86,20 @@ export default class HelpCommand extends Command {
       return given.reply(warning('No command provided.'));
     }
 
-    const config = await GuildData.findOne({ id: given.guild?.id })
-        ?? await GuildData.create({ id: given.guild?.id });
+    const config =
+      (await GuildData.findOne({ id: given.guild?.id })) ??
+      (await GuildData.create({ id: given.guild?.id }));
     const prefix = config.prefix ?? PREFIX;
     const invite = `https://discord.com/oauth2/authorize?&client_id=${CLIENT_ID}&scope=bot%20applications.commands&permissions=2134207679`;
 
     const commands = commandHandler.commands;
-    const helpMenu = new HelpMenu({ prefix, invite, commands, name: NAME, supportServer: SUPPORT_SERVER });
+    const helpMenu = new HelpMenu({
+      prefix,
+      invite,
+      commands,
+      name: NAME,
+      supportServer: SUPPORT_SERVER
+    });
     Fluid.mount(helpMenu, given, { time: 15_000 });
   }
 
@@ -91,7 +107,7 @@ export default class HelpCommand extends Command {
     super({
       name: 'help',
       desc: 'Provides basic information about the bot or a command.',
-      perms: [ Permissions.FLAGS.SEND_MESSAGES ],
+      perms: [Permissions.FLAGS.SEND_MESSAGES],
       options: [
         {
           name: 'command',
@@ -104,7 +120,7 @@ export default class HelpCommand extends Command {
           name: 'argument',
           type: 'string',
           desc: 'The command argument to get information about.',
-          prompt: 'Which of the command\'s arguments do you want to know about?',
+          prompt: "Which of the command's arguments do you want to know about?",
           required: false
         }
       ]

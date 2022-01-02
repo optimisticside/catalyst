@@ -8,7 +8,7 @@ import * as path from 'path';
 
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
-type ConfigTemplate = {[key: string]: string | ElementSpec};
+type ConfigTemplate = { [key: string]: string | ElementSpec };
 type ElemHandler = (element: string, of?: string) => any;
 
 interface ElementSpec {
@@ -16,7 +16,7 @@ interface ElementSpec {
   require?: boolean;
   default?: any;
   of?: any;
-};
+}
 
 interface ParsedConfig {
   NAME: string;
@@ -50,9 +50,9 @@ interface ParsedConfig {
   TOPGG_TOKEN?: string;
   DISCORD_LABS_TOKEN?: string;
   STATCORD_TOKEN?: string;
-};
+}
 
-const elemHandlers: {[key: string]: ElemHandler} = {
+const elemHandlers: { [key: string]: ElemHandler } = {
   string: e => e,
   integer: e => parseInt(e),
   number: e => parseFloat(e),
@@ -69,21 +69,21 @@ const readElem = (name: string, data: any, spec: string | ElementSpec) => {
   // type narrowing, we have to use some hacky workarounds.
   const isString = typeof spec === 'string';
   const asObject = spec as ElementSpec;
-  const type = isString ? spec as string : asObject.type ?? 'string';
+  const type = isString ? (spec as string) : asObject.type ?? 'string';
   if (!data && !isString) {
     if (asObject.default !== undefined) return asObject.default;
     if (asObject.require) throw new Error(`${name} is a required config entry`);
   }
   return elemHandlers[type](data, isString ? undefined : asObject.of);
-}
+};
 
 const parseConfig = (env: NodeJS.ProcessEnv, specs: ConfigTemplate): ParsedConfig => {
   let result = {};
-  Object.entries(specs).map(([ name, spec ]) => {
+  Object.entries(specs).map(([name, spec]) => {
     const data = env[name];
     result[name] = readElem(name, data, spec);
   });
   return result as ParsedConfig;
-}
+};
 
 export default parseConfig(process.env, template);

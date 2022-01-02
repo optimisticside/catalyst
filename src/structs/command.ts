@@ -4,12 +4,17 @@
 
 import config from 'core/config';
 import CatalystClient from 'core/client';
-import { ApplicationCommandOptionChoice, AutocompleteInteraction, CommandInteraction, Message } from 'discord.js';
+import {
+  ApplicationCommandOptionChoice,
+  AutocompleteInteraction,
+  CommandInteraction,
+  Message
+} from 'discord.js';
 const { DEFAULT_COOLDOWN } = config;
 
 export type CommandGiven = CommandInteraction | Message;
 export type CommandValidator = (given: CommandGiven, command: Command) => Promise<boolean>;
-export type CommandArgs = {[key: string]: any};
+export type CommandArgs = { [key: string]: any };
 
 export interface CommandOption {
   name: string;
@@ -20,9 +25,10 @@ export interface CommandOption {
   choices?: Array<ApplicationCommandOptionChoice>;
   minimum?: any;
   maximum?: any;
-  autoComplete?: (current: AutocompleteInteraction) =>
-    Promise<Array<ApplicationCommandOptionChoice>>;
-};
+  autoComplete?: (
+    current: AutocompleteInteraction
+  ) => Promise<Array<ApplicationCommandOptionChoice>>;
+}
 
 export interface CommandInfo {
   name: string;
@@ -46,7 +52,7 @@ export interface CommandInfo {
   creatorOnly?: boolean;
   allowBots?: boolean;
   nsfw?: boolean;
-};
+}
 
 export default abstract class Command {
   name: string;
@@ -101,4 +107,4 @@ export default abstract class Command {
     this.allowBots = info.allowBots ?? this.allowBots;
     this.nsfw = info.nsfw ?? this.nsfw;
   }
-};
+}

@@ -22,8 +22,8 @@ export default class PingCommand extends Command {
   constructor() {
     super({
       name: 'ping',
-      desc: 'Gets the bot\'s latency.',
-      tags: [ 'testing' ],
+      desc: "Gets the bot's latency.",
+      tags: ['testing']
     });
   }
-};
+}

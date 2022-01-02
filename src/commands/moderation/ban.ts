@@ -12,9 +12,9 @@ const { alert, success } = formatter('Ban Command');
 export default class BanCommand extends Command {
   async run(_client: CatalystClient, given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
-    const target = await parser.getOption('target') as GuildMember;
-    const reason = await parser.getOption('reason') as string | undefined;
-    const days = await parser.getOption('days') as number | undefined;
+    const target = (await parser.getOption('target')) as GuildMember;
+    const reason = (await parser.getOption('reason')) as string | undefined;
+    const days = (await parser.getOption('days')) as number | undefined;
     if (!target) return;
 
     // We can remove this after slash command
@@ -24,7 +24,8 @@ export default class BanCommand extends Command {
     }
 
     const username = `${target.user.username}#${target.user.discriminator}`;
-    target.ban({ days, reason })
+    target
+      .ban({ days, reason })
       .then(() => {
         given.reply(success(`Successfully banned ${username}`));
       })
@@ -38,8 +39,8 @@ export default class BanCommand extends Command {
     super({
       name: 'ban',
       desc: 'Bans the provided user.',
-      perms: [ Permissions.FLAGS.BAN_MEMBERS ],
-      tags: [ 'moderation' ],
+      perms: [Permissions.FLAGS.BAN_MEMBERS],
+      tags: ['moderation'],
       guildOnly: true,
       passive: false,
       options: [
@@ -69,4 +70,4 @@ export default class BanCommand extends Command {
       ]
     });
   }
-};
+}

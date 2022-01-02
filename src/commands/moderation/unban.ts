@@ -16,11 +16,11 @@ export default class UnbanCommand extends Command {
     const id = await parser.getOption('target');
 
     const guild = given.guild;
-    const user = given instanceof CommandInteraction
-      ? given.user : given.author;
+    const user = given instanceof CommandInteraction ? given.user : given.author;
     if (!guild) return;
-    
-    guild.bans.remove(id, `Unbanned by ${user.id}`)
+
+    guild.bans
+      .remove(id, `Unbanned by ${user.id}`)
       .then(() => {
         given.reply(success(`Successfully unbanned user`));
       })
@@ -34,8 +34,8 @@ export default class UnbanCommand extends Command {
     super({
       name: 'unban',
       desc: 'Unbans the provided user.',
-      perms: [ Permissions.FLAGS.BAN_MEMBERS ],
-      tags: [ 'moderation' ],
+      perms: [Permissions.FLAGS.BAN_MEMBERS],
+      tags: ['moderation'],
       guildOnly: true,
       passive: false,
       options: [
@@ -49,4 +49,4 @@ export default class UnbanCommand extends Command {
       ]
     });
   }
-};
+}

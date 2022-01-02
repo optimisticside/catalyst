@@ -3,7 +3,16 @@
 // See LICENSE for details
 
 import { Schema, Document, model } from 'mongoose';
-const moderationActions = [ 'Ban', 'Block', 'Kick', 'Mute', 'SoftBan', 'Strike', 'Temp Ban', 'Temp Mute' ];
+const moderationActions = [
+  'Ban',
+  'Block',
+  'Kick',
+  'Mute',
+  'SoftBan',
+  'Strike',
+  'Temp Ban',
+  'Temp Mute'
+];
 
 export enum ModerationAction {
   BAN = 'Ban',
@@ -14,12 +23,12 @@ export enum ModerationAction {
   STRIKE = 'Strike',
   TEMP_BAN = 'Temp Ban',
   TEMP_MUTE = 'Temp Mute'
-};
+}
 
 export interface TimerDocument {
   user: string;
   date: Date;
-};
+}
 
 const timerSchema = new Schema({
   user: String,
@@ -34,7 +43,7 @@ export interface ModerationCaseDocument {
   isValid: boolean;
   canEdit: boolean;
   types: ModerationAction;
-};
+}
 
 const moderationCaseSchema = new Schema({
   id: { type: String, require: true, unique: true },
@@ -49,7 +58,7 @@ const moderationCaseSchema = new Schema({
 export interface StrikePolicyActionDocument {
   count: number;
   action: ModerationAction;
-};
+}
 
 const strikePolicyActionSchema = new Schema({
   count: { type: Number, require: true },
@@ -62,16 +71,19 @@ export interface ReactionRoleDocument {
   roleData: {
     roleId: string;
     name: string;
-  }
-};
+  };
+}
 
 const reactionRoleSchema = new Schema({
   messageId: { type: String, require: true, unique: true },
   multiSelect: { type: Boolean, default: false },
-  roleData: { type: Array, of: new Schema({
-    roleId: { type: String, require: true, unique: true },
-    name: { type: String, require: true }
-  }) }
+  roleData: {
+    type: Array,
+    of: new Schema({
+      roleId: { type: String, require: true, unique: true },
+      name: { type: String, require: true }
+    })
+  }
 });
 
 export interface GuildDocument extends Document {
@@ -121,11 +133,11 @@ export interface GuildDocument extends Document {
   strikePolicy: Array<StrikePolicyActionDocument>;
 
   reactionRoleEnabled: boolean;
-  reactionRoles: Array<ReactionRoleDocument>
+  reactionRoles: Array<ReactionRoleDocument>;
 
   autoRoleEnabled: boolean;
   autoRoles: Array<string>;
-};
+}
 
 const guildDataSchema = new Schema({
   id: { type: String, require: true, unique: true },
@@ -133,8 +145,11 @@ const guildDataSchema = new Schema({
 
   greetingEnabled: { type: Boolean, default: false },
   greetingChannel: { type: String },
-  greetingMessage: { type: String, default: '{mention} has joined the server!' },
-  
+  greetingMessage: {
+    type: String,
+    default: '{mention} has joined the server!'
+  },
+
   goodbyeEnabled: { type: Boolean, default: false },
   goodbyeChannel: { type: String },
   goodbyeMessage: { type: String, default: '{user} has left the server!' },

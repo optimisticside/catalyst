@@ -10,7 +10,7 @@ import CommandHandler from '@modules/commands';
 export default class OptionParser {
   given: Message | CommandInteraction;
   command: Command;
-  args: {[key: string]: any};
+  args: { [key: string]: any };
 
   async getOption(name: string) {
     const client: CatalystClient = this.given.client as CatalystClient;
@@ -21,7 +21,9 @@ export default class OptionParser {
     }
 
     switch (option.type) {
-      case 'text': case 'raw': case 'string':
+      case 'text':
+      case 'raw':
+      case 'string':
         return this.given.options.getString(name);
       case 'integer':
         return this.given.options.getInteger(name);

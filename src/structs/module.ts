@@ -10,7 +10,7 @@ interface ModuleOptions {
   desc?: string;
   authors?: Array<string>;
   client: CatalystClient;
-};
+}
 
 export default class Module extends EventEmitter {
   name: string;
@@ -18,7 +18,7 @@ export default class Module extends EventEmitter {
   authors: Array<string> = [];
   client: CatalystClient;
 
-  load(_modules: {[key: string]: any}): void {
+  load(_modules: { [key: string]: any }): void {
     // TODO: Fix the typedef for the `modules` parameter.
     // Nothing to do here.
   }
@@ -32,4 +32,4 @@ export default class Module extends EventEmitter {
 
     console.log(`${this.name} module loaded.`);
   }
-};
+}

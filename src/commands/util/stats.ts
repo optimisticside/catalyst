@@ -13,17 +13,17 @@ const { NAME, DEFAULT_COLOR } = config;
 
 const fixedDigits = (num: number, count: number) => {
   let string = num.toString();
-  const current = [ ...string ].filter(c => c !== '.').length;
+  const current = [...string].filter(c => c !== '.').length;
   if (current >= count) return string;
   return '0'.repeat(count - current) + string;
-}
+};
 
 const toHrMinSec = (time: number) => {
   const seconds = Math.floor((time / 1000) % 60);
   const minutes = Math.floor((time / 1000 / 60) % 60);
   const hours = Math.floor((time / 1000 / 60 / 60) % 60);
   return `${fixedDigits(hours, 2)}:${fixedDigits(minutes, 2)}:${fixedDigits(seconds, 2)}`;
-}
+};
 
 export default class StatsCommand extends Command {
   async run(client: CatalystClient, given: CommandGiven) {
@@ -32,10 +32,12 @@ export default class StatsCommand extends Command {
     const totalMem = Math.round((memoryUsage.heapTotal / GIGA_BYTE) * 1000) / 1000;
     const uptime = toHrMinSec(process.uptime() * 1000);
 
-    const result = await Promise.all([
+    const result = (await Promise.all([
       client.shard?.fetchClientValues('guilds.cache.size'),
-      client.shard?.broadcastEval(c => c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0))
-    ]) as Array<Array<number>>;
+      client.shard?.broadcastEval(c =>
+        c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0)
+      )
+    ])) as Array<Array<number>>;
     const totalGuilds = result[0].reduce((acc, count) => acc + count, 0);
     const totalUsers = result[1].reduce((acc, count) => acc + count, 0);
 
@@ -48,14 +50,14 @@ export default class StatsCommand extends Command {
       //.addField('Load Avg', os.loadavg().map(n => n.toFixed(3)).join(', '))
       .addField('Memory Usage', `${usedMem} GB / ${totalMem} GB`, true)
       .setFooter(`PID: ${process.pid} | Shard: ${client.shardId}`);
-    given.reply({ embeds: [ embed ] });
+    given.reply({ embeds: [embed] });
   }
 
   constructor() {
     super({
       name: 'stats',
-      desc: 'Provides information about the bot\'s state.',
-      perms: [ Permissions.FLAGS.SEND_MESSAGES ],
+      desc: "Provides information about the bot's state.",
+      perms: [Permissions.FLAGS.SEND_MESSAGES]
     });
   }
-};
+}
