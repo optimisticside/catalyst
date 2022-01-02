@@ -1,6 +1,7 @@
 // Catalyst
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
+// This is legacy code and will be replaced soon
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib = require('tslib');
