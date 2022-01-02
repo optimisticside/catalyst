@@ -122,6 +122,7 @@ export interface GuildDocument extends Document {
   filterZalgo: boolean;
   filterLinks: boolean;
   filterInvites: boolean;
+  filterDuplicates: boolean;
   filterIps: boolean;
   filterSelfBots: boolean;
 
@@ -178,6 +179,7 @@ const guildDataSchema = new Schema({
   filterZalgo: { type: Boolean, default: false },
   filterLinks: { type: Boolean, default: false },
   filterInvites: { type: Boolean, default: false },
+  filterDuplicates: { type: Boolean, default: false },
   filterIps: { type: Boolean, default: false },
   filterSelfBots: { type: Boolean, default: false },
 
