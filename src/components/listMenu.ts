@@ -4,7 +4,14 @@
 
 import config from 'core/config';
 import { MessageEmbed, MessageActionRow, MessageButton, ColorResolvable } from 'discord.js';
-import { Component, redirect, action, ComponentProps, ComponentState, ActionCallback } from 'libs/fluid';
+import {
+  Component,
+  redirect,
+  action,
+  ComponentProps,
+  ComponentState,
+  ActionCallback
+} from 'libs/fluid';
 const { DEFAULT_COLOR } = config;
 
 export interface ListElement {
@@ -13,17 +20,17 @@ export interface ListElement {
   emoji?: string;
   desc?: string;
   action?: ActionCallback;
-};
+}
 
 export interface ListProps {
   header: string;
   desc?: string;
-  body: Array<ListElement>
-};
+  body: Array<ListElement>;
+}
 
 export interface ListState {
   body: Array<ListElement>;
-};
+}
 
 export default class ListComponent extends Component {
   declare props: ListProps;
@@ -41,7 +48,7 @@ export default class ListComponent extends Component {
   }
 
   addElement(element: ListElement) {
-    const newBody = this.state.body.concat([ element ]);
+    const newBody = this.state.body.concat([element]);
     return this.setState({ body: newBody });
   }
 
@@ -87,11 +94,13 @@ export default class ListComponent extends Component {
     // TODO: This should be a constant.
     const backRedirect = this.previous && redirect(this, this.previous);
     if (backRedirect && buttons.length < 5) {
-      buttons.push(new MessageButton({
-        label: 'Back',
-        style: 'DANGER',
-        customId: backRedirect
-      }));
+      buttons.push(
+        new MessageButton({
+          label: 'Back',
+          style: 'DANGER',
+          customId: backRedirect
+        })
+      );
     }
 
     const components: Array<MessageActionRow> = [];
@@ -100,8 +109,8 @@ export default class ListComponent extends Component {
     }
 
     return {
-      embeds: [ embed ],
+      embeds: [embed],
       components
-    }
+    };
   }
 }

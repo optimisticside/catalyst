@@ -13,11 +13,12 @@ const { alert, success } = formatter('Purge Command');
 export default class PurgeCommand extends Command {
   async run(_client: CatalystClient, given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
-    const amount = await parser.getOption('amount') as number;
+    const amount = (await parser.getOption('amount')) as number;
     const channel = given.channel;
 
     if (!(channel instanceof TextChannel)) return;
-    channel.bulkDelete(amount, true)
+    channel
+      .bulkDelete(amount, true)
       .then(messages => {
         given.reply(success(`Successfully deleted ${messages.size} messages`));
       })
@@ -31,8 +32,8 @@ export default class PurgeCommand extends Command {
     super({
       name: 'purge',
       desc: 'Deletes the given amount of messages.',
-      perms: [ Permissions.FLAGS.MANAGE_MESSAGES ],
-      tags: [ 'moderation' ],
+      perms: [Permissions.FLAGS.MANAGE_MESSAGES],
+      tags: ['moderation'],
       guildOnly: true,
       passive: false,
       options: [
@@ -46,4 +47,4 @@ export default class PurgeCommand extends Command {
       ]
     });
   }
-};
+}

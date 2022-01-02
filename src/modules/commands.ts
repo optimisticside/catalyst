@@ -6,7 +6,12 @@ import config from 'core/config';
 import formatter from 'utils/formatter';
 import { Permissions, Message, User, GuildMember, TextChannel } from 'discord.js';
 import Module from 'structs/module.js';
-import Command, { CommandArgs, CommandGiven, CommandOption, CommandValidator } from 'structs/command';
+import Command, {
+  CommandArgs,
+  CommandGiven,
+  CommandOption,
+  CommandValidator
+} from 'structs/command';
 import { CommandGroup, SubCommandGroup } from 'structs/group';
 import Serializer from 'utils/serializer';
 import GuildData from 'models/guildData';
@@ -56,7 +61,10 @@ export default class CommandHandler extends Module {
 
   async parseArg(message: Message | null, option: CommandOption, given: string) {
     switch (option.type) {
-      case 'text': case 'raw': case 'string': default: {
+      case 'text':
+      case 'raw':
+      case 'string':
+      default: {
         if (option.choices) return this.handleArgChoices(option, given);
         return given;
       }
@@ -78,7 +86,7 @@ export default class CommandHandler extends Module {
 
           // TODO: This code can be greatly improved.
           const unitEntries = Object.entries(units);
-          const unit = unitName && unitEntries.find(([ name ]) => name.startsWith(unitName));
+          const unit = unitName && unitEntries.find(([name]) => name.startsWith(unitName));
           if (!unit || !numPart) throw new TypeError('Invalid unit');
           result += parseInt(numPart) * unit[1];
         });
@@ -87,17 +95,21 @@ export default class CommandHandler extends Module {
         if (option.choices) return this.handleArgChoices(option, given);
         const int = parseInt(given);
         if (isNaN(int)) throw 'Invalid integer';
-        if (option.minimum && int < (option.minimum as number)) throw new RangeError('Below minimum');
-        if (option.maximum && int > (option.maximum as number)) throw new RangeError('Below minimum');
+        if (option.minimum && int < (option.minimum as number))
+          throw new RangeError('Below minimum');
+        if (option.maximum && int > (option.maximum as number))
+          throw new RangeError('Below minimum');
         return int;
       case 'number':
         const float = parseFloat(given);
         if (isNaN(float)) throw 'Invalid number';
-        if (option.minimum && float < (option.minimum as number)) throw new RangeError('Below minimum');
-        if (option.maximum && float > (option.minimum as number)) throw new RangeError('Below minimum');
+        if (option.minimum && float < (option.minimum as number))
+          throw new RangeError('Below minimum');
+        if (option.maximum && float > (option.minimum as number))
+          throw new RangeError('Below minimum');
         return float;
       case 'boolean':
-        return (given === 'yes' || given === 'true' || given === 'on');
+        return given === 'yes' || given === 'true' || given === 'on';
       case 'user': {
         const match = Serializer.deserializeUser(given);
         return message?.guild?.members.cache.get(match);
@@ -125,10 +137,15 @@ export default class CommandHandler extends Module {
 
   promptArg(message: Message, option: CommandOption): Promise<string> {
     return new Promise((resolve, reject) => {
-      message.channel.send(prompt(option.prompt ?? `Enter ${option.name} (${option.type}):`))
+      message.channel
+        .send(prompt(option.prompt ?? `Enter ${option.name} (${option.type}):`))
         .then((reply: Message) => {
           const filter = (m: Message) => m.author === message.author;
-          const collector = message.channel.createMessageCollector({ filter, max: 1, time: 60000 });
+          const collector = message.channel.createMessageCollector({
+            filter,
+            max: 1,
+            time: 60000
+          });
           collector.on('collect', m => resolve(m.content));
           collector.on('end', () => reject(reply));
         });
@@ -147,13 +164,12 @@ export default class CommandHandler extends Module {
       //   Else, display syntax error to user.
       if (!given && !option.required) return;
       if (!given && option.required) {
-        given = await this.promptArg(message, option)
-          .catch((reply: Message) => {
-            // This is done under the assumption that `promptArg` is
-            // rejecting because it timed out.
-            if (!(reply instanceof Message)) return;
-            reply.reply(alert('Prompt timed out'));
-          });
+        given = await this.promptArg(message, option).catch((reply: Message) => {
+          // This is done under the assumption that `promptArg` is
+          // rejecting because it timed out.
+          if (!(reply instanceof Message)) return;
+          reply.reply(alert('Prompt timed out'));
+        });
       }
       if (!given) return;
       await this.parseArg(message, option, given)
@@ -188,13 +204,14 @@ export default class CommandHandler extends Module {
     if (!command) return;
     if (!command.cooldown) return;
     const now = Date.now();
-    
+
     // If the cooldown is longer than a certain threshold,
     // we will store it in MongoDB in case we have to restart.
     if (command.cooldown > COOLDOWN_PERSISTANCE_THRESHOLD) {
-      const userData = await UserData.findOne({ id: user.id }) ??
-        await UserData.create({ id: user.id });
-      const current = userData.cooldowns.find(cl => cl.command === command.name) ??
+      const userData =
+        (await UserData.findOne({ id: user.id })) ?? (await UserData.create({ id: user.id }));
+      const current =
+        userData.cooldowns.find(cl => cl.command === command.name) ??
         userData.cooldowns.push({ command: command.name });
       current.since = now;
       userData.markModified('cooldowns');
@@ -216,8 +233,8 @@ export default class CommandHandler extends Module {
       return;
     }
 
-    const userData = await UserData.findOne({ id: user.id }) ??
-      await UserData.create({ id: user.id });
+    const userData =
+      (await UserData.findOne({ id: user.id })) ?? (await UserData.create({ id: user.id }));
     userData.cooldowns.filter(cl => cl.command === command.name);
     userData.markModified('cooldowns');
     await userData.save();
@@ -225,11 +242,10 @@ export default class CommandHandler extends Module {
 
   async handleStatement(message: Message, statement: string) {
     let content = statement.trim();
-    const args = (content.match(/(?:[^\s"]+|"[^"]*")+/g) ?? [])
-      .map(a => a.replaceAll('"', ''));
+    const args = (content.match(/(?:[^\s"]+|"[^"]*")+/g) ?? []).map(a => a.replaceAll('"', ''));
     const commandCall = args.shift();
-    const command = commandCall && await this.findCommand(commandCall);
-    const lastRun = command && await this.getCooldown(message.author, command);
+    const command = commandCall && (await this.findCommand(commandCall));
+    const lastRun = command && (await this.getCooldown(message.author, command));
 
     // Command execution requirements:
     // Blacklist/whitelist system must allow user.
@@ -245,7 +261,7 @@ export default class CommandHandler extends Module {
     if (!command || !command.run) {
       // After close consideration, I've decieded that
       // it's probably better to not warn of invalid commands.
-      return // message.reply(warning(`\`${commandCall}\` is not a valid command.`));
+      return; // message.reply(warning(`\`${commandCall}\` is not a valid command.`));
     }
     if (command.guildOnly && !message.guild) {
       return message.reply(denial('Guild-only commands cannot be run outside of a guild.'));
@@ -259,24 +275,38 @@ export default class CommandHandler extends Module {
     if (command.nsfw && (!message.guild || !message.channel.nsfw)) {
       return message.reply(denial('NSFW commands can only be run in NSFW channels.'));
     }
-    if (message.member && !await this.checkPerms(command.userPerms, message.member, message.channel)) {
+    if (
+      message.member &&
+      !(await this.checkPerms(command.userPerms, message.member, message.channel))
+    ) {
       return message.reply(denial('You do not have the permissions required by this command.'));
     }
-    if (message.guild?.me && !await this.checkPerms(command.botPerms, message.guild.me, message.channel)) {
+    if (
+      message.guild?.me &&
+      !(await this.checkPerms(command.botPerms, message.guild.me, message.channel))
+    ) {
       return message.reply(denial('I do not have the permissions required to run this command.'));
     }
     if (lastRun) {
       const deltaTime = Date.now() - lastRun;
       if (deltaTime <= command.cooldown) {
         const timeLeft = command.cooldown - deltaTime;
-        return message.reply(denial(`You're on cooldown. Please wait ${Math.ceil(timeLeft / 1000)} seconds before trying again.`));
+        return message.reply(
+          denial(
+            `You're on cooldown. Please wait ${Math.ceil(
+              timeLeft / 1000
+            )} seconds before trying again.`
+          )
+        );
       } else {
         this.clearCooldown(message.author, command);
       }
     }
-    if ((this.validator && !await this.validator(message, command))
-        || (command.validate && !await command.validate(message))) {
-       return message.reply(denial('Command validation failed.'));
+    if (
+      (this.validator && !(await this.validator(message, command))) ||
+      (command.validate && !(await command.validate(message)))
+    ) {
+      return message.reply(denial('Command validation failed.'));
     }
 
     await this.handleArgs(message, command, args)
@@ -317,13 +347,16 @@ export default class CommandHandler extends Module {
     let content = message.content.trim();
     let config, guildPrefix;
     if (message.guild) {
-      config = await GuildData.findOne({ id: message.guild.id })
-        ?? await GuildData.create({ id: message.guild.id });
+      config =
+        (await GuildData.findOne({ id: message.guild.id })) ??
+        (await GuildData.create({ id: message.guild.id }));
       guildPrefix = config.prefix;
     }
 
     if (!this.client.user) return;
-    const prefixes = [ `<@${this.client.user.id}>`, `<@!${this.client.user.id}>` ].concat(guildPrefix ?? PREFIX);
+    const prefixes = [`<@${this.client.user.id}>`, `<@!${this.client.user.id}>`].concat(
+      guildPrefix ?? PREFIX
+    );
     const prefix = prefixes.find(p => content.startsWith(p));
     if (!prefix) return;
     content = content.slice(prefix.length);
@@ -344,4 +377,4 @@ export default class CommandHandler extends Module {
       client: client
     });
   }
-};
+}

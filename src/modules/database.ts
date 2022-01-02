@@ -13,7 +13,8 @@ export default class Database extends Module {
   connected: boolean = false;
 
   load() {
-    mongoose.connect(MONGODB_SRV)
+    mongoose
+      .connect(MONGODB_SRV)
       .then(() => {
         console.log('Connected to Mongo DB');
         this.connected = true;

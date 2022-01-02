@@ -39,15 +39,17 @@ if (LIFETIME) {
 
 (async () => {
   const serviceFiles = await glob(path.join(__dirname, 'services/**/*.js'));
-  await Promise.all(serviceFiles.map(async file => {
-    const fileName = path.basename(file, path.extname(file));
-    const result = await resolveFile<Service>(file).catch(err => {
-      console.error(`Unable to load ${fileName} service: ${err}`);
-    });
+  await Promise.all(
+    serviceFiles.map(async file => {
+      const fileName = path.basename(file, path.extname(file));
+      const result = await resolveFile<Service>(file).catch(err => {
+        console.error(`Unable to load ${fileName} service: ${err}`);
+      });
 
-    if (!result || !(result instanceof Function)) return;
-    await result(shardingManager).catch(err => {
-      console.error(`Unable to start ${fileName} service: ${err}`);
-    });
-  }));
+      if (!result || !(result instanceof Function)) return;
+      await result(shardingManager).catch(err => {
+        console.error(`Unable to start ${fileName} service: ${err}`);
+      });
+    })
+  );
 })();

@@ -13,7 +13,7 @@ export interface ConfirmationProps {
   body: string;
   ifYes: ActionCallback;
   ifNo: ActionCallback;
-};
+}
 
 export default class ConfirmationComponent extends Component {
   declare props: ConfirmationProps;
@@ -32,28 +32,29 @@ export default class ConfirmationComponent extends Component {
     const yesAction = action(this, this.props.ifYes);
     const noAction = action(this, this.props.ifNo);
     if (yesAction) {
-      components.push(new MessageButton({
-        label: 'Confirm',
-        style: 'SUCCESS',
-        customId: yesAction
-      }));
+      components.push(
+        new MessageButton({
+          label: 'Confirm',
+          style: 'SUCCESS',
+          customId: yesAction
+        })
+      );
     }
     if (noAction) {
-      components.push(new MessageButton({
-        label: 'Cancel',
-        style: 'DANGER',
-         customId: noAction
-      }));
+      components.push(
+        new MessageButton({
+          label: 'Cancel',
+          style: 'DANGER',
+          customId: noAction
+        })
+      );
     }
 
-    const actionRow = new MessageActionRow()
-      .addComponents(
-        components
-      );
+    const actionRow = new MessageActionRow().addComponents(components);
 
     return {
-      embeds: [ embed ],
-      components: [ actionRow ]
-    }
+      embeds: [embed],
+      components: [actionRow]
+    };
   }
-};
+}

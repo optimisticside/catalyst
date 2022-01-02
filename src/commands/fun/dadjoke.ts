@@ -12,8 +12,10 @@ const { neutral } = formatter('Dadjoke Command');
 
 export default class DadJokeCommand extends Command {
   async run(_client: CatalystClient, given: CommandGiven, _args: CommandArgs) {
-    const res = await fetch('https://icanhazdadjoke.com/', { headers: { 'Accept': 'application/json' } });
-    const joke = (await res.json() as any)?.joke;
+    const res = await fetch('https://icanhazdadjoke.com/', {
+      headers: { Accept: 'application/json' }
+    });
+    const joke = ((await res.json()) as any)?.joke as string;
 
     given.reply(neutral(joke));
   }
@@ -22,8 +24,8 @@ export default class DadJokeCommand extends Command {
     super({
       name: 'dadjoke',
       desc: 'Sends a random dad joke.',
-      perms: [ Permissions.FLAGS.SEND_MESSAGES ],
-      tags: [ 'fun' ]
+      perms: [Permissions.FLAGS.SEND_MESSAGES],
+      tags: ['fun']
     });
   }
-};
+}

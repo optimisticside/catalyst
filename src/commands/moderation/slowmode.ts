@@ -20,7 +20,8 @@ export default class SlowmodeCommand extends Command {
     if (!member || !(channel instanceof TextChannel)) return;
     const username = `${member.user.username}#${member.user.discriminator}`;
 
-    channel.setRateLimitPerUser(time, `Changed by ${username}`)
+    channel
+      .setRateLimitPerUser(time, `Changed by ${username}`)
       .then(() => {
         given.reply(success(`Changed slowmode to ${time} seconds.`));
       })
@@ -34,8 +35,8 @@ export default class SlowmodeCommand extends Command {
     super({
       name: 'slowmode',
       desc: 'Toggles slowmode in a channel.',
-      perms: [ Permissions.FLAGS.MANAGE_MESSAGES ],
-      tags: [ 'moderation' ],
+      perms: [Permissions.FLAGS.MANAGE_MESSAGES],
+      tags: ['moderation'],
       guildOnly: true,
       passive: false,
       options: [
@@ -49,4 +50,4 @@ export default class SlowmodeCommand extends Command {
       ]
     });
   }
-};
+}

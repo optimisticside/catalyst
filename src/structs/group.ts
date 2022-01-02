@@ -5,7 +5,7 @@
 export interface CommandGroupOptions {
   name: string;
   desc: string;
-};
+}
 
 export class CommandGroup implements CommandGroupOptions {
   name: string;
@@ -15,7 +15,7 @@ export class CommandGroup implements CommandGroupOptions {
     this.name = data.name;
     this.desc = data.desc;
   }
-};
+}
 
 export interface SubCommandGroupOptions {
   name: string;
@@ -33,4 +33,4 @@ export class SubCommandGroup implements SubCommandGroupOptions {
     this.desc = data.desc;
     this.group = data.group;
   }
-};
+}

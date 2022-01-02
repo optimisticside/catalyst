@@ -4,8 +4,8 @@
 
 import * as path from 'path';
 
-export async function resolveFile<T>(file: string, ...args: any[]) : Promise<T | null> {
+export async function resolveFile<T>(file: string, ...args: any[]): Promise<T | null> {
   const resolved = path.resolve(file);
   const File = await (await import(resolved)).default;
-  return File?.constructor && new File(...args) as T;
+  return File?.constructor && (new File(...args) as T);
 }

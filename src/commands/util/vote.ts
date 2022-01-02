@@ -28,7 +28,7 @@ export default class HelpCommand extends Command {
     super({
       name: 'vote',
       desc: 'Displays links where you can vote for the bot.',
-      perms: [ Permissions.FLAGS.SEND_MESSAGES ],
+      perms: [Permissions.FLAGS.SEND_MESSAGES]
     });
   }
-};
+}

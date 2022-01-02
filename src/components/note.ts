@@ -11,8 +11,8 @@ const { DEFAULT_COLOR } = config;
 export interface NoteProps {
   header: string;
   body: string;
-  color?: ColorResolvable
-};
+  color?: ColorResolvable;
+}
 
 export default class NoteComponent extends Component {
   declare props: NoteProps;
@@ -24,11 +24,11 @@ export default class NoteComponent extends Component {
   render() {
     const embed = new MessageEmbed()
       .setTitle(this.props.header)
-      .setColor(this.props.color ?? DEFAULT_COLOR as ColorResolvable)
+      .setColor(this.props.color ?? (DEFAULT_COLOR as ColorResolvable))
       .setDescription(this.props.body);
 
     return {
-      embeds: [ embed ]
-    }
+      embeds: [embed]
+    };
   }
-};
+}

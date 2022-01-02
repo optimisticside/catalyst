@@ -3,7 +3,17 @@
 // See LICENSE for details
 
 import config from 'core/config';
-import { ColorResolvable, CommandInteraction, Guild, Message, MessageEmbed, Collection, GuildMember, TextChannel, Snowflake } from 'discord.js';
+import {
+  ColorResolvable,
+  CommandInteraction,
+  Guild,
+  Message,
+  MessageEmbed,
+  Collection,
+  GuildMember,
+  TextChannel,
+  Snowflake
+} from 'discord.js';
 import Module from 'structs/module';
 import GuildData, { GuildDocument } from 'models/guildData';
 import Serializer from 'utils/serializer';
@@ -23,8 +33,9 @@ export default class Logs extends Module {
 
   async onMessageDelete(message: Message) {
     if (message.author.bot || !message.guild) return;
-    const config = await GuildData.findOne({ id: message.guild.id })
-      ?? await GuildData.create({ id: message.guild.id });
+    const config =
+      (await GuildData.findOne({ id: message.guild.id })) ??
+      (await GuildData.create({ id: message.guild.id }));
     const channel = await this.getData('logMessageDelete', message.guild, config);
     if (!channel || !(channel instanceof TextChannel)) return;
 
@@ -32,17 +43,23 @@ export default class Logs extends Module {
     const embed = new MessageEmbed()
       .setAuthor({ name: username, iconURL: message.author.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
-      .setDescription(`Message sent by <@${message.author.id}> deleted in <#${message.channel.id}>\n${message.content}`)
+      .setDescription(
+        `Message sent by <@${message.author.id}> deleted in <#${message.channel.id}>\n${message.content}`
+      )
       .setFooter(`ID: ${message.id}`)
       .setTimestamp(Date.now());
-    channel.send({ embeds: [ embed ], files: message.attachments.map(a => a.url) });
+    channel.send({
+      embeds: [embed],
+      files: message.attachments.map(a => a.url)
+    });
   }
 
   async onMessageBulkDelete(messages: Collection<Snowflake, Message>) {
     const last = messages.last();
     if (!last || !last.guild) return;
-    const config = await GuildData.findOne({ id: last.guild.id })
-      ?? await GuildData.create({ id: last.guild.id });
+    const config =
+      (await GuildData.findOne({ id: last.guild.id })) ??
+      (await GuildData.create({ id: last.guild.id }));
     const channel = await this.getData('logMessageDelete', last.guild, config);
     if (!channel || !(channel instanceof TextChannel)) return;
 
@@ -52,13 +69,14 @@ export default class Logs extends Module {
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`${messages.size} messages bulk-deleted in <#${last.channel.id}>`)
       .setTimestamp(Date.now());
-    channel.send({ embeds: [ embed ] });
+    channel.send({ embeds: [embed] });
   }
 
   async onMessageEdit(oldMessage: Message, newMessage: Message) {
     if (newMessage.author.bot || !newMessage.guild) return;
-    const config = await GuildData.findOne({ id: newMessage.guild.id })
-      ?? await GuildData.create({ id: newMessage.guild.id });
+    const config =
+      (await GuildData.findOne({ id: newMessage.guild.id })) ??
+      (await GuildData.create({ id: newMessage.guild.id }));
     const channel = await this.getData('logMessageEdit', newMessage.guild, config);
     if (!channel || !(channel instanceof TextChannel)) return;
 
@@ -68,19 +86,25 @@ export default class Logs extends Module {
     const url = `https://discordapp.com/channels/${newMessage.guild.id}/${newMessage.channel.id}/${newMessage.id}`;
     const username = `${newMessage.author.username}#${newMessage.author.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor({ name: username, iconURL: newMessage.author.displayAvatarURL() })
+      .setAuthor({
+        name: username,
+        iconURL: newMessage.author.displayAvatarURL()
+      })
       .setColor(DEFAULT_COLOR as ColorResolvable)
-      .setDescription( `Message sent by <@${newMessage.author.id}> edited in <#${newMessage.channel.id}> [Jump to message](${url})`)
+      .setDescription(
+        `Message sent by <@${newMessage.author.id}> edited in <#${newMessage.channel.id}> [Jump to message](${url})`
+      )
       .addField('Before', oldMessage.content)
       .addField('After', newMessage.content)
       .setFooter(`ID: ${newMessage.id}`)
       .setTimestamp(Date.now());
-    channel.send({ embeds: [ embed ] });
+    channel.send({ embeds: [embed] });
   }
 
   async onGuildMemberAdd(member: GuildMember) {
-    const config = await GuildData.findOne({ id: member.guild.id })
-      ?? await GuildData.create({ id: member.guild.id });
+    const config =
+      (await GuildData.findOne({ id: member.guild.id })) ??
+      (await GuildData.create({ id: member.guild.id }));
     const channel = await this.getData('logMemberJoin', member.guild, config);
     if (!channel || !(channel instanceof TextChannel)) return;
 
@@ -91,15 +115,15 @@ export default class Logs extends Module {
       .setDescription(`<@${member.user.id}> joined the server`)
       .setFooter(`ID: ${member.user.id}`)
       .setTimestamp(Date.now());
-    channel.send({ embeds: [ embed ] });
+    channel.send({ embeds: [embed] });
   }
 
   async onGuildMemberRemove(member: GuildMember) {
     const user = await this.client.users.fetch(member.id);
     const guild = await this.client.guilds.fetch(member.guild.id);
 
-    const config = await GuildData.findOne({ id: guild.id })
-      ?? await GuildData.create({ id: guild.id });
+    const config =
+      (await GuildData.findOne({ id: guild.id })) ?? (await GuildData.create({ id: guild.id }));
     const channel = await this.getData('logMemberLeave', member.guild, config);
     if (!channel || !(channel instanceof TextChannel)) return;
 
@@ -110,48 +134,58 @@ export default class Logs extends Module {
       .setDescription(`<@${user.id}> left the server`)
       .setFooter(`ID: ${user.id}`)
       .setTimestamp(Date.now());
-    channel.send({ embeds: [ embed ] });
+    channel.send({ embeds: [embed] });
   }
 
   async onGuildMemberUpdate(oldMember: GuildMember, newMember: GuildMember) {
-    const config = await GuildData.findOne({ id: newMember.guild.id })
-      ?? await GuildData.create({ id: newMember.guild.id });
+    const config =
+      (await GuildData.findOne({ id: newMember.guild.id })) ??
+      (await GuildData.create({ id: newMember.guild.id }));
     const channel = await this.getData('logMemberUpdate', newMember.guild, config);
     if (!channel || !(channel instanceof TextChannel)) return;
-    
+
     const username = `${newMember.user.username}#${newMember.user.discriminator}`;
     if (oldMember.nickname != newMember.nickname) {
       const embed = new MessageEmbed()
-        .setAuthor({ name: username, iconURL: newMember.user.displayAvatarURL() })
+        .setAuthor({
+          name: username,
+          iconURL: newMember.user.displayAvatarURL()
+        })
         .setColor(DEFAULT_COLOR as ColorResolvable)
         .setDescription(`<@${newMember.user.id}> nickname changed`)
         .addField('Before', oldMember.nickname ?? oldMember.user.username)
         .addField('After', newMember.nickname ?? newMember.user.username)
         .setFooter(`ID: ${newMember.user.id}`)
         .setTimestamp(Date.now());
-      channel.send({ embeds: [ embed ] });
+      channel.send({ embeds: [embed] });
     }
 
     oldMember.roles.cache.forEach(role => {
       if (newMember.roles.cache.has(role.id)) return;
       const embed = new MessageEmbed()
-        .setAuthor({ name: username, iconURL: newMember.user.displayAvatarURL() })
+        .setAuthor({
+          name: username,
+          iconURL: newMember.user.displayAvatarURL()
+        })
         .setColor(DEFAULT_COLOR as ColorResolvable)
         .setDescription(`<@${newMember.user.id}> was removed from the \`${role.name}\` role`)
         .setFooter(`Author ID: ${newMember.user.id} | Role ID: ${role.id}`)
         .setTimestamp(Date.now());
-      channel.send({ embeds: [ embed ] });
+      channel.send({ embeds: [embed] });
     });
 
     newMember.roles.cache.forEach(role => {
       if (oldMember.roles.cache.has(role.id)) return;
       const embed = new MessageEmbed()
-        .setAuthor({ name: username, iconURL: newMember.user.displayAvatarURL() })
+        .setAuthor({
+          name: username,
+          iconURL: newMember.user.displayAvatarURL()
+        })
         .setColor(DEFAULT_COLOR as ColorResolvable)
         .setDescription(`<@${newMember.user.id}> was given the \`${role.name}\` role`)
         .setFooter(`Author ID: ${newMember.user.id} | Role ID: ${role.id}`)
         .setTimestamp(Date.now());
-      channel.send({ embeds: [ embed ] });
+      channel.send({ embeds: [embed] });
     });
   }
 
@@ -160,8 +194,9 @@ export default class Logs extends Module {
     if (command.tags?.find(t => t === 'fun')) return;
     if (message.author.bot || !message.guild) return;
 
-    const config = await GuildData.findOne({ id: message.guild.id })
-      ?? await GuildData.create({ id: message.guild.id });
+    const config =
+      (await GuildData.findOne({ id: message.guild.id })) ??
+      (await GuildData.create({ id: message.guild.id }));
     const channel = await this.getData('logCommmands', message.guild, config);
     if (!channel || !(channel instanceof TextChannel)) return;
 
@@ -169,10 +204,12 @@ export default class Logs extends Module {
     const embed = new MessageEmbed()
       .setAuthor({ name: username, iconURL: message.author.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
-      .setDescription(`Used ${command.name} command in <#${message.channel.id}>\n${message.content}`)
+      .setDescription(
+        `Used ${command.name} command in <#${message.channel.id}>\n${message.content}`
+      )
       .setFooter(`Author ID: ${message.author.id} | Message ID: ${message.id}`)
       .setTimestamp(Date.now());
-    channel.send({ embeds: [ embed ] });
+    channel.send({ embeds: [embed] });
   }
 
   async onSlashCommandRun(interaction: CommandInteraction, command: Command) {
@@ -185,15 +222,19 @@ export default class Logs extends Module {
     // library was better built.
     const deserialize = async (given: any, option: CommandOption) => {
       switch (option.type) {
-        case 'text': case 'raw': case 'string': default:
+        case 'text':
+        case 'raw':
+        case 'string':
+        default:
           return given;
         case 'integer':
           return Serializer.serializeInt(given);
         case 'number':
           return Serializer.serializeFloat(given);
         //case 'boolean':
-          //return Serializer.serializeBool(given);
-        case 'user': case 'member':
+        //return Serializer.serializeBool(given);
+        case 'user':
+        case 'member':
           return Serializer.serializeUser(given);
         case 'channel':
           return Serializer.serializeChannel(given);
@@ -201,11 +242,12 @@ export default class Logs extends Module {
           return Serializer.serializeRole(given);
         case 'mentionable':
           return Serializer.serializeMentionable(given);
-      };
-    }
+      }
+    };
 
-    const config = await GuildData.findOne({ id: interaction.guild.id })
-      ?? await GuildData.create({ id: interaction.guild.id });
+    const config =
+      (await GuildData.findOne({ id: interaction.guild.id })) ??
+      (await GuildData.create({ id: interaction.guild.id }));
     const channel = await this.getData('logCommands', interaction.guild, config);
     if (!channel || !(channel instanceof TextChannel)) return;
 
@@ -214,26 +256,34 @@ export default class Logs extends Module {
     const subGroupName = interaction.options.getSubcommandGroup(false);
     if (subGroupName) message = `${message} ${subGroupName}`;
     if (subName) message = `${message} ${subName}`;
-    await Promise.all(command.options.map(async option => {
-      const given = interaction.options.get(option.name);
-      if (!given || !given.value) return;
-      message = `${message} ${option.name}: ${await deserialize(given.value, option)}`
-    }));
+    await Promise.all(
+      command.options.map(async option => {
+        const given = interaction.options.get(option.name);
+        if (!given || !given.value) return;
+        message = `${message} ${option.name}: ${await deserialize(given.value, option)}`;
+      })
+    );
 
     const username = `${interaction.user.username}#${interaction.user.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor({ name: username, iconURL: interaction.user.displayAvatarURL() })
+      .setAuthor({
+        name: username,
+        iconURL: interaction.user.displayAvatarURL()
+      })
       .setColor(DEFAULT_COLOR as ColorResolvable)
-      .setDescription(`Used ${command.name} slash command in <#${interaction.channel?.id}>\n${message}`)
+      .setDescription(
+        `Used ${command.name} slash command in <#${interaction.channel?.id}>\n${message}`
+      )
       .setFooter(`ID: ${interaction.user.id}`)
       .setTimestamp(Date.now());
-    channel.send({ embeds: [ embed ] });
+    channel.send({ embeds: [embed] });
   }
 
   async onGuardianDelete(message: Message, reason: string) {
     if (!message.guild) return;
-    const config = await GuildData.findOne({ id: message.guild.id })
-      ?? await GuildData.create({ id: message.guild.id });
+    const config =
+      (await GuildData.findOne({ id: message.guild.id })) ??
+      (await GuildData.create({ id: message.guild.id }));
     const channel = await this.getData('logGuardian', message.guild, config);
     if (!channel || !(channel instanceof TextChannel)) return;
 
@@ -241,18 +291,21 @@ export default class Logs extends Module {
     const embed = new MessageEmbed()
       .setAuthor({ name: username, iconURL: message.author.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
-      .setDescription(`Guardian deleted a message sent by <@${message.author.id}> in <#${message.channel.id}>`)
+      .setDescription(
+        `Guardian deleted a message sent by <@${message.author.id}> in <#${message.channel.id}>`
+      )
       .addField('Reason', reason)
       .setFooter(`ID: ${message.author.id}`)
       .setTimestamp(Date.now());
-    channel.send({ embeds: [ embed ] });
+    channel.send({ embeds: [embed] });
   }
 
   async onGuardianBulkDelete(messages: Collection<Snowflake, Message>, reason: string) {
     const last = messages.last();
     if (!last || !last.guild) return;
-    const config = await GuildData.findOne({ id: last.guild.id })
-      ?? await GuildData.create({ id: last.guild.id });
+    const config =
+      (await GuildData.findOne({ id: last.guild.id })) ??
+      (await GuildData.create({ id: last.guild.id }));
     const channel = await this.getData('logGuardian', last.guild, config);
     if (!channel || !(channel instanceof TextChannel)) return;
 
@@ -260,11 +313,13 @@ export default class Logs extends Module {
     const embed = new MessageEmbed()
       .setAuthor({ name: username, iconURL: last.author.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
-      .setDescription(`Guardian bulk-deleted ${messages.size} sent by <@${last.author.id}> in <#${last.channel.id}>`)
+      .setDescription(
+        `Guardian bulk-deleted ${messages.size} sent by <@${last.author.id}> in <#${last.channel.id}>`
+      )
       .addField('Reason', reason)
       .setFooter(`ID: ${last.author.id}`)
       .setTimestamp(Date.now());
-    channel.send({ embeds: [ embed ] });
+    channel.send({ embeds: [embed] });
   }
 
   load({ commandHandler, eventHandler, slashHandler, guardian }) {
@@ -286,4 +341,4 @@ export default class Logs extends Module {
       client: client
     });
   }
-};
+}

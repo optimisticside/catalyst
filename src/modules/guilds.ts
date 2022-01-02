@@ -14,7 +14,8 @@ export default class Guilds extends Module {
     const channel = member.guild.channels.cache.get(config.greetingChannel);
     if (!channel || !config.greetingMessage || !(channel instanceof TextChannel)) return;
 
-    const formatted = config.greetingMessage.replace('{mention}', `<@${member.user.id}>`) 
+    const formatted = config.greetingMessage
+      .replace('{mention}', `<@${member.user.id}>`)
       .replaceAll('{user}', member.user.username)
       .replaceAll('{guild}', member.guild.name)
       .replaceAll('{count}', member.guild.memberCount.toString());
@@ -28,8 +29,9 @@ export default class Guilds extends Module {
 
     const channel = guild.channels.cache.get(config.goodbyeChannel);
     if (!channel || !config.goodbyeMessage || !(channel instanceof TextChannel)) return;
-    
-    const formatted = config.goodbyeMessage.replace('{user}', user.username)
+
+    const formatted = config.goodbyeMessage
+      .replace('{user}', user.username)
       .replaceAll('{guild}', guild.name)
       .replaceAll('{count}', guild.memberCount.toString());
     channel.send(formatted);
@@ -37,7 +39,8 @@ export default class Guilds extends Module {
 
   async joinDmMember(member: GuildMember, config: GuildDocument) {
     if (!config.joinDmEnabled || !config.joinDmMessage) return;
-    const formatted = config.joinDmMessage.replace('{mention}', `<@${member.user.id}>`) 
+    const formatted = config.joinDmMessage
+      .replace('{mention}', `<@${member.user.id}>`)
       .replaceAll('{user}', member.user.username)
       .replaceAll('{guild}', member.guild.name)
       .replaceAll('{count}', member.guild.memberCount.toString());
@@ -52,20 +55,22 @@ export default class Guilds extends Module {
   async autoRole(member: GuildMember, config: GuildDocument) {
     if (!config.autoRoleEnabled || !config.autoRoles) return;
     const roles = config.autoRoles.map(r => member.guild.roles.cache.get(r));
-    await Promise.all(roles.map(async r => r && await member.roles.add(r)));
+    await Promise.all(roles.map(async r => r && (await member.roles.add(r))));
   }
 
   async onMemberAdd(member: GuildMember) {
-    const config = await GuildData.findOne({ id: member.guild.id })
-      ?? await GuildData.create({ id: member.guild.id });
+    const config =
+      (await GuildData.findOne({ id: member.guild.id })) ??
+      (await GuildData.create({ id: member.guild.id }));
     await this.greetMember(member, config);
     await this.joinDmMember(member, config);
     await this.autoRole(member, config);
   }
 
   async onMemberRemove(member: GuildMember) {
-    const config = await GuildData.findOne({ id: member.guild.id })
-      ?? await GuildData.create({ id: member.guild.id });
+    const config =
+      (await GuildData.findOne({ id: member.guild.id })) ??
+      (await GuildData.create({ id: member.guild.id }));
     await this.goodbyeMember(member, config);
   }
 
@@ -129,4 +134,4 @@ export default class Guilds extends Module {
       client: client
     });
   }
-};
+}

@@ -2,14 +2,31 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-import { ApplicationCommandOptionChoice, AutocompleteInteraction, CommandInteraction, Guild, GuildChannel, Interaction, TextChannel } from 'discord.js';
+import {
+  ApplicationCommandOptionChoice,
+  AutocompleteInteraction,
+  CommandInteraction,
+  Guild,
+  GuildChannel,
+  Interaction,
+  TextChannel
+} from 'discord.js';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import config from 'core/config';
 import formatter from 'utils/formatter';
-import { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandGroupBuilder } from '@discordjs/builders';
+import {
+  SlashCommandBuilder,
+  SlashCommandSubcommandBuilder,
+  SlashCommandSubcommandGroupBuilder
+} from '@discordjs/builders';
 import Module from 'structs/module';
-import Command, { CommandArgs, CommandGiven, CommandOption, CommandValidator } from 'structs/command';
+import Command, {
+  CommandArgs,
+  CommandGiven,
+  CommandOption,
+  CommandValidator
+} from 'structs/command';
 import CatalystClient from 'core/client';
 import CommandHandler from './commands';
 
@@ -21,56 +38,59 @@ export default class SlashModule extends Module {
 
   async buildCommand(command: Command, isSubCommand?: boolean) {
     const builder = (isSubCommand ? new SlashCommandSubcommandBuilder() : new SlashCommandBuilder())
-      .setName(isSubCommand && command.groupMember?.toLowerCase() || command.name.toLowerCase())
+      .setName((isSubCommand && command.groupMember?.toLowerCase()) || command.name.toLowerCase())
       .setDescription(command.desc);
-      //.setDefaultPermission(false);
+    //.setDefaultPermission(false);
 
-    await Promise.all(command.options.map(async (option: CommandOption) => {
-      const loadOption = (o) => {
-        o
-          .setName(option.name)
-          .setDescription(option.desc)
-          .setRequired(option.required);
-        // .setAutocomplete() and .addChoice sometimes
-        // do not exist when the option-type doesn't support it.
-        if (option.autoComplete) {
-          o.setAutocomplete(true);
-        }
-        if (option.choices) {
-          option.choices.map((choice: ApplicationCommandOptionChoice) => {
-            o.addChoice(choice.name, choice.value ?? choice.name);
-          });
-        }
-        return o;
-      }
+    await Promise.all(
+      command.options.map(async (option: CommandOption) => {
+        const loadOption = o => {
+          o.setName(option.name).setDescription(option.desc).setRequired(option.required);
+          // .setAutocomplete() and .addChoice sometimes
+          // do not exist when the option-type doesn't support it.
+          if (option.autoComplete) {
+            o.setAutocomplete(true);
+          }
+          if (option.choices) {
+            option.choices.map((choice: ApplicationCommandOptionChoice) => {
+              o.addChoice(choice.name, choice.value ?? choice.name);
+            });
+          }
+          return o;
+        };
 
-      switch (option.type) {
-        case 'text': case 'raw': case 'string': default:
-          builder.addStringOption(loadOption);
-          break;
-        case 'integer':
-          builder.addIntegerOption(loadOption);
-          break;
-        case 'number':
-          builder.addNumberOption(loadOption);
-          break;
-        case 'boolean':
-          builder.addBooleanOption(loadOption);
-          break;
-        case 'user': case 'member':
-          builder.addUserOption(loadOption);
-          break;
-        case 'channel':
-          builder.addChannelOption(loadOption);
-          break;
-        case 'role':
-          builder.addRoleOption(loadOption);
-          break;
-        case 'mentionable':
-          builder.addMentionableOption(loadOption);
-          break;
-      };
-    }));
+        switch (option.type) {
+          case 'text':
+          case 'raw':
+          case 'string':
+          default:
+            builder.addStringOption(loadOption);
+            break;
+          case 'integer':
+            builder.addIntegerOption(loadOption);
+            break;
+          case 'number':
+            builder.addNumberOption(loadOption);
+            break;
+          case 'boolean':
+            builder.addBooleanOption(loadOption);
+            break;
+          case 'user':
+          case 'member':
+            builder.addUserOption(loadOption);
+            break;
+          case 'channel':
+            builder.addChannelOption(loadOption);
+            break;
+          case 'role':
+            builder.addRoleOption(loadOption);
+            break;
+          case 'mentionable':
+            builder.addMentionableOption(loadOption);
+            break;
+        }
+      })
+    );
 
     return builder;
   }
@@ -80,37 +100,51 @@ export default class SlashModule extends Module {
     const commands: Array<SlashCommandBuilder> = [];
     const addedSubs: Array<string> = [];
 
-    await Promise.all(commandHandler.groups.map(async group => {
-      const builder = new SlashCommandBuilder()
-        .setName(group.name.toLowerCase())
-        .setDescription(group.desc);
-      const subGroups = commandHandler.subGroups.filter(sg => sg.group === group.name);
-      const subCommands = commandHandler.commands.filter(c => c.group === group.name);
+    await Promise.all(
+      commandHandler.groups.map(async group => {
+        const builder = new SlashCommandBuilder()
+          .setName(group.name.toLowerCase())
+          .setDescription(group.desc);
+        const subGroups = commandHandler.subGroups.filter(sg => sg.group === group.name);
+        const subCommands = commandHandler.commands.filter(c => c.group === group.name);
 
-      await Promise.all(subGroups.map(async subGroup => {
-        const subBuilder = new SlashCommandSubcommandGroupBuilder()
-          .setName(subGroup.name.toLowerCase())
-          .setDescription(subGroup.desc);
-        await Promise.all(subCommands.map(async subCommand => {
-          subBuilder.addSubcommand(await this.buildCommand(subCommand, true) as SlashCommandSubcommandBuilder);
-          addedSubs.push(subCommand.name);
-        }));
-        builder.addSubcommandGroup(subBuilder);
-      }));
+        await Promise.all(
+          subGroups.map(async subGroup => {
+            const subBuilder = new SlashCommandSubcommandGroupBuilder()
+              .setName(subGroup.name.toLowerCase())
+              .setDescription(subGroup.desc);
+            await Promise.all(
+              subCommands.map(async subCommand => {
+                subBuilder.addSubcommand(
+                  (await this.buildCommand(subCommand, true)) as SlashCommandSubcommandBuilder
+                );
+                addedSubs.push(subCommand.name);
+              })
+            );
+            builder.addSubcommandGroup(subBuilder);
+          })
+        );
 
-      await Promise.all(subCommands.map(async subCommand => {
-        if (addedSubs.find(s => s === subCommand.name)) return;
-        builder.addSubcommand(await this.buildCommand(subCommand, true) as SlashCommandSubcommandBuilder);
-        addedSubs.push(subCommand.name);
-      }));
+        await Promise.all(
+          subCommands.map(async subCommand => {
+            if (addedSubs.find(s => s === subCommand.name)) return;
+            builder.addSubcommand(
+              (await this.buildCommand(subCommand, true)) as SlashCommandSubcommandBuilder
+            );
+            addedSubs.push(subCommand.name);
+          })
+        );
 
-      commands.push(builder);
-    }));
+        commands.push(builder);
+      })
+    );
 
-    await Promise.all(commandHandler.commands.map(async command => {
-      if (addedSubs.find(s => s === command.name)) return;
-      commands.push(await this.buildCommand(command) as SlashCommandBuilder);
-    }));
+    await Promise.all(
+      commandHandler.commands.map(async command => {
+        if (addedSubs.find(s => s === command.name)) return;
+        commands.push((await this.buildCommand(command)) as SlashCommandBuilder);
+      })
+    );
 
     return commands;
   }
@@ -138,12 +172,11 @@ export default class SlashModule extends Module {
   }
 
   async refreshCommands(guild: Guild, commands: Array<SlashCommandBuilder>) {
-    const rest = new REST({ version: '9' })
-      .setToken(TOKEN);
+    const rest = new REST({ version: '9' }).setToken(TOKEN);
     if (!this.client.user) return;
     const commandRoute = Routes.applicationGuildCommands(this.client.user.id, guild.id);
     // const permRoute = Routes.guildApplicationCommandsPermissions(this.client.user.id, guild.id);
-  
+
     // To avoid risk of duplicate commands (when altering command description),
     // all commands are cleared before new commands are added.
     // Edit: Upon further thought, I've realized how horrible
@@ -177,7 +210,7 @@ export default class SlashModule extends Module {
       if (group.name.toLowerCase() !== interaction.commandName) return;
       const subName = interaction.options.getSubcommand(false);
       const subGroupName = interaction.options.getSubcommandGroup(false);
-     
+
       if (subGroupName) {
         const subGroup = commandHandler.subGroups.find(sg => sg.name.toLowerCase() === subGroup);
         if (!subGroup) return;
@@ -189,9 +222,13 @@ export default class SlashModule extends Module {
           return true;
         });
       }
-      command = commandHandler.commands.find(c => c.groupMember && c.groupMember.toLowerCase() === subName);
+      command = commandHandler.commands.find(
+        c => c.groupMember && c.groupMember.toLowerCase() === subName
+      );
     });
-    return command ?? commandHandler.commands.find(c => c.name.toLowerCase() === interaction.commandName);
+    return (
+      command ?? commandHandler.commands.find(c => c.name.toLowerCase() === interaction.commandName)
+    );
   }
 
   async executeCommand(command: Command, ...params: [CatalystClient, CommandGiven, CommandArgs]) {
@@ -202,7 +239,7 @@ export default class SlashModule extends Module {
     if (!interaction.isCommand() || !(interaction.channel instanceof TextChannel)) return;
     const commandHandler = this.client.modules.commandHandler as unknown as CommandHandler;
     const command = await this.findCommand(interaction);
-    const lastRun = command && await commandHandler.getCooldown(interaction.user, command);
+    const lastRun = command && (await commandHandler.getCooldown(interaction.user, command));
     const member = await interaction.guild?.members.cache.get(interaction.user.id);
 
     // Command execution requirements:
@@ -222,7 +259,10 @@ export default class SlashModule extends Module {
     if (command.guildOnly && !interaction.guild) {
       return interaction.reply(denial('Guild-only commands cannot be run outside of a guild.'));
     }
-    if (command.ownerOnly && (!interaction.guild || interaction.user.id !== interaction.guild.ownerId)) {
+    if (
+      command.ownerOnly &&
+      (!interaction.guild || interaction.user.id !== interaction.guild.ownerId)
+    ) {
       return interaction.reply(denial('Owner-only commands can only be run by the guild owner.'));
     }
     if (command.creatorOnly && !CREATORS.find(c => c === interaction.user.id)) {
@@ -231,23 +271,46 @@ export default class SlashModule extends Module {
     if (command.nsfw && (!interaction.guild || !interaction.channel?.nsfw)) {
       return interaction.reply(denial('NSFW commands can only be run in NSFW channels.'));
     }
-    if (member && !await commandHandler.checkPerms(command.userPerms, member,
-        (interaction.channel instanceof GuildChannel) ? interaction.channel : undefined)) {
+    if (
+      member &&
+      !(await commandHandler.checkPerms(
+        command.userPerms,
+        member,
+        interaction.channel instanceof GuildChannel ? interaction.channel : undefined
+      ))
+    ) {
       return interaction.reply(denial('You do not have the permissions required by this command.'));
     }
-    if (interaction.guild?.me && !await commandHandler.checkPerms(command.botPerms, interaction.guild.me, interaction.channel)) {
-      return interaction.reply(denial('I do not have the permissions required to run this command.'));
+    if (
+      interaction.guild?.me &&
+      !(await commandHandler.checkPerms(
+        command.botPerms,
+        interaction.guild.me,
+        interaction.channel
+      ))
+    ) {
+      return interaction.reply(
+        denial('I do not have the permissions required to run this command.')
+      );
     }
     if (lastRun) {
       const deltaTime = Date.now() - lastRun;
       if (deltaTime <= command.cooldown) {
         const timeLeft = command.cooldown - deltaTime;
-        return interaction.reply(denial(`You're on cooldown. Please wait ${Math.ceil(timeLeft / 1000)} seconds before trying again.`));
+        return interaction.reply(
+          denial(
+            `You're on cooldown. Please wait ${Math.ceil(
+              timeLeft / 1000
+            )} seconds before trying again.`
+          )
+        );
       }
     }
-    if ((this.validator && !await this.validator(interaction, command))
-        || (command.validate && !await command.validate(interaction))) {
-       return interaction.reply(denial('Command validation failed.'));
+    if (
+      (this.validator && !(await this.validator(interaction, command))) ||
+      (command.validate && !(await command.validate(interaction)))
+    ) {
+      return interaction.reply(denial('Command validation failed.'));
     }
 
     // if (!interaction.client) interaction.client = this.client;
@@ -255,7 +318,7 @@ export default class SlashModule extends Module {
       .then(() => {
         commandHandler.saveCooldown(interaction.user, command);
         this.emit('commandRun', interaction, command);
-        
+
         // TODO: Since most commands do not await for their interaction response,
         // this sometimes replies before they get the chance to.
         /*if (!interaction.replied && !interaction.deferred) {
@@ -265,7 +328,7 @@ export default class SlashModule extends Module {
       .catch(err => {
         console.error(`Unable to run ${command.name} command: ${err}`);
         interaction.reply(warning('An error occured during command execution.'));
-    });
+      });
   }
 
   async handleAutocomplete(interaction: AutocompleteInteraction) {
@@ -275,10 +338,11 @@ export default class SlashModule extends Module {
 
     const focused = interaction.options.getFocused();
     if (typeof focused !== 'string') return;
-    const option = command.options.find(o =>
-      o.name === focused && o.autoComplete);
+    const option = command.options.find(o => o.name === focused && o.autoComplete);
 
-    return option?.autoComplete && await interaction.respond(await option.autoComplete(interaction));
+    return (
+      option?.autoComplete && (await interaction.respond(await option.autoComplete(interaction)))
+    );
   }
 
   async handleInteraction(interaction: Interaction) {

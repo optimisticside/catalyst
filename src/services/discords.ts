@@ -15,9 +15,11 @@ export default class DiscordsService extends Service {
     if (!DISCORDS_TOKEN) return;
 
     const updateStats = async () => {
-      const guildCounts = await shardingManager.fetchClientValues('guilds.cache.size') as Array<number>;
+      const guildCounts = (await shardingManager.fetchClientValues(
+        'guilds.cache.size'
+      )) as Array<number>;
       const guilds = guildCounts.reduce((acc, count) => acc + count, 0);
-    
+
       return await fetch(API_URL, {
         method: 'POST',
         headers: { Authorization: DISCORDS_TOKEN },

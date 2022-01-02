@@ -15,10 +15,12 @@ export default class DiscordLabsService extends Service {
     if (!DISCORD_LABS_TOKEN) return;
 
     const updateStats = async () => {
-      const guildCounts = await shardingManager.fetchClientValues('guilds.cache.size') as Array<number>;
+      const guildCounts = (await shardingManager.fetchClientValues(
+        'guilds.cache.size'
+      )) as Array<number>;
       const guilds = guildCounts.reduce((acc, count) => acc + count, 0);
       const shards = shardingManager.shards.size;
-    
+
       return await fetch(API_URL, {
         method: 'POST',
         headers: { authorization: DISCORD_LABS_TOKEN },

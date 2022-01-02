@@ -16,7 +16,7 @@ interface MessageTracker {
   last: number;
   lastReply?: number;
   pressure: number;
-};
+}
 
 interface AntispamConfig {
   pressureDecay: number;
@@ -29,16 +29,17 @@ interface AntispamConfig {
   linePressure: number;
   pingPressure: number;
   notifyInterval: number;
-};
+}
 
 export default class Guardian extends Module {
-  messages: {[key: string]: string};
-  reasons: {[key: string]: string};
+  messages: { [key: string]: string };
+  reasons: { [key: string]: string };
   messageTrackers: Map<Snowflake, MessageTracker>;
   antispam: AntispamConfig;
 
   async notify(message: Message, reason: string) {
-    await message.reply(warning(this.messages[reason] ?? 'Your message(s) were blocked.'))
+    await message
+      .reply(warning(this.messages[reason] ?? 'Your message(s) were blocked.'))
       .then(reply => {
         // We do not want to yield the `notify` function.
         wait(5000).then(() => reply.delete().catch(console.error));
@@ -61,8 +62,9 @@ export default class Guardian extends Module {
     const content = message.content;
     const channel = message.channel;
     const createdAt = message.createdTimestamp;
-    const config = await GuildData.findOne({ id: message.guild.id })
-      ?? await GuildData.create({ id: message.guild.id });
+    const config =
+      (await GuildData.findOne({ id: message.guild.id })) ??
+      (await GuildData.create({ id: message.guild.id }));
     if (!config.guardianEnabled || !(channel instanceof TextChannel)) return;
 
     // Anti spam pressure values.
@@ -70,11 +72,13 @@ export default class Guardian extends Module {
     // TODO: Create a new table for this.
 
     //const images = message.attachments.filter(a => a.type === 'image');
-    const hasDuplicates = (/^(.+)(?: +\1){3}/).test(content);
-    const hasZalgo = (/%CC%/g).test(encodeURIComponent(content));
+    const hasDuplicates = /^(.+)(?: +\1){3}/.test(content);
+    const hasZalgo = /%CC%/g.test(encodeURIComponent(content));
     const hasInvite = content.includes('discord.gg/') || content.includes('discordapp.com/invite/');
-    const hasLink = (/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/).test(content);
-    const hasIp = (/^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$/).test(content);
+    const hasLink = /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/.test(
+      content
+    );
+    const hasIp = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$/.test(content);
     //const hasEmbeds = message.embeds.length > 0;
     const isBlacklisted = config.blacklistedWords?.find(w => content.includes(w));
 
@@ -86,15 +90,17 @@ export default class Guardian extends Module {
       const tracker = this.messageTrackers.get(message.author.id);
       if (tracker !== undefined) {
         const lastPressure = tracker.pressure;
-        tracker.pressure -= this.antispam.basePressure
-         * (createdAt - tracker.last) / (this.antispam.pressureDecay * 1000);
-        tracker.pressure = Math.max(tracker.pressure, 0)
-         + this.antispam.basePressure
-         + this.antispam.imagePressure * message.attachments.size
-         + this.antispam.imagePressure * message.embeds.length
-         + this.antispam.lengthPressure * content.length
-         + this.antispam.linePressure * content.split(/\r\n|\r|\n/).length
-         + this.antispam.pingPressure * [ ...content.matchAll(/<@!?&?(\d+)>/g) ].length;
+        tracker.pressure -=
+          (this.antispam.basePressure * (createdAt - tracker.last)) /
+          (this.antispam.pressureDecay * 1000);
+        tracker.pressure =
+          Math.max(tracker.pressure, 0) +
+          this.antispam.basePressure +
+          this.antispam.imagePressure * message.attachments.size +
+          this.antispam.imagePressure * message.embeds.length +
+          this.antispam.lengthPressure * content.length +
+          this.antispam.linePressure * content.split(/\r\n|\r|\n/).length +
+          this.antispam.pingPressure * [...content.matchAll(/<@!?&?(\d+)>/g)].length;
 
         tracker.last = createdAt;
         const tolerance = this.antispam.basePressure + this.antispam.toleranceEpsilon;
@@ -111,16 +117,24 @@ export default class Guardian extends Module {
 
           message.channel.messages?.fetch({ limit: 20 }).then(messages => {
             if (tracker.start === undefined || !channel.bulkDelete) return;
-            messages = messages.filter(m =>
-              tracker.start !== undefined && m.author === message.author && m.createdTimestamp > tracker.start);
-              //.map(m => m.delete().catch(console.error));
-            channel.bulkDelete(messages)
+            messages = messages.filter(
+              m =>
+                tracker.start !== undefined &&
+                m.author === message.author &&
+                m.createdTimestamp > tracker.start
+            );
+            //.map(m => m.delete().catch(console.error));
+            channel
+              .bulkDelete(messages)
               .then(() => this.emit('messageBulkDelete', messages, this.reasons.spam))
               .catch(console.error);
           });
         }
       } else {
-        this.messageTrackers.set(message.author.id, { last: createdAt, pressure: 0 });
+        this.messageTrackers.set(message.author.id, {
+          last: createdAt,
+          pressure: 0
+        });
       }
     }
 
@@ -138,7 +152,7 @@ export default class Guardian extends Module {
   load({ eventHandler }) {
     eventHandler.on('messageCreate', this.handleMessage.bind(this));
   }
-  
+
   constructor(client: CatalystClient) {
     super({
       name: 'guardian',
@@ -179,11 +193,11 @@ export default class Guardian extends Module {
       pressureRange,
       pressureDecay: 2.5,
       notifyInterval: 7500,
-      toleranceEpsilon: basePressure + (pressureRange * 0.175),
+      toleranceEpsilon: basePressure + pressureRange * 0.175,
       imagePressure: pressureRange / 6,
       lengthPressure: pressureRange / 8000,
       linePressure: pressureRange / 70,
-      pingPressure: pressureRange / 20,
-    }; 
+      pingPressure: pressureRange / 20
+    };
   }
-};
+}

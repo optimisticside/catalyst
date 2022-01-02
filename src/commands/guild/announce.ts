@@ -13,15 +13,16 @@ const { success, alert } = formatter('Announce Command');
 export default class AnnounceCommand extends Command {
   async run(_client: CatalystClient, given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
-    const channelId = await parser.getOption('channel') as string;
-    const message = await parser.getOption('message') as string;
+    const channelId = (await parser.getOption('channel')) as string;
+    const message = (await parser.getOption('message')) as string;
     if (!channelId || !message) return;
 
     const guild = given.guild;
     const channel = guild?.channels.cache.get(channelId);
     if (!channel || !(channel instanceof TextChannel)) return;
 
-    channel.send(message)
+    channel
+      .send(message)
       .then(() => {
         given.reply(success('Successfully sent message'));
       })
@@ -35,9 +36,9 @@ export default class AnnounceCommand extends Command {
     super({
       name: 'announce',
       desc: 'Announces a message in the given channel.',
-      userPerms: [ Permissions.FLAGS.MANAGE_GUILD ],
-      botPerms: [ Permissions.FLAGS.SEND_MESSAGES ],
-      tags: [ 'guild' ],
+      userPerms: [Permissions.FLAGS.MANAGE_GUILD],
+      botPerms: [Permissions.FLAGS.SEND_MESSAGES],
+      tags: ['guild'],
       guildOnly: true,
       passive: false,
       options: [
@@ -58,4 +59,4 @@ export default class AnnounceCommand extends Command {
       ]
     });
   }
-};
+}
