@@ -61,20 +61,20 @@ export default abstract class Command {
   group?: string;
   subGroup?: string;
   groupMember?: string;
-  desc: string = 'No description provided';
-  cooldown: number = DEFAULT_COOLDOWN;
+  desc = 'No description provided';
+  cooldown = DEFAULT_COOLDOWN;
   tags: Array<string> = [];
   examples: Array<string> = [];
   authors: Array<string> = [];
   userPerms: Array<bigint> = [];
   botPerms: Array<bigint> = [];
-  passive: boolean = true;
-  hidden: boolean = false;
-  guildOnly: boolean = false;
-  ownerOnly: boolean = false;
-  creatorOnly: boolean = false;
-  allowBots: boolean = false;
-  nsfw: boolean = false;
+  passive = true;
+  hidden = false;
+  guildOnly = false;
+  ownerOnly = false;
+  creatorOnly = false;
+  allowBots = false;
+  nsfw = false;
 
   async validate(given: CommandGiven): Promise<boolean> {
     return given !== null;

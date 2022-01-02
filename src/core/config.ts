@@ -78,7 +78,7 @@ const readElem = (name: string, data: any, spec: string | ElementSpec) => {
 };
 
 const parseConfig = (env: NodeJS.ProcessEnv, specs: ConfigTemplate): ParsedConfig => {
-  let result = {};
+  const result = {};
   Object.entries(specs).map(([name, spec]) => {
     const data = env[name];
     result[name] = readElem(name, data, spec);

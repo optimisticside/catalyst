@@ -44,7 +44,7 @@ export default class OptionParser {
         return this.given.options.getRole(name);
       case 'mentionable':
         return this.given.options.getMentionable(name);
-      default:
+      default: {
         // Handles special arguments not supported by Discord,
         // such as time. If it's still not found then the command
         // handler's parser can handle it.
@@ -52,6 +52,7 @@ export default class OptionParser {
         if (!raw) return;
         const commandHandler = client.modules.commandHandler as unknown as CommandHandler;
         return commandHandler.parseArg(null, option, raw);
+      }
     }
   }
 

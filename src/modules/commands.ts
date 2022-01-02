@@ -68,7 +68,7 @@ export default class CommandHandler extends Module {
         if (option.choices) return this.handleArgChoices(option, given);
         return given;
       }
-      case 'time':
+      case 'time': {
         const units = {
           seconds: 1,
           minutes: 1 * 60,
@@ -91,7 +91,8 @@ export default class CommandHandler extends Module {
           result += parseInt(numPart) * unit[1];
         });
         return result;
-      case 'integer':
+      }
+      case 'integer': {
         if (option.choices) return this.handleArgChoices(option, given);
         const int = parseInt(given);
         if (isNaN(int)) throw 'Invalid integer';
@@ -100,7 +101,8 @@ export default class CommandHandler extends Module {
         if (option.maximum && int > (option.maximum as number))
           throw new RangeError('Below minimum');
         return int;
-      case 'number':
+      }
+      case 'number': {
         const float = parseFloat(given);
         if (isNaN(float)) throw 'Invalid number';
         if (option.minimum && float < (option.minimum as number))
@@ -108,6 +110,7 @@ export default class CommandHandler extends Module {
         if (option.maximum && float > (option.minimum as number))
           throw new RangeError('Below minimum');
         return float;
+      }
       case 'boolean':
         return given === 'yes' || given === 'true' || given === 'on';
       case 'user': {
@@ -184,7 +187,7 @@ export default class CommandHandler extends Module {
 
     // A for loop needs to be used since we want the
     // handlers to be run sequentially but also be asynchronous.
-    for (let option of command.options) {
+    for (const option of command.options) {
       await handler(option);
     }
     return result;
@@ -241,7 +244,7 @@ export default class CommandHandler extends Module {
   }
 
   async handleStatement(message: Message, statement: string) {
-    let content = statement.trim();
+    const content = statement.trim();
     const args = (content.match(/(?:[^\s"]+|"[^"]*")+/g) ?? []).map(a => a.replaceAll('"', ''));
     const commandCall = args.shift();
     const command = commandCall && (await this.findCommand(commandCall));

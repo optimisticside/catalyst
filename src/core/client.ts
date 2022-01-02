@@ -44,9 +44,9 @@ export default class CatalystClient extends Client {
     });
 
     (async () => {
-      let moduleFiles = await glob(path.join(__dirname + '/../modules/**/*.js'));
+      const moduleFiles = await glob(path.join(__dirname + '/../modules/**/*.js'));
       await Promise.all(moduleFiles.map(this.loadModule.bind(this)));
-      const moduleArray = Object.entries(this.modules).map(([_, module]) => module);
+      const moduleArray = Object.entries(this.modules).map(([, module]) => module);
       await Promise.all(moduleArray.map(this.initModule.bind(this)));
 
       await this.login(token);

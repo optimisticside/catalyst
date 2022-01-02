@@ -10,7 +10,7 @@ import CatalystClient from 'core/client';
 const { MONGODB_SRV } = config;
 
 export default class Database extends Module {
-  connected: boolean = false;
+  connected = false;
 
   load() {
     mongoose

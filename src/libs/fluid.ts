@@ -80,7 +80,7 @@ export abstract class Component extends EventEmitter {
 
   setState(changes: ComponentState) {
     const changesArray = Object.entries(changes);
-    let oldState = {};
+    const oldState = {};
     Object.assign(oldState, this.state);
     changesArray.map(([index, change]) => {
       this.state[index] = change;
