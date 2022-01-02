@@ -60,8 +60,7 @@ export default class Guilds extends Module {
 
   async onMemberAdd(member: GuildMember) {
     const config =
-      (await GuildData.findOne({ id: member.guild.id })) ??
-      (await GuildData.create({ id: member.guild.id }));
+      (await GuildData.findOne({ id: member.guild.id })) ?? (await GuildData.create({ id: member.guild.id }));
     await this.greetMember(member, config);
     await this.joinDmMember(member, config);
     await this.autoRole(member, config);
@@ -69,8 +68,7 @@ export default class Guilds extends Module {
 
   async onMemberRemove(member: GuildMember) {
     const config =
-      (await GuildData.findOne({ id: member.guild.id })) ??
-      (await GuildData.create({ id: member.guild.id }));
+      (await GuildData.findOne({ id: member.guild.id })) ?? (await GuildData.create({ id: member.guild.id }));
     await this.goodbyeMember(member, config);
   }
 

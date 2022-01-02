@@ -32,10 +32,8 @@ export default class VoteMenuComponent extends Component {
 
     const links: Array<Array<string>> = [];
     if (this.props.showTopgg) links.push(['Top.gg', `https://top.gg/bot/${this.props.clientId}`]);
-    if (this.props.showDiscords)
-      links.push(['Discords', `https://discords.com/bots/bot/${this.props.clientId}`]);
-    if (this.props.showDbl)
-      links.push(['DBL', `https://discordbotlist.com/bots/${this.props.clientId}`]);
+    if (this.props.showDiscords) links.push(['Discords', `https://discords.com/bots/bot/${this.props.clientId}`]);
+    if (this.props.showDbl) links.push(['DBL', `https://discordbotlist.com/bots/${this.props.clientId}`]);
 
     const actionRow = new MessageActionRow().addComponents(
       ...links.map(([name, url]) => {

@@ -29,10 +29,7 @@ export type ComponentProps = { [key: string]: any };
 export type ComponentListener = (interaction: MessageComponentInteraction) => void;
 
 export type Redirector = (redirect: Component) => void;
-export type ActionCallback = (
-  redirector: Redirector,
-  interaction: MessageComponentInteraction
-) => void;
+export type ActionCallback = (redirector: Redirector, interaction: MessageComponentInteraction) => void;
 
 export abstract class Component extends EventEmitter {
   alive: boolean;

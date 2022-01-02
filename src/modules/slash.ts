@@ -21,12 +21,7 @@ import {
   SlashCommandSubcommandGroupBuilder
 } from '@discordjs/builders';
 import Module from 'structs/module';
-import Command, {
-  CommandArgs,
-  CommandGiven,
-  CommandOption,
-  CommandValidator
-} from 'structs/command';
+import Command, { CommandArgs, CommandGiven, CommandOption, CommandValidator } from 'structs/command';
 import CatalystClient from 'core/client';
 import CommandHandler from './commands';
 
@@ -102,9 +97,7 @@ export default class SlashModule extends Module {
 
     await Promise.all(
       commandHandler.groups.map(async group => {
-        const builder = new SlashCommandBuilder()
-          .setName(group.name.toLowerCase())
-          .setDescription(group.desc);
+        const builder = new SlashCommandBuilder().setName(group.name.toLowerCase()).setDescription(group.desc);
         const subGroups = commandHandler.subGroups.filter(sg => sg.group === group.name);
         const subCommands = commandHandler.commands.filter(c => c.group === group.name);
 
@@ -115,9 +108,7 @@ export default class SlashModule extends Module {
               .setDescription(subGroup.desc);
             await Promise.all(
               subCommands.map(async subCommand => {
-                subBuilder.addSubcommand(
-                  (await this.buildCommand(subCommand, true)) as SlashCommandSubcommandBuilder
-                );
+                subBuilder.addSubcommand((await this.buildCommand(subCommand, true)) as SlashCommandSubcommandBuilder);
                 addedSubs.push(subCommand.name);
               })
             );
@@ -128,9 +119,7 @@ export default class SlashModule extends Module {
         await Promise.all(
           subCommands.map(async subCommand => {
             if (addedSubs.find(s => s === subCommand.name)) return;
-            builder.addSubcommand(
-              (await this.buildCommand(subCommand, true)) as SlashCommandSubcommandBuilder
-            );
+            builder.addSubcommand((await this.buildCommand(subCommand, true)) as SlashCommandSubcommandBuilder);
             addedSubs.push(subCommand.name);
           })
         );
@@ -222,13 +211,9 @@ export default class SlashModule extends Module {
           return true;
         });
       }
-      command = commandHandler.commands.find(
-        c => c.groupMember && c.groupMember.toLowerCase() === subName
-      );
+      command = commandHandler.commands.find(c => c.groupMember && c.groupMember.toLowerCase() === subName);
     });
-    return (
-      command ?? commandHandler.commands.find(c => c.name.toLowerCase() === interaction.commandName)
-    );
+    return command ?? commandHandler.commands.find(c => c.name.toLowerCase() === interaction.commandName);
   }
 
   async executeCommand(command: Command, ...params: [CatalystClient, CommandGiven, CommandArgs]) {
@@ -259,10 +244,7 @@ export default class SlashModule extends Module {
     if (command.guildOnly && !interaction.guild) {
       return interaction.reply(denial('Guild-only commands cannot be run outside of a guild.'));
     }
-    if (
-      command.ownerOnly &&
-      (!interaction.guild || interaction.user.id !== interaction.guild.ownerId)
-    ) {
+    if (command.ownerOnly && (!interaction.guild || interaction.user.id !== interaction.guild.ownerId)) {
       return interaction.reply(denial('Owner-only commands can only be run by the guild owner.'));
     }
     if (command.creatorOnly && !CREATORS.find(c => c === interaction.user.id)) {
@@ -283,26 +265,16 @@ export default class SlashModule extends Module {
     }
     if (
       interaction.guild?.me &&
-      !(await commandHandler.checkPerms(
-        command.botPerms,
-        interaction.guild.me,
-        interaction.channel
-      ))
+      !(await commandHandler.checkPerms(command.botPerms, interaction.guild.me, interaction.channel))
     ) {
-      return interaction.reply(
-        denial('I do not have the permissions required to run this command.')
-      );
+      return interaction.reply(denial('I do not have the permissions required to run this command.'));
     }
     if (lastRun) {
       const deltaTime = Date.now() - lastRun;
       if (deltaTime <= command.cooldown) {
         const timeLeft = command.cooldown - deltaTime;
         return interaction.reply(
-          denial(
-            `You're on cooldown. Please wait ${Math.ceil(
-              timeLeft / 1000
-            )} seconds before trying again.`
-          )
+          denial(`You're on cooldown. Please wait ${Math.ceil(timeLeft / 1000)} seconds before trying again.`)
         );
       }
     }
@@ -340,9 +312,7 @@ export default class SlashModule extends Module {
     if (typeof focused !== 'string') return;
     const option = command.options.find(o => o.name === focused && o.autoComplete);
 
-    return (
-      option?.autoComplete && (await interaction.respond(await option.autoComplete(interaction)))
-    );
+    return option?.autoComplete && (await interaction.respond(await option.autoComplete(interaction)));
   }
 
   async handleInteraction(interaction: Interaction) {

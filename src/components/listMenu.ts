@@ -4,14 +4,7 @@
 
 import config from 'core/config';
 import { MessageEmbed, MessageActionRow, MessageButton, ColorResolvable } from 'discord.js';
-import {
-  Component,
-  redirect,
-  action,
-  ComponentProps,
-  ComponentState,
-  ActionCallback
-} from 'libs/fluid';
+import { Component, redirect, action, ComponentProps, ComponentState, ActionCallback } from 'libs/fluid';
 const { DEFAULT_COLOR } = config;
 
 export interface ListElement {
@@ -53,9 +46,7 @@ export default class ListComponent extends Component {
   }
 
   render() {
-    const embed = new MessageEmbed()
-      .setTitle(this.props.header)
-      .setColor(DEFAULT_COLOR as ColorResolvable);
+    const embed = new MessageEmbed().setTitle(this.props.header).setColor(DEFAULT_COLOR as ColorResolvable);
 
     if (this.props.desc) {
       embed.setDescription(this.props.desc);

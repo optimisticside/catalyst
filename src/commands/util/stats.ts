@@ -34,9 +34,7 @@ export default class StatsCommand extends Command {
 
     const result = (await Promise.all([
       client.shard?.fetchClientValues('guilds.cache.size'),
-      client.shard?.broadcastEval(c =>
-        c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0)
-      )
+      client.shard?.broadcastEval(c => c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0))
     ])) as Array<Array<number>>;
     const totalGuilds = result[0].reduce((acc, count) => acc + count, 0);
     const totalUsers = result[1].reduce((acc, count) => acc + count, 0);

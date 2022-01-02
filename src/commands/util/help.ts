@@ -17,12 +17,7 @@ const { NAME, PREFIX, SUPPORT_SERVER, CLIENT_ID, DEFAULT_COLOR } = config;
 const { warning } = formatter('Help Command');
 
 export default class HelpCommand extends Command {
-  async argumentHelp(
-    _client: CatalystClient,
-    given: CommandGiven,
-    command: Command,
-    argumentName: string
-  ) {
+  async argumentHelp(_client: CatalystClient, given: CommandGiven, command: Command, argumentName: string) {
     const option = command.options.find(o => o.name === argumentName);
     if (!option) {
       return given.reply(warning('Unable to find argument.'));
@@ -37,12 +32,7 @@ export default class HelpCommand extends Command {
     given.reply({ embeds: [embed] });
   }
 
-  async commandHelp(
-    client: CatalystClient,
-    given: CommandGiven,
-    parser: OptionParser,
-    commandName: string
-  ) {
+  async commandHelp(client: CatalystClient, given: CommandGiven, parser: OptionParser, commandName: string) {
     const commandHandler = client.modules.commandHandler as unknown as CommandHandler;
     const command = await commandHandler.findCommand(commandName);
     if (!command) {
@@ -87,8 +77,7 @@ export default class HelpCommand extends Command {
     }
 
     const config: GuildDocument =
-      (await GuildData.findOne({ id: given.guild?.id })) ??
-      (await GuildData.create({ id: given.guild?.id }));
+      (await GuildData.findOne({ id: given.guild?.id })) ?? (await GuildData.create({ id: given.guild?.id }));
     const prefix = config.prefix ?? PREFIX;
     const invite = `https://discord.com/oauth2/authorize?&client_id=${CLIENT_ID}&scope=bot%20applications.commands&permissions=2134207679`;
 

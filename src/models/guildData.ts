@@ -3,16 +3,7 @@
 // See LICENSE for details
 
 import { Schema, Document, model } from 'mongoose';
-const moderationActions = [
-  'Ban',
-  'Block',
-  'Kick',
-  'Mute',
-  'SoftBan',
-  'Strike',
-  'Temp Ban',
-  'Temp Mute'
-];
+const moderationActions = ['Ban', 'Block', 'Kick', 'Mute', 'SoftBan', 'Strike', 'Temp Ban', 'Temp Mute'];
 
 export enum ModerationAction {
   BAN = 'Ban',
