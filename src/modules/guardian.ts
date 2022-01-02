@@ -75,7 +75,7 @@ export default class Guardian extends Module {
     const hasDuplicates = /^(.+)(?: +\1){3}/.test(content);
     const hasZalgo = /%CC%/g.test(encodeURIComponent(content));
     const hasInvite = content.includes('discord.gg/') || content.includes('discordapp.com/invite/');
-    const hasLink = /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/.test(
+    const hasLink = /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/.test(
       content
     );
     const hasIp = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$/.test(content);
