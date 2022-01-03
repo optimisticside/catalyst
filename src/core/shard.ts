@@ -23,6 +23,7 @@ export default class CatalystCluster extends BaseCluster {
       setInterval(this.updateStatus.bind(this), 5000);
     });
   
+    client.cluster = this;
     client.load()
       .then(() => client.login(TOKEN));
   }
