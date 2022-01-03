@@ -17,7 +17,7 @@ export default class DblService extends Service {
     const updateStats = async () => {
       const result = (await Promise.all([
         shardingManager.fetchClientValues('guilds.cache.size'),
-        shardingManager.eval('guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0)')
+        shardingManager.fetchClientValues('guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0)')
       ])) as Array<Array<number>>;
       const guilds = result[0].reduce((acc, count) => acc + count, 0);
       const users = result[1].reduce((acc, count) => acc + count, 0);

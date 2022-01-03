@@ -11,8 +11,8 @@ import * as path from 'path';
 import { resolveFile } from 'utils/file';
 import CatalystClient from 'core/client';
 import { Intents } from 'discord.js';
+import Service from 'structs/service';
 
-type Service = (shardingManager: ShardingManager) => Promise<void>;
 const { TOKEN, TOTAL_SHARDS, GUILDS_PER_SHARD, LIFETIME, REST_TIME_OFFSET } = config;
 
 const shardingManager = new ShardingManager(path.join(__dirname, 'core/cluster'), {
@@ -62,8 +62,8 @@ if (cluster.isPrimary) {
           console.error(`Unable to load ${fileName} service: ${err}`);
         });
 
-        if (!result || !(result instanceof Function)) return;
-        await result(shardingManager).catch(err => {
+        if (!result || !(result instanceof Service)) return;
+        await result.run(shardingManager).catch(err => {
           console.error(`Unable to start ${fileName} service: ${err}`);
         });
       })
