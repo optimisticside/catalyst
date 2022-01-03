@@ -10,22 +10,20 @@ import CatalystClient from './client';
 const { TOKEN } = config;
 
 export default class CatalystCluster extends BaseCluster {
+  updateStatus() {
+    this.client.user?.setActivity(`${this.client.guilds.cache.size} servers`, {
+      type: 'WATCHING'
+    });
+  }
+
   launch() {
-    const client = new CatalystClient(TOKEN);
-    const updateStatus = () => {
-      client.user?.setActivity(`${client.guilds.cache.size} servers`, {
-        type: 'WATCHING'
-      });
-    };
-  
+    const client = this.client as CatalystClient;
     client.on('ready', async () => {
-      updateStatus();
-      setInterval(updateStatus, 5000);
+      this.updateStatus();
+      setInterval(this.updateStatus.bind(this), 5000);
     });
   
-    process.on('message', async (message: any) => {
-      if (message.type !== 'shardId') return;
-      client.shardId = message.data.shardId;
-    });
+    client.load()
+      .then(() => client.login(TOKEN));
   }
 }
