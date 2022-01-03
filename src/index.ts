@@ -45,7 +45,6 @@ shardingManager.on(SharderEvents.SHARD_READY, (shard: number) => {
 shardingManager.spawn();
 
 if (cluster.isPrimary) {
-  console.log(shardingManager)
   if (LIFETIME) {
     setTimeout(() => {
       shardingManager.respawn = false;
