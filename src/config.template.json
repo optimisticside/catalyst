@@ -11,7 +11,7 @@
   "DEFAULT_COOLDOWN": { "type": "integer", "default": 3000 },
   "REST_TIME_OFFSET": { "type": "integer", "default": 0 },
   "TOTAL_SHARDS": { "type": "number" },
-  "SHARD_LIFETIME": { "type": "number" },
+  "GUILDS_PER_SHARD": { "type": "number" },
   "LIFETIME": { "type": "number" },
 
   "DEFAULT_COLOR": { "type": "string", "default": "BLURPLE" },

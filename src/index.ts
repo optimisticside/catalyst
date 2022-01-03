@@ -13,11 +13,13 @@ import CatalystClient from 'core/client';
 import { Intents } from 'discord.js';
 
 type Service = (shardingManager: ShardingManager) => Promise<void>;
-const { TOKEN, LIFETIME, REST_TIME_OFFSET } = config;
+const { TOKEN, TOTAL_SHARDS, GUILDS_PER_SHARD, LIFETIME, REST_TIME_OFFSET } = config;
 
 const shardingManager = new ShardingManager(path.join(__dirname, 'core/cluster'), {
   token: TOKEN,
   client: CatalystClient,
+  shardCount: TOTAL_SHARDS,
+  guildsPerShard: GUILDS_PER_SHARD,
   clientOptions: {
     intents: [
       Intents.FLAGS.GUILDS,
@@ -43,6 +45,7 @@ shardingManager.on(SharderEvents.SHARD_READY, (shard: number) => {
 shardingManager.spawn();
 
 if (cluster.isPrimary) {
+  console.log(shardingManager)
   if (LIFETIME) {
     setTimeout(() => {
       shardingManager.respawn = false;
