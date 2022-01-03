@@ -3,7 +3,7 @@
 // See LICENSE for details
 
 import config from 'core/config';
-import { ShardingManager } from 'discord.js';
+import { ShardingManager } from 'kurasuta';
 import fetch from 'node-fetch';
 import Service from 'structs/service';
 

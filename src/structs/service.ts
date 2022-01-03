@@ -2,7 +2,7 @@
 // Copyright 2021 Catalyst contributors
 // See LICENSE for details
 
-import { ShardingManager } from 'discord.js';
+import { ShardingManager } from 'kurasuta';
 import { EventEmitter } from 'events';
 
 export default class Service extends EventEmitter {
