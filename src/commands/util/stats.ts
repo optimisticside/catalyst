@@ -47,7 +47,7 @@ export default class StatsCommand extends Command {
       .addField('Uptime', `${uptime}`, true)
       //.addField('Load Avg', os.loadavg().map(n => n.toFixed(3)).join(', '))
       .addField('Memory Usage', `${usedMem} GB / ${totalMem} GB`, true)
-      .setFooter(`PID: ${process.pid} | Shard: ${client.shardId}`);
+      .setFooter({ text: `PID: ${process.pid} | Cluster: ${client.shard?.id} | Shard: ${client.shard?.shardCount}` });
     given.reply({ embeds: [embed] });
   }
 
