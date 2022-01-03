@@ -7,7 +7,7 @@ import Module from 'structs/module';
 import glob from 'glob-promise';
 import * as path from 'path';
 import { resolveFile } from 'utils/file';
-import CatalystCluster from 'core/shard';
+import CatalystCluster from 'core/cluster';
 
 export default class CatalystClient<Ready extends boolean = boolean> extends Client<Ready> {
   modules: { [key: string]: Module } = {};
