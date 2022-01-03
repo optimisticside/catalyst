@@ -9,12 +9,27 @@ import cluster from 'cluster';
 import glob from 'glob-promise';
 import * as path from 'path';
 import { resolveFile } from 'utils/file';
+import CatalystClient from 'core/client';
+import { Intents } from 'discord.js';
 
 type Service = (shardingManager: ShardingManager) => Promise<void>;
-const { TOKEN, LIFETIME } = config;
+const { TOKEN, LIFETIME, REST_TIME_OFFSET } = config;
 
 const shardingManager = new ShardingManager(path.join(__dirname, 'core/shard.js'), {
-  token: TOKEN
+  token: TOKEN,
+  client: CatalystClient,
+  clientOptions: {
+    intents: [
+      Intents.FLAGS.GUILDS,
+      Intents.FLAGS.GUILD_MESSAGES,
+      Intents.FLAGS.DIRECT_MESSAGES,
+      Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+      Intents.FLAGS.GUILD_INVITES,
+      Intents.FLAGS.GUILD_MEMBERS
+    ],
+    partials: ['GUILD_MEMBER', 'REACTION'],
+    restTimeOffset: REST_TIME_OFFSET ?? 500
+  }
 });
 
 shardingManager.on(SharderEvents.READY, (cluster: Cluster) => {
