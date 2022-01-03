@@ -33,7 +33,7 @@ export default class StatcordService extends Service {
 
       lastUsedBytes = lastUsedBytes <= 0 ? await getUsedBytes() : lastUsedBytes;
       const usedBytes = await getUsedBytes();
-      const bandwidth = usedBytes - lastUsedBytes;
+      const bandwidth = (usedBytes - lastUsedBytes).toString();
       lastUsedBytes = usedBytes;
 
       return await fetch(API_URL, {
@@ -49,7 +49,7 @@ export default class StatcordService extends Service {
           memactive: mem.active.toString(),
           memload: Math.round((mem.active / mem.total) * 100).toString(),
           cpuload: Math.round(load.currentLoad).toString(),
-          bandwidth: bandwidth.toString()
+          bandwidth
         })
       }).catch(err => {
         console.error(`Unable to post stats to StatCord: ${err}`);
