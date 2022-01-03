@@ -49,7 +49,7 @@ export default class StatcordService extends Service {
           memactive: mem.active.toString(),
           memload: Math.round((mem.active / mem.total) * 100).toString(),
           cpuload: Math.round(load.currentLoad).toString(),
-          bandwidth: bandwidth
+          bandwidth: bandwidth.toString()
         })
       }).catch(err => {
         console.error(`Unable to post stats to StatCord: ${err}`);
