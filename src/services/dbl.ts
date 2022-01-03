@@ -3,7 +3,7 @@
 // See LICENSE for details
 
 import config from 'core/config';
-import { ShardingManager } from 'discord.js';
+import { ShardingManager } from 'kurasuta';
 import Service from 'structs/service';
 import fetch from 'node-fetch';
 
@@ -17,7 +17,7 @@ export default class DblService extends Service {
     const updateStats = async () => {
       const result = (await Promise.all([
         shardingManager.fetchClientValues('guilds.cache.size'),
-        shardingManager.broadcastEval(c => c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0))
+        shardingManager.eval('guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0)')
       ])) as Array<Array<number>>;
       const guilds = result[0].reduce((acc, count) => acc + count, 0);
       const users = result[1].reduce((acc, count) => acc + count, 0);

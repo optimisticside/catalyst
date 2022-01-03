@@ -3,7 +3,7 @@
 // See LICENSE for details
 
 import config from 'core/config';
-import { ShardingManager } from 'discord.js';
+import { ShardingManager } from 'kurasuta';
 import fetch from 'node-fetch';
 import Service from 'structs/service';
 
@@ -17,7 +17,7 @@ export default class TopggService extends Service {
     const updateStats = async () => {
       const guildCounts = (await shardingManager.fetchClientValues('guilds.cache.size')) as Array<number>;
       const guilds = guildCounts.reduce((acc, count) => acc + count, 0);
-      const shards = shardingManager.shards.size;
+      const shards = shardingManager.shardCount;
 
       return await fetch(API_URL, {
         method: 'POST',

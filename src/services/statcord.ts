@@ -3,7 +3,7 @@
 // See LICENSE for details
 
 import config from 'core/config';
-import { ShardingManager } from 'discord.js';
+import { ShardingManager } from 'kurasuta';
 import Service from 'structs/service';
 
 const { STATCORD_TOKEN, CLIENT_ID, STATS_UPDATE_INTERVAL } = config;
@@ -16,7 +16,7 @@ export default class StatcordService extends Service {
     const updateStats = async () => {
       const result = (await Promise.all([
         shardingManager.fetchClientValues('guilds.cache.size'),
-        shardingManager.broadcastEval(c => c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0))
+        shardingManager.eval('guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0)')
       ])) as Array<Array<number>>;
       const servers = result[0].reduce((acc, count) => acc + count, 0);
       const users = result[1].reduce((acc, count) => acc + count, 0);
