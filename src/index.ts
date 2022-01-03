@@ -15,7 +15,7 @@ import { Intents } from 'discord.js';
 type Service = (shardingManager: ShardingManager) => Promise<void>;
 const { TOKEN, LIFETIME, REST_TIME_OFFSET } = config;
 
-const shardingManager = new ShardingManager(path.join(__dirname, 'core/shard.js'), {
+const shardingManager = new ShardingManager(path.join(__dirname, 'core/cluster'), {
   token: TOKEN,
   client: CatalystClient,
   clientOptions: {
