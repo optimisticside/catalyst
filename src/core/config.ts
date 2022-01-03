@@ -31,7 +31,7 @@ interface ParsedConfig {
   DEFAULT_COOLDOWN: number;
   REST_TIME_OFFSET: number;
   TOTAL_SHARDS?: number;
-  SHARD_LIFETIME?: number;
+  GUILDS_PER_SHARD?: number;
   LIFETIME?: number;
 
   DEFAULT_COLOR: string;
@@ -54,8 +54,8 @@ interface ParsedConfig {
 
 const elemHandlers: { [key: string]: ElemHandler } = {
   string: e => e,
-  integer: e => parseInt(e),
-  number: e => parseFloat(e),
+  integer: e => e && parseInt(e),
+  number: e => e && parseFloat(e),
   array: (e, of) => {
     // This not be provided for nested arrays,
     // which are not supported.
