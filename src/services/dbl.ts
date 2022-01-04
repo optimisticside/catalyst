@@ -23,6 +23,7 @@ export default class DblService extends Service {
       const users = result[1].reduce((acc, count) => acc + count, 0);
 
       return await fetch(API_URL, {
+        method: 'POST',
         headers: { Authorization: DBL_TOKEN },
         body: JSON.stringify({ users, guilds })
       }).catch(err => {
