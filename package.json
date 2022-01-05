@@ -39,15 +39,15 @@
     "glob-promise": "^4.2.2",
     "kurasuta": "^3.0.1",
     "module-alias": "^2.2.2",
-    "mongoose": "^6.1.4",
+    "mongoose": "^6.1.5",
     "node": "17.3.0",
     "node-fetch": "^2.6.6",
     "systeminformation": "^5.9.17",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.8.1",
-    "@typescript-eslint/parser": "^5.8.1",
+    "@typescript-eslint/eslint-plugin": "^5.9.0",
+    "@typescript-eslint/parser": "^5.9.0",
     "eslint": "^8.6.0",
     "prettier": "^2.5.1",
     "typescript": "^4.5.4"
