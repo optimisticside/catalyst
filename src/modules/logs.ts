@@ -43,7 +43,7 @@ export default class Logs extends Module {
       .setAuthor({ name: username, iconURL: message.author.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`Message sent by <@${message.author.id}> deleted in <#${message.channel.id}>\n${message.content}`)
-      .setFooter(`ID: ${message.id}`)
+      .setFooter({ text: `ID: ${message.id}` })
       .setTimestamp(Date.now());
     channel.send({
       embeds: [embed],
@@ -90,7 +90,7 @@ export default class Logs extends Module {
       )
       .addField('Before', oldMessage.content)
       .addField('After', newMessage.content)
-      .setFooter(`ID: ${newMessage.id}`)
+      .setFooter({ text: `ID: ${newMessage.id}` })
       .setTimestamp(Date.now());
     channel.send({ embeds: [embed] });
   }
@@ -106,7 +106,7 @@ export default class Logs extends Module {
       .setAuthor({ name: username, iconURL: member.user.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`<@${member.user.id}> joined the server`)
-      .setFooter(`ID: ${member.user.id}`)
+      .setFooter({ text: `ID: ${member.user.id}` })
       .setTimestamp(Date.now());
     channel.send({ embeds: [embed] });
   }
@@ -124,7 +124,7 @@ export default class Logs extends Module {
       .setAuthor({ name: username, iconURL: user.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`<@${user.id}> left the server`)
-      .setFooter(`ID: ${user.id}`)
+      .setFooter({ text: `ID: ${user.id}` })
       .setTimestamp(Date.now());
     channel.send({ embeds: [embed] });
   }
@@ -146,7 +146,7 @@ export default class Logs extends Module {
         .setDescription(`<@${newMember.user.id}> nickname changed`)
         .addField('Before', oldMember.nickname ?? oldMember.user.username)
         .addField('After', newMember.nickname ?? newMember.user.username)
-        .setFooter(`ID: ${newMember.user.id}`)
+        .setFooter({ text: `ID: ${newMember.user.id}` })
         .setTimestamp(Date.now());
       channel.send({ embeds: [embed] });
     }
@@ -160,7 +160,7 @@ export default class Logs extends Module {
         })
         .setColor(DEFAULT_COLOR as ColorResolvable)
         .setDescription(`<@${newMember.user.id}> was removed from the \`${role.name}\` role`)
-        .setFooter(`Author ID: ${newMember.user.id} | Role ID: ${role.id}`)
+        .setFooter({ text: `Author ID: ${newMember.user.id} | Role ID: ${role.id}` })
         .setTimestamp(Date.now());
       channel.send({ embeds: [embed] });
     });
@@ -174,7 +174,7 @@ export default class Logs extends Module {
         })
         .setColor(DEFAULT_COLOR as ColorResolvable)
         .setDescription(`<@${newMember.user.id}> was given the \`${role.name}\` role`)
-        .setFooter(`Author ID: ${newMember.user.id} | Role ID: ${role.id}`)
+        .setFooter({ text: `Author ID: ${newMember.user.id} | Role ID: ${role.id}` })
         .setTimestamp(Date.now());
       channel.send({ embeds: [embed] });
     });
@@ -195,7 +195,7 @@ export default class Logs extends Module {
       .setAuthor({ name: username, iconURL: message.author.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`Used ${command.name} command in <#${message.channel.id}>\n${message.content}`)
-      .setFooter(`Author ID: ${message.author.id} | Message ID: ${message.id}`)
+      .setFooter({ text: `Author ID: ${message.author.id} | Message ID: ${message.id}` })
       .setTimestamp(Date.now());
     channel.send({ embeds: [embed] });
   }
@@ -259,7 +259,7 @@ export default class Logs extends Module {
       })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`Used ${command.name} slash command in <#${interaction.channel?.id}>\n${message}`)
-      .setFooter(`ID: ${interaction.user.id}`)
+      .setFooter({ text: `ID: ${interaction.user.id}` })
       .setTimestamp(Date.now());
     channel.send({ embeds: [embed] });
   }
@@ -277,7 +277,7 @@ export default class Logs extends Module {
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`Guardian deleted a message sent by <@${message.author.id}> in <#${message.channel.id}>`)
       .addField('Reason', reason)
-      .setFooter(`ID: ${message.author.id}`)
+      .setFooter({ text: `ID: ${message.author.id}` })
       .setTimestamp(Date.now());
     channel.send({ embeds: [embed] });
   }
@@ -295,7 +295,7 @@ export default class Logs extends Module {
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`Guardian bulk-deleted ${messages.size} sent by <@${last.author.id}> in <#${last.channel.id}>`)
       .addField('Reason', reason)
-      .setFooter(`ID: ${last.author.id}`)
+      .setFooter({ text: `ID: ${last.author.id}` })
       .setTimestamp(Date.now());
     channel.send({ embeds: [embed] });
   }
