@@ -6,6 +6,7 @@ import config from 'core/config';
 import { ShardingManager } from 'kurasuta';
 import Service from 'structs/service';
 import si from 'systeminformation';
+import fetch from 'node-fetch';
 
 const { STATCORD_TOKEN, CLIENT_ID, STATS_UPDATE_INTERVAL } = config;
 const API_URL = 'https://api.statcord.com/v3/stats';
