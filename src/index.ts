@@ -10,7 +10,7 @@ import glob from 'glob-promise';
 import * as path from 'path';
 import { resolveFile } from 'utils/file';
 import CatalystClient from 'core/client';
-import { Intents } from 'discord.js';
+import { Intents, Options } from 'discord.js';
 import Service from 'structs/service';
 
 const { TOKEN, TOTAL_SHARDS, GUILDS_PER_SHARD, LIFETIME, REST_TIME_OFFSET } = config;
@@ -37,6 +37,9 @@ const shardingManager = new ShardingManager(path.join(__dirname, 'core/cluster')
         interval: 43200,
       },
     },
+    makeCache: Options.cacheWithLimits({
+      MessageManager: 25
+    })
   }
 });
 
