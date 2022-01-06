@@ -34,8 +34,8 @@ const shardingManager = new ShardingManager(path.join(__dirname, 'core/cluster')
     sweepers: {
       messages: {
         lifetime: 21600,
-        interval: 43200,
-      },
+        interval: 43200
+      }
     },
     makeCache: Options.cacheWithLimits({
       MessageManager: 25
