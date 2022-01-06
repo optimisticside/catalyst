@@ -21,6 +21,8 @@ const shardingManager = new ShardingManager(path.join(__dirname, 'core/cluster')
   shardCount: TOTAL_SHARDS,
   guildsPerShard: GUILDS_PER_SHARD,
   clientOptions: {
+    partials: ['GUILD_MEMBER', 'REACTION'],
+    restTimeOffset: REST_TIME_OFFSET ?? 500,
     intents: [
       Intents.FLAGS.GUILDS,
       Intents.FLAGS.GUILD_MESSAGES,
@@ -29,8 +31,12 @@ const shardingManager = new ShardingManager(path.join(__dirname, 'core/cluster')
       Intents.FLAGS.GUILD_INVITES,
       Intents.FLAGS.GUILD_MEMBERS
     ],
-    partials: ['GUILD_MEMBER', 'REACTION'],
-    restTimeOffset: REST_TIME_OFFSET ?? 500
+    sweepers: {
+      messages: {
+        lifetime: 21600,
+        interval: 43200,
+      },
+    },
   }
 });
 
