@@ -39,6 +39,8 @@ export default class StatsCommand extends Command {
     const totalGuilds = result[0].reduce((acc, count) => acc + count, 0);
     const totalUsers = result[1].reduce((acc, count) => acc + count, 0);
 
+    // TODO: Can we use the systeminformation library to do some
+    // of this for us?
     const embed = new MessageEmbed()
       .setTitle(NAME)
       .setColor(DEFAULT_COLOR as ColorResolvable)
