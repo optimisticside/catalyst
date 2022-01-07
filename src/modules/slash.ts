@@ -21,7 +21,7 @@ import {
   SlashCommandSubcommandGroupBuilder
 } from '@discordjs/builders';
 import Module from 'structs/module';
-import Command, { CommandArgs, CommandGiven, CommandOption, CommandValidator } from 'structs/command';
+import Command, { CommandArgs, CommandGiven, CommandValidator } from 'structs/command';
 import CatalystClient from 'core/client';
 import CommandHandler from './commands';
 
@@ -37,7 +37,7 @@ export default class SlashModule extends Module {
       .setDescription(command.desc);
     //.setDefaultPermission(false);
 
-    command.options.map((option: CommandOption) => {
+    command.options.map(option => {
       const loadOption = o => {
         o.setName(option.name).setDescription(option.desc).setRequired(option.required);
         // .setAutocomplete() and .addChoice sometimes
