@@ -41,7 +41,7 @@ export default class ListComponent extends Component {
   }
 
   addElement(element: ListElement) {
-    const newBody = this.state.body.concat([element]);
+    const newBody = [ ...this.state.body, element ];
     return this.setState({ body: newBody });
   }
 

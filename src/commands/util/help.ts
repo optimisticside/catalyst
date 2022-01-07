@@ -34,7 +34,7 @@ export default class HelpCommand extends Command {
 
   async commandHelp(client: CatalystClient, given: CommandGiven, parser: OptionParser, commandName: string) {
     const commandHandler = client.modules.commandHandler as unknown as CommandHandler;
-    const command = await commandHandler.findCommand(commandName);
+    const command = commandHandler.findCommand(commandName);
     if (!command) {
       return given.reply(warning('Unable to find command.'));
     }
