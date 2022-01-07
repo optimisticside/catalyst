@@ -22,7 +22,7 @@ export default class CatalystClient<Ready extends boolean = boolean> extends Cli
     this.modules[module.name] = module;
   }
 
-  async initModule(module: Module) {
+  initModule(module: Module) {
     if (!module.load) return;
     module.load(this.modules);
   }
@@ -31,7 +31,7 @@ export default class CatalystClient<Ready extends boolean = boolean> extends Cli
     const moduleFiles = await glob(path.join(__dirname + '/../modules/**/*.js'));
     await Promise.all(moduleFiles.map(this.loadModule.bind(this)));
     const moduleArray = Object.entries(this.modules).map(([, module]) => module);
-    await Promise.all(moduleArray.map(this.initModule.bind(this)));
+    moduleArray.map(this.initModule.bind(this));
   }
 
   constructor(options: ClientOptions) {
