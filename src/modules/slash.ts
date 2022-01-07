@@ -31,114 +31,102 @@ const { warning, denial } = formatter('Slash Command Handler');
 export default class SlashModule extends Module {
   validator?: CommandValidator;
 
-  async buildCommand(command: Command, isSubCommand?: boolean) {
+  buildCommand(command: Command, isSubCommand?: boolean) {
     const builder = (isSubCommand ? new SlashCommandSubcommandBuilder() : new SlashCommandBuilder())
       .setName((isSubCommand && command.groupMember?.toLowerCase()) || command.name.toLowerCase())
       .setDescription(command.desc);
     //.setDefaultPermission(false);
 
-    await Promise.all(
-      command.options.map(async (option: CommandOption) => {
-        const loadOption = o => {
-          o.setName(option.name).setDescription(option.desc).setRequired(option.required);
-          // .setAutocomplete() and .addChoice sometimes
-          // do not exist when the option-type doesn't support it.
-          if (option.autoComplete) {
-            o.setAutocomplete(true);
-          }
-          if (option.choices) {
-            option.choices.map((choice: ApplicationCommandOptionChoice) => {
-              o.addChoice(choice.name, choice.value ?? choice.name);
-            });
-          }
-          return o;
-        };
-
-        switch (option.type) {
-          case 'text':
-          case 'raw':
-          case 'string':
-          default:
-            builder.addStringOption(loadOption);
-            break;
-          case 'integer':
-            builder.addIntegerOption(loadOption);
-            break;
-          case 'number':
-            builder.addNumberOption(loadOption);
-            break;
-          case 'boolean':
-            builder.addBooleanOption(loadOption);
-            break;
-          case 'user':
-          case 'member':
-            builder.addUserOption(loadOption);
-            break;
-          case 'channel':
-            builder.addChannelOption(loadOption);
-            break;
-          case 'role':
-            builder.addRoleOption(loadOption);
-            break;
-          case 'mentionable':
-            builder.addMentionableOption(loadOption);
-            break;
+    command.options.map((option: CommandOption) => {
+      const loadOption = o => {
+        o.setName(option.name).setDescription(option.desc).setRequired(option.required);
+        // .setAutocomplete() and .addChoice sometimes
+        // do not exist when the option-type doesn't support it.
+        if (option.autoComplete) {
+          o.setAutocomplete(true);
         }
-      })
-    );
+        if (option.choices) {
+          option.choices.map((choice: ApplicationCommandOptionChoice) => {
+            o.addChoice(choice.name, choice.value ?? choice.name);
+          });
+        }
+        return o;
+      };
+
+      switch (option.type) {
+        case 'text':
+        case 'raw':
+        case 'string':
+        default:
+          builder.addStringOption(loadOption);
+          break;
+        case 'integer':
+          builder.addIntegerOption(loadOption);
+          break;
+        case 'number':
+          builder.addNumberOption(loadOption);
+          break;
+        case 'boolean':
+          builder.addBooleanOption(loadOption);
+          break;
+        case 'user':
+        case 'member':
+          builder.addUserOption(loadOption);
+          break;
+        case 'channel':
+          builder.addChannelOption(loadOption);
+          break;
+        case 'role':
+          builder.addRoleOption(loadOption);
+          break;
+        case 'mentionable':
+          builder.addMentionableOption(loadOption);
+          break;
+        }
+      });
 
     return builder;
   }
 
-  async buildCommands() {
+  buildCommands() {
     const commandHandler = this.client.modules.commandHandler as unknown as CommandHandler;
     const commands: Array<SlashCommandBuilder> = [];
     const addedSubs: Array<string> = [];
 
-    await Promise.all(
-      commandHandler.groups.map(async group => {
-        const builder = new SlashCommandBuilder().setName(group.name.toLowerCase()).setDescription(group.desc);
-        const subGroups = commandHandler.subGroups.filter(sg => sg.group === group.name);
-        const subCommands = commandHandler.commands.filter(c => c.group === group.name);
+    commandHandler.groups.map(group => {
+      const builder = new SlashCommandBuilder().setName(group.name.toLowerCase()).setDescription(group.desc);
+      const subGroups = commandHandler.subGroups.filter(sg => sg.group === group.name);
+      const subCommands = commandHandler.commands.filter(c => c.group === group.name);
 
-        await Promise.all(
-          subGroups.map(async subGroup => {
-            const subBuilder = new SlashCommandSubcommandGroupBuilder()
-              .setName(subGroup.name.toLowerCase())
-              .setDescription(subGroup.desc);
-            await Promise.all(
-              subCommands.map(async subCommand => {
-                subBuilder.addSubcommand((await this.buildCommand(subCommand, true)) as SlashCommandSubcommandBuilder);
-                addedSubs.push(subCommand.name);
-              })
-            );
-            builder.addSubcommandGroup(subBuilder);
-          })
-        );
+      subGroups.map(subGroup => {
+        const subBuilder = new SlashCommandSubcommandGroupBuilder()
+          .setName(subGroup.name.toLowerCase())
+          .setDescription(subGroup.desc);
+        subCommands.map(subCommand => {
+          subBuilder.addSubcommand(this.buildCommand(subCommand, true) as SlashCommandSubcommandBuilder);
+          addedSubs.push(subCommand.name);
+        });
+        builder.addSubcommandGroup(subBuilder);
+      });
 
-        await Promise.all(
-          subCommands.map(async subCommand => {
-            if (addedSubs.find(s => s === subCommand.name)) return;
-            builder.addSubcommand((await this.buildCommand(subCommand, true)) as SlashCommandSubcommandBuilder);
-            addedSubs.push(subCommand.name);
-          })
-        );
+      subCommands.map(subCommand => {
+        if (addedSubs.find(s => s === subCommand.name)) return;
+        builder.addSubcommand(this.buildCommand(subCommand, true) as SlashCommandSubcommandBuilder);
+        addedSubs.push(subCommand.name);
+      });
 
-        commands.push(builder);
-      })
-    );
+      commands.push(builder);
+    });
 
-    await Promise.all(
-      commandHandler.commands.map(async command => {
-        if (addedSubs.find(s => s === command.name)) return;
-        commands.push((await this.buildCommand(command)) as SlashCommandBuilder);
-      })
-    );
+    commandHandler.commands.map(async command => {
+      if (addedSubs.find(s => s === command.name)) return;
+      commands.push(this.buildCommand(command) as SlashCommandBuilder);
+    });
 
     return commands;
   }
 
-  async createPerms(guild: Guild, command: Command) {
+  createPerms(guild: Guild, command: Command) {
     const perms: Array<any> = [];
 
     guild.roles.cache.map(role => {
@@ -186,12 +174,12 @@ export default class SlashModule extends Module {
   }
 
   async setupGuild(guild: Guild) {
-    await this.refreshCommands(guild, await this.buildCommands()).catch(err => {
+    await this.refreshCommands(guild, this.buildCommands()).catch(err => {
       console.error(`Unable to load slash commands to guild ${guild.id}: ${err}`);
     });
   }
 
-  async findCommand(interaction: CommandInteraction | AutocompleteInteraction) {
+  findCommand(interaction: CommandInteraction | AutocompleteInteraction) {
     const commandHandler = this.client.modules.commandHandler as unknown as CommandHandler;
     let command: Command | undefined = undefined;
 
@@ -223,9 +211,9 @@ export default class SlashModule extends Module {
   async handleCommand(interaction: CommandInteraction) {
     if (!interaction.isCommand() || !(interaction.channel instanceof TextChannel)) return;
     const commandHandler = this.client.modules.commandHandler as unknown as CommandHandler;
-    const command = await this.findCommand(interaction);
+    const command = this.findCommand(interaction);
     const lastRun = command && (await commandHandler.getCooldown(interaction.user, command));
-    const member = await interaction.guild?.members.cache.get(interaction.user.id);
+    const member = await interaction.guild?.members.fetch(interaction.user.id);
 
     // Command execution requirements:
     // Command must support slash commands.
@@ -255,17 +243,17 @@ export default class SlashModule extends Module {
     }
     if (
       member &&
-      !(await commandHandler.checkPerms(
+      !commandHandler.checkPerms(
         command.userPerms,
         member,
         interaction.channel instanceof GuildChannel ? interaction.channel : undefined
-      ))
+      )
     ) {
       return interaction.reply(denial('You do not have the permissions required by this command.'));
     }
     if (
       interaction.guild?.me &&
-      !(await commandHandler.checkPerms(command.botPerms, interaction.guild.me, interaction.channel))
+      !commandHandler.checkPerms(command.botPerms, interaction.guild.me, interaction.channel)
     ) {
       return interaction.reply(denial('I do not have the permissions required to run this command.'));
     }
@@ -305,7 +293,7 @@ export default class SlashModule extends Module {
 
   async handleAutocomplete(interaction: AutocompleteInteraction) {
     if (!interaction.isAutocomplete()) return;
-    const command = await this.findCommand(interaction);
+    const command = this.findCommand(interaction);
     if (!command) return;
 
     const focused = interaction.options.getFocused();
