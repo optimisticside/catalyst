@@ -26,13 +26,13 @@ export default class CommandHandler extends Module {
   cooldowns: Map<string, number> = new Map();
   validator?: CommandValidator;
 
-  async checkPerms(required: Array<bigint>, member: GuildMember, channel?: TextChannel) {
+  checkPerms(required: Array<bigint>, member: GuildMember, channel?: TextChannel) {
     let perms = member.permissions;
     if (channel) perms = channel.permissionsFor(member);
     return required.every(p => perms.has(p)) || perms.has(Permissions.FLAGS.ADMINISTRATOR);
   }
 
-  async findCommand(commandCall: string) {
+  findCommand(commandCall: string) {
     commandCall = commandCall.toLowerCase();
     return this.commands.find(command => {
       if (command.name.toLowerCase() === commandCall) return true;
@@ -234,7 +234,7 @@ export default class CommandHandler extends Module {
     const content = statement.trim();
     const args = (content.match(/(?:[^\s"]+|"[^"]*")+/g) ?? []).map(a => a.replaceAll('"', ''));
     const commandCall = args.shift();
-    const command = commandCall && (await this.findCommand(commandCall));
+    const command = commandCall && this.findCommand(commandCall);
     const lastRun = command && (await this.getCooldown(message.author, command));
 
     // Command execution requirements:
@@ -265,10 +265,10 @@ export default class CommandHandler extends Module {
     if (command.nsfw && (!message.guild || !message.channel.nsfw)) {
       return message.reply(denial('NSFW commands can only be run in NSFW channels.'));
     }
-    if (message.member && !(await this.checkPerms(command.userPerms, message.member, message.channel))) {
+    if (message.member && !this.checkPerms(command.userPerms, message.member, message.channel)) {
       return message.reply(denial('You do not have the permissions required by this command.'));
     }
-    if (message.guild?.me && !(await this.checkPerms(command.botPerms, message.guild.me, message.channel))) {
+    if (message.guild?.me && !this.checkPerms(command.botPerms, message.guild.me, message.channel)) {
       return message.reply(denial('I do not have the permissions required to run this command.'));
     }
     if (lastRun) {
