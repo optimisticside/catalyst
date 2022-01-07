@@ -82,8 +82,8 @@ export default class SlashModule extends Module {
         case 'mentionable':
           builder.addMentionableOption(loadOption);
           break;
-        }
-      });
+      }
+    });
 
     return builder;
   }
@@ -118,7 +118,7 @@ export default class SlashModule extends Module {
       commands.push(builder);
     });
 
-    commandHandler.commands.map(async command => {
+    commandHandler.commands.map(command => {
       if (addedSubs.find(s => s === command.name)) return;
       commands.push(this.buildCommand(command) as SlashCommandBuilder);
     });
