@@ -53,7 +53,7 @@ export default class StatcordService extends Service {
           bandwidth
         })
       }).catch(err => {
-        console.error(`Unable to post stats to StatCord: ${err}`);
+        this.logger.error(`Unable to post stats to StatCord: ${err}`);
       });
     };
 

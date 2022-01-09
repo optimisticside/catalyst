@@ -24,7 +24,7 @@ export default class TopggService extends Service {
         headers: { Authorization: TOPGG_TOKEN },
         body: JSON.stringify({ server_count: guilds, shard_count: shards })
       }).catch(err => {
-        console.error(`Unable to post stats to Top.gg: ${err}`);
+        this.logger.error(`Unable to post stats to Top.gg: ${err}`);
       });
     };
 
