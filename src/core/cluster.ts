@@ -23,13 +23,16 @@ export default class CatalystCluster extends BaseCluster {
     });
   }
 
-  launch() {
-    this.client.on('ready', async () => {
-      this.updateStatus();
-      setInterval(this.updateStatus.bind(this), 5000);
-    });
-
+  async launch() {
     this.client.cluster = this;
-    this.client.load().then(() => this.client.login(TOKEN));
+    await this.client.load()
+
+    this.client.login(TOKEN);
+    if (this.client.isReady()) {
+      await new Promise(res => this.client.on('ready', res));
+    }
+
+    this.updateStatus();
+    setInterval(this.updateStatus.bind(this), 5000);
   }
 }
