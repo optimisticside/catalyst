@@ -101,7 +101,7 @@ exports.default = class ConfigCommand extends Command {
           .finally(() => reply.reactions.removeAll())
           .then(() => reply.edit(success(`Successfully ${current === true ? 'disabled' : 'enabled'} ${name}`, 'embed')))
           .catch(err => {
-            console.log(`Unable to write to database: ${err}`);
+            this.logger.error(`Unable to write to database: ${err}`);
             reply.edit(alert(`Unable to change ${name}`, 'embed'));
           });
       } else {

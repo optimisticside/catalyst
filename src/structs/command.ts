@@ -77,8 +77,7 @@ export default abstract class Command {
     return given !== null;
   }
 
-  async run(client: CatalystClient, given: CommandGiven, args: CommandArgs): Promise<any> {
-    console.log(client, given, args);
+  async run(_client: CatalystClient, _given: CommandGiven, _args: CommandArgs): Promise<any> {
     throw new Error(`${this.name} doesn't have a run() method.`);
   }
 
