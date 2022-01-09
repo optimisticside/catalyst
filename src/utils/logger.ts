@@ -6,12 +6,9 @@ import { createLogger as winstonCreateLogger, format, transports, Logger as Wins
 
 export type Logger = WinstonLogger;
 export function createLogger(defaultMeta?: any) {
-  let formatting = [
-    format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    format.errors({ stack: true })
-  ]
+  let formatting = [format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), format.errors({ stack: true })];
   if (process.env.NODE_ENV === 'production') {
-    formatting = [ ...formatting, format.json() ];
+    formatting = [...formatting, format.json()];
   } else {
     formatting = [
       ...formatting,
