@@ -281,8 +281,9 @@ exports.default = class ConfigCommand extends Command {
       `React with the corresponding emoji to configure ${NAME}.`, this.settings);
   }
 
-  constructor() {
+  constructor(client) {
     super({
+      client,
       name: 'config',
       desc: 'Lets you manage the guild configuration.',
       userPerms: [ Permissions.FLAGS.MANAGE_GUILD ],

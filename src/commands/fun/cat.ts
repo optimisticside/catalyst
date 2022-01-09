@@ -16,8 +16,9 @@ export default class CatCommand extends Command {
     given.reply({ embeds: [embed] });
   }
 
-  constructor() {
+  constructor(client: CatalystClient) {
     super({
+      client,
       name: 'cat',
       desc: 'Sends a random picture of a cat.',
       perms: [Permissions.FLAGS.SEND_MESSAGES],

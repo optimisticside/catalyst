@@ -297,7 +297,7 @@ export default class CommandHandler extends Module {
             this.emit('commandRun', message, command, finalArgs);
           })
           .catch(err => {
-            console.error(`Unable to run ${command.name} command: ${err}`);
+            this.logger.error(`Unable to run ${command.name} command: ${err}`);
             message.reply(warning('An error occured during command execution.'));
           });
       })
@@ -309,7 +309,7 @@ export default class CommandHandler extends Module {
   }
 
   async loadCommand(file: string) {
-    const command = await resolveFile<Command | CommandGroup | SubCommandGroup>(file);
+    const command = await resolveFile<Command | CommandGroup | SubCommandGroup>(file, this.client);
     if (command instanceof Command) return this.commands.push(command);
     if (command instanceof CommandGroup) return this.groups.push(command);
     if (command instanceof SubCommandGroup) return this.subGroups.push(command);
@@ -318,7 +318,7 @@ export default class CommandHandler extends Module {
   async loadCommands() {
     const files = await glob(path.join(__dirname, '/../commands/**/*.js'));
     await Promise.all(files.map(this.loadCommand.bind(this)));
-    console.log('Commands loaded');
+    this.logger.info('Commands loaded');
     this.emit('commandsLoad');
   }
 

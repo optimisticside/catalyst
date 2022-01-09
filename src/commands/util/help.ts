@@ -92,8 +92,9 @@ export default class HelpCommand extends Command {
     Fluid.mount(helpMenu, given, { time: 15_000 });
   }
 
-  constructor() {
+  constructor(client: CatalystClient) {
     super({
+      client,
       name: 'help',
       desc: 'Provides basic information about the bot or a command.',
       perms: [Permissions.FLAGS.SEND_MESSAGES],

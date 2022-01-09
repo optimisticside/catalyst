@@ -4,6 +4,7 @@
 
 import { EventEmitter } from 'events';
 import CatalystClient from 'core/client';
+import { createLogger, Logger } from 'utils/logger';
 
 interface ModuleOptions {
   name: string;
@@ -17,6 +18,7 @@ export default class Module extends EventEmitter {
   desc = 'No description';
   authors: Array<string> = [];
   client: CatalystClient;
+  logger: Logger;
 
   load(_modules: { [key: string]: any }): void {
     // TODO: Fix the typedef for the `modules` parameter.
@@ -29,7 +31,12 @@ export default class Module extends EventEmitter {
     this.desc = info.desc ?? this.desc;
     this.client = info.client;
     this.authors = info.authors ?? this.authors;
+    this.logger = createLogger({
+      cluster: this.client.shard?.clusterCount,
+      shard: this.client.shard?.id,
+      module: this.name
+    });
 
-    console.log(`${this.name} module loaded.`);
+    this.logger.info(`${this.name} module loaded.`);
   }
 }

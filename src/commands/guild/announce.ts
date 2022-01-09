@@ -28,12 +28,13 @@ export default class AnnounceCommand extends Command {
       })
       .catch(err => {
         given.reply(alert('Unable to send message in channel'));
-        console.log(`Unable to send message ${message} in ${channel}: ${err}`);
+        this.logger.error(`Unable to send message ${message} in ${channel}: ${err}`);
       });
   }
 
-  constructor() {
+  constructor(client: CatalystClient) {
     super({
+      client,
       name: 'announce',
       desc: 'Announces a message in the given channel.',
       userPerms: [Permissions.FLAGS.MANAGE_GUILD],

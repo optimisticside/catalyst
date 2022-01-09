@@ -5,6 +5,7 @@
 import config from 'core/config';
 import CatalystClient from 'core/client';
 import { ApplicationCommandOptionChoice, AutocompleteInteraction, CommandInteraction, Message } from 'discord.js';
+import { createLogger, Logger } from 'utils/logger';
 const { DEFAULT_COOLDOWN } = config;
 
 export type CommandGiven = CommandInteraction | Message;
@@ -25,6 +26,7 @@ export interface CommandOption {
 
 export interface CommandInfo {
   name: string;
+  client: CatalystClient;
   aliases?: Array<string>;
   options?: Array<CommandOption>;
   group?: string;
@@ -49,6 +51,8 @@ export interface CommandInfo {
 
 export default abstract class Command {
   name: string;
+  client: CatalystClient;
+  logger: Logger;
   aliases: Array<string> = [];
   options: Array<CommandOption> = [];
   group?: string;
@@ -80,6 +84,7 @@ export default abstract class Command {
 
   constructor(info: CommandInfo) {
     this.name = info.name;
+    this.client = info.client;
     this.aliases = info.aliases ?? this.aliases;
     this.options = info.options ?? this.options;
     this.group = info.group;
@@ -99,5 +104,10 @@ export default abstract class Command {
     this.creatorOnly = info.creatorOnly ?? this.creatorOnly;
     this.allowBots = info.allowBots ?? this.allowBots;
     this.nsfw = info.nsfw ?? this.nsfw;
+    this.logger = createLogger({
+      cluster: this.client.shard?.clusterCount,
+      shard: this.client.shard?.id,
+      command: this.name
+    });
   }
 }

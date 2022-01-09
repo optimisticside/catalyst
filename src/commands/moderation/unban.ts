@@ -26,12 +26,13 @@ export default class UnbanCommand extends Command {
       })
       .catch(err => {
         given.reply(alert(`Unable to ban user`));
-        console.log(`Unable to unban ${id}: ${err}`);
+        this.logger.error(`Unable to unban ${id}: ${err}`);
       });
   }
 
-  constructor() {
+  constructor(client: CatalystClient) {
     super({
+      client,
       name: 'unban',
       desc: 'Unbans the provided user.',
       perms: [Permissions.FLAGS.BAN_MEMBERS],

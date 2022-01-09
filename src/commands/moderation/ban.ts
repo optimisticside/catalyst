@@ -31,12 +31,13 @@ export default class BanCommand extends Command {
       })
       .catch(err => {
         given.reply(alert(`Unable to ban ${username}`));
-        console.log(`Unable to ban user: ${err}`);
+        this.logger.error(`Unable to ban user: ${err}`);
       });
   }
 
-  constructor() {
+  constructor(client: CatalystClient) {
     super({
+      client,
       name: 'ban',
       desc: 'Bans the provided user.',
       perms: [Permissions.FLAGS.BAN_MEMBERS],

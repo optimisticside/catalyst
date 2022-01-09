@@ -19,8 +19,9 @@ export default class PingCommand extends Command {
     }
   }
 
-  constructor() {
+  constructor(client: CatalystClient) {
     super({
+      client,
       name: 'ping',
       desc: "Gets the bot's latency.",
       tags: ['testing']

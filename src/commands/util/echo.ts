@@ -12,8 +12,9 @@ export default class EchoCommand extends Command {
     given.reply((await parser.getOption('message')) as string);
   }
 
-  constructor() {
+  constructor(client: CatalystClient) {
     super({
+      client,
       name: 'echo',
       desc: 'Repeats whatever you tell it.',
       hidden: true,

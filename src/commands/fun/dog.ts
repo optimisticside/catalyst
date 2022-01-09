@@ -16,8 +16,9 @@ export default class DogCommand extends Command {
     given.reply({ embeds: [embed] });
   }
 
-  constructor() {
+  constructor(client: CatalystClient) {
     super({
+      client,
       name: 'dog',
       desc: 'Sends a random picture of a dog.',
       perms: [Permissions.FLAGS.SEND_MESSAGES],

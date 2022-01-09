@@ -54,8 +54,9 @@ export default class StatsCommand extends Command {
     given.reply({ embeds: [embed] });
   }
 
-  constructor() {
+  constructor(client: CatalystClient) {
     super({
+      client,
       name: 'stats',
       desc: "Provides information about the bot's state.",
       perms: [Permissions.FLAGS.SEND_MESSAGES]

@@ -25,12 +25,13 @@ export default class KickCommand extends Command {
       })
       .catch(err => {
         given.reply(alert(`Unable to kick ${username}`));
-        console.log(`Unable to kick user: ${err}`);
+        this.logger.error(`Unable to kick user: ${err}`);
       });
   }
 
-  constructor() {
+  constructor(client: CatalystClient) {
     super({
+      client,
       name: 'kick',
       desc: 'Kicks the provided user.',
       perms: [Permissions.FLAGS.KICK_MEMBERS],
