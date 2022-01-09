@@ -19,13 +19,13 @@ export default class CatalystCluster extends BaseCluster {
     this.client.user?.setPresence({
       status: 'online',
       activities: [{ name: `${guilds} servers`, type: 'WATCHING' }],
-      shardId: this.client.shard?.id,
+      shardId: this.client.shard?.id
     });
   }
 
   async launch() {
     this.client.cluster = this;
-    await this.client.load()
+    await this.client.load();
 
     this.client.login(TOKEN);
     if (this.client.isReady()) {
