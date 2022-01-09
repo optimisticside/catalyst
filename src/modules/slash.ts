@@ -175,7 +175,7 @@ export default class SlashModule extends Module {
 
   async setupGuild(guild: Guild) {
     await this.refreshCommands(guild, this.buildCommands()).catch(err => {
-      console.error(`Unable to load slash commands to guild ${guild.id}: ${err}`);
+      this.logger.error(`Unable to load slash commands to guild ${guild.id}: ${err}`);
     });
   }
 
@@ -286,7 +286,7 @@ export default class SlashModule extends Module {
         }*/
       })
       .catch(err => {
-        console.error(`Unable to run ${command.name} command: ${err}`);
+        this.logger.error(`Unable to run ${command.name} command: ${err}`);
         interaction.reply(warning('An error occured during command execution.'));
       });
   }
@@ -317,7 +317,7 @@ export default class SlashModule extends Module {
     eventHandler.on('interactionCreate', this.handleInteraction.bind(this));
 
     commandHandler.on('commandsLoad', async () => {
-      console.log('Setting up slash commands');
+      this.logger.info('Setting up slash commands');
       eventHandler.on('guildCreate', this.setupGuild.bind(this));
 
       if (!this.client.isReady()) {

@@ -11,10 +11,12 @@ import * as path from 'path';
 import { resolveFile } from 'utils/file';
 import CatalystClient from 'core/client';
 import { Intents, Options } from 'discord.js';
+import { createLogger } from 'utils/logger';
 import Service from 'structs/service';
 
 const { TOKEN, TOTAL_SHARDS, GUILDS_PER_SHARD, LIFETIME, REST_TIME_OFFSET } = config;
 
+const logger = createLogger();
 const shardingManager = new ShardingManager(path.join(__dirname, 'core/cluster'), {
   token: TOKEN,
   client: CatalystClient,
@@ -44,11 +46,11 @@ const shardingManager = new ShardingManager(path.join(__dirname, 'core/cluster')
 });
 
 shardingManager.on(SharderEvents.READY, (cluster: Cluster) => {
-  console.log(`Cluster ${cluster.id} spawned`);
+  logger.info(`Cluster ${cluster.id} spawned`);
 });
 
 shardingManager.on(SharderEvents.SHARD_READY, (shard: number) => {
-  console.log(`Shard ${shard} connected to Discord`);
+  logger.info(`Shard ${shard} connected to Discord`);
 });
 
 shardingManager.spawn();
@@ -67,12 +69,12 @@ if (cluster.isPrimary) {
       serviceFiles.map(async file => {
         const fileName = path.basename(file, path.extname(file));
         const result = await resolveFile<Service>(file).catch(err => {
-          console.error(`Unable to load ${fileName} service: ${err}`);
+          logger.error(`Unable to load ${fileName} service: ${err}`);
         });
 
         if (!result || !(result instanceof Service)) return;
         await result.run(shardingManager).catch(err => {
-          console.error(`Unable to start ${fileName} service: ${err}`);
+          logger.error(`Unable to start ${fileName} service: ${err}`);
         });
       })
     );

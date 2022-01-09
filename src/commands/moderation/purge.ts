@@ -24,12 +24,13 @@ export default class PurgeCommand extends Command {
       })
       .catch(err => {
         given.reply(alert(`Unable to delete messages.`));
-        console.log(`Unable to kick user: ${err}`);
+        this.logger.error(`Unable to kick user: ${err}`);
       });
   }
 
-  constructor() {
+  constructor(client: CatalystClient) {
     super({
+      client,
       name: 'purge',
       desc: 'Deletes the given amount of messages.',
       perms: [Permissions.FLAGS.MANAGE_MESSAGES],

@@ -29,17 +29,18 @@ export default class SoftbanCommand extends Command {
           })
           .catch(err => {
             given.reply(alert(`Unable to unban ${username}`));
-            console.log(`Unable to unban user: ${err}`);
+            this.logger.error(`Unable to unban user: ${err}`);
           });
       })
       .catch(err => {
         given.reply(alert(`Unable to ban ${username}`));
-        console.log(`Unable to ban user: ${err}`);
+        this.logger.error(`Unable to ban user: ${err}`);
       });
   }
 
-  constructor() {
+  constructor(client: CatalystClient) {
     super({
+      client,
       name: 'softBan',
       desc: 'Bans and unbans the provided user to delete messages.',
       perms: [Permissions.FLAGS.BAN_MEMBERS],

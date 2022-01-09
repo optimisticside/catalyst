@@ -24,8 +24,9 @@ export default class HelpCommand extends Command {
     Fluid.mount(voteMenu, given, { time: 15_000 });
   }
 
-  constructor() {
+  constructor(client: CatalystClient) {
     super({
+      client,
       name: 'vote',
       desc: 'Displays links where you can vote for the bot.',
       perms: [Permissions.FLAGS.SEND_MESSAGES]

@@ -27,12 +27,13 @@ export default class SlowmodeCommand extends Command {
       })
       .catch(err => {
         given.reply(alert(`Unable to set slowmode to ${time} seconds.`));
-        console.log(`Unable to set rate limit to ${time} seconds: ${err}`);
+        this.logger.error(`Unable to set rate limit to ${time} seconds: ${err}`);
       });
   }
 
-  constructor() {
+  constructor(client: CatalystClient) {
     super({
+      client,
       name: 'slowmode',
       desc: 'Toggles slowmode in a channel.',
       perms: [Permissions.FLAGS.MANAGE_MESSAGES],

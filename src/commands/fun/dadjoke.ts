@@ -20,8 +20,9 @@ export default class DadJokeCommand extends Command {
     given.reply(neutral(joke));
   }
 
-  constructor() {
+  constructor(client: CatalystClient) {
     super({
+      client,
       name: 'dadjoke',
       desc: 'Sends a random dad joke.',
       perms: [Permissions.FLAGS.SEND_MESSAGES],

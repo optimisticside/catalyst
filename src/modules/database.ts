@@ -16,12 +16,12 @@ export default class Database extends Module {
     mongoose
       .connect(MONGODB_SRV)
       .then(() => {
-        console.log('Connected to Mongo DB');
+        this.logger.info('Connected to Mongo DB');
         this.connected = true;
         this.emit('connect');
       })
       .catch(err => {
-        console.error(`Unable to connect to Mongo DB: ${err}`);
+        this.logger.error(`Unable to connect to Mongo DB: ${err}`);
       });
   }
 
