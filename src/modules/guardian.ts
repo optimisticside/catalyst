@@ -40,7 +40,7 @@ export default class Guardian extends Module {
   async notify(message: Message, reason: string) {
     await message.reply(warning(this.messages[reason] ?? 'Your message(s) were blocked.')).then(reply => {
       // We do not want to yield the `notify` function.
-      wait(5000).then(() => reply.delete().catch(console.error));
+      wait(5000).then(() => reply.delete().catch(this.logger.error));
     });
   }
 
@@ -49,7 +49,7 @@ export default class Guardian extends Module {
     this.emit('messageDelete', message, this.reasons[reason] ?? reason);
     // This causes the shard to restart so
     // we will do this >:)
-    message.delete().catch(console.error);
+    message.delete().catch(this.logger.error);
   }
 
   async handleMessage(message: Message) {
@@ -114,11 +114,11 @@ export default class Guardian extends Module {
             messages = messages.filter(
               m => tracker.start !== undefined && m.author === message.author && m.createdTimestamp > tracker.start
             );
-            //.map(m => m.delete().catch(console.error));
+            //.map(m => m.delete().catch(this.logger.error));
             channel
               .bulkDelete(messages)
               .then(() => this.emit('messageBulkDelete', messages, this.reasons.spam))
-              .catch(console.error);
+              .catch(this.logger.error);
           });
         }
       } else {

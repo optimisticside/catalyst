@@ -24,7 +24,7 @@ export default class DiscordLabsService extends Service {
         headers: { authorization: DISCORD_LABS_TOKEN },
         body: JSON.stringify({ server_count: guilds, shard_count: shards })
       }).catch(err => {
-        console.error(`Unable to post stats to Discord Labs: ${err}`);
+        this.logger.error(`Unable to post stats to Discord Labs: ${err}`);
       });
     };
 

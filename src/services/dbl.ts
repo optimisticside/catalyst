@@ -27,7 +27,7 @@ export default class DblService extends Service {
         headers: { Authorization: DBL_TOKEN },
         body: JSON.stringify({ users, guilds })
       }).catch(err => {
-        console.error(`Unable to post stats to DBL: ${err}`);
+        this.logger.error(`Unable to post stats to DBL: ${err}`);
       });
     };
 

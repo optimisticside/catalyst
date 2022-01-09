@@ -261,7 +261,7 @@ exports.default = class ConfigCommand extends Command {
     const parser = new OptionParser(this, given, args);
     //const path = await parser.getOption('path');
 
-    /*if (path) { console.log(path.split(PATH_DELIM))
+    /*if (path) { this.logger.info(path.split(PATH_DELIM))
       const elements = path.split(PATH_DELIM);
       let position = this.settings;
       elements.forEach(e => {

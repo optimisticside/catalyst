@@ -23,7 +23,7 @@ export default class DiscordsService extends Service {
         headers: { Authorization: DISCORDS_TOKEN },
         body: JSON.stringify({ server_count: guilds })
       }).catch(err => {
-        console.error(`Unable to post stats to Discords: ${err}`);
+        this.logger.error(`Unable to post stats to Discords: ${err}`);
       });
     };
 

@@ -8,15 +8,17 @@ import glob from 'glob-promise';
 import * as path from 'path';
 import { resolveFile } from 'utils/file';
 import CatalystCluster from 'core/cluster';
+import { createLogger, Logger } from 'utils/logger';
 
 export default class CatalystClient<Ready extends boolean = boolean> extends Client<Ready> {
   modules: { [key: string]: Module } = {};
   cluster?: CatalystCluster;
+  logger: Logger;
 
   async loadModule(file: string) {
     const module = await resolveFile<Module>(file, this).catch((err: Error) => {
       const fileName = path.basename(file, path.extname(file));
-      console.error(`Unable to load ${fileName} module: ${err}`);
+      this.logger.error(`Unable to load ${fileName} module: ${err}`);
     });
     if (!module) return;
     this.modules[module.name] = module;
@@ -36,5 +38,9 @@ export default class CatalystClient<Ready extends boolean = boolean> extends Cli
 
   constructor(options: ClientOptions) {
     super(options);
+    this.logger = createLogger({
+      cluster: this.shard?.clusterCount ?? this.cluster?.id,
+      shard: this.shard?.id
+    });
   }
 }
