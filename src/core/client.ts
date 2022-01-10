@@ -1,5 +1,5 @@
 // Catalyst
-// Copyright 2021 Catalyst contributors
+// Copyright 2022 Catalyst contributors
 // See LICENSE for details
 
 import { Client, ClientOptions } from 'discord.js';
