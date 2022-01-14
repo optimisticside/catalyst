@@ -33,7 +33,7 @@ export default class HelpCommand extends Command {
   }
 
   async commandHelp(client: CatalystClient, given: CommandGiven, parser: OptionParser, commandName: string) {
-    const commandHandler = client.modules.commandHandler as unknown as CommandHandler;
+    const commandHandler = client.getModule<CommandHandler>('commandHandler');
     const command = commandHandler.findCommand(commandName);
     if (!command) {
       return given.reply(warning('Unable to find command.'));
@@ -64,7 +64,7 @@ export default class HelpCommand extends Command {
   }
 
   async run(client: CatalystClient, given: CommandGiven, args: CommandArgs) {
-    const commandHandler = client.modules.commandHandler as unknown as CommandHandler;
+    const commandHandler = client.getModule<CommandHandler>('commandHandler');
     const parser = new OptionParser(this, given, args);
     const commandName = (await parser.getOption('command')) as string | undefined;
     const argumentName = (await parser.getOption('argument')) as string | undefined;

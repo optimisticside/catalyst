@@ -50,7 +50,7 @@ export default class OptionParser {
         // handler's parser can handle it.
         const raw = this.given.options.getString(name);
         if (!raw) return;
-        const commandHandler = client.modules.commandHandler as unknown as CommandHandler;
+        const commandHandler = client.getModule<CommandHandler>('commandHandler');
         return commandHandler.parseArg(null, option, raw);
       }
     }

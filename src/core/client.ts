@@ -15,6 +15,10 @@ export default class CatalystClient<Ready extends boolean = boolean> extends Cli
   cluster?: CatalystCluster;
   logger: Logger;
 
+  getModule<T extends Module>(name: string): T {
+    return this.modules[name] as T;
+  }
+
   async loadModule(file: string) {
     const module = await resolveFile<Module>(file, this).catch((err: Error) => {
       const fileName = path.basename(file, path.extname(file));
