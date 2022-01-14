@@ -89,7 +89,7 @@ export default class SlashModule extends Module {
   }
 
   buildCommands() {
-    const commandHandler = this.client.modules.commandHandler as unknown as CommandHandler;
+    const commandHandler = this.client.getModule<CommandHandler>('commandHandler');
     const commands: Array<SlashCommandBuilder> = [];
     const addedSubs: Array<string> = [];
 
@@ -180,7 +180,7 @@ export default class SlashModule extends Module {
   }
 
   findCommand(interaction: CommandInteraction | AutocompleteInteraction) {
-    const commandHandler = this.client.modules.commandHandler as unknown as CommandHandler;
+    const commandHandler = this.client.getModule<CommandHandler>('commandHandler');
     let command: Command | undefined = undefined;
 
     commandHandler.groups.map(group => {
@@ -210,7 +210,7 @@ export default class SlashModule extends Module {
 
   async handleCommand(interaction: CommandInteraction) {
     if (!interaction.isCommand() || !(interaction.channel instanceof TextChannel)) return;
-    const commandHandler = this.client.modules.commandHandler as unknown as CommandHandler;
+    const commandHandler = this.client.getModule<CommandHandler>('commandHandler');
     const command = this.findCommand(interaction);
     const lastRun = command && (await commandHandler.getCooldown(interaction.user, command));
     const member = await interaction.guild?.members.fetch(interaction.user.id);
