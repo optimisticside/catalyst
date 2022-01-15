@@ -6,9 +6,9 @@ import { GuildMember, TextChannel } from 'discord.js';
 import Module from 'structs/module';
 import GuildData, { GuildDocument } from 'models/guildData';
 import CatalystClient from 'core/client';
-import EventHandler from '@modules/events';
+import EventModule from '@modules/events';
 
-export default class Guilds extends Module {
+export default class GuildsModule extends Module {
   async greetMember(member: GuildMember, config: GuildDocument) {
     if (member.partial) member = await member.fetch();
     if (!config.greetingEnabled || !config.greetingChannel) return;
@@ -122,7 +122,7 @@ export default class Guilds extends Module {
   }*/
 
   load() {
-    const eventHandler = this.client.getModule<EventHandler>('eventHandler');
+    const eventHandler = this.client.getModule<EventModule>('eventHandler');
     eventHandler.on('guildMemberAdd', this.onMemberAdd.bind(this));
     eventHandler.on('guildMemberRemove', this.onMemberRemove.bind(this));
     // eventHandler.on('messageReactionAdd', this.onReactionAdd.bind(this));

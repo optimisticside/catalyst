@@ -15,7 +15,7 @@ export interface EventHandler {
   run: EventCallback;
 }
 
-export default class EventHalder extends Module {
+export default class EventsModule extends Module {
   on(name: string, run: EventCallback) {
     this.client.on(name, run);
     return this;

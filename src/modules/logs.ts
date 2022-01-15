@@ -19,14 +19,14 @@ import GuildData, { GuildDocument } from 'models/guildData';
 import Serializer, { Deserializable } from 'utils/serializer';
 import Command, { CommandArgs, CommandOption } from 'structs/command';
 import CatalystClient from 'core/client';
-import CommandHandler from '@modules/commands';
-import EventHandler from '@modules/events';
-import Guardian from '@modules/guardian';
-import SlashHandler from './slash';
+import EventsModule from '@modules/events';
+import SlashModule from '@modules/slash';
+import GuardianModule from '@modules/guardian';
+import CommandModule from '@modules/commands';
 
 const { DEFAULT_COLOR } = config;
 
-export default class Logs extends Module {
+export default class LogsModules extends Module {
   async getData(key: string, guild: Guild, config: GuildDocument) {
     if (!guild || !config) return;
     if (!config.logsEnabled || !config[key]) return;
@@ -305,10 +305,10 @@ export default class Logs extends Module {
   }
 
   load() {
-    const commandHandler = this.client.getModule<CommandHandler>('commandHandler');
-    const eventHandler = this.client.getModule<EventHandler>('eventHandler');
-    const slashHandler = this.client.getModule<SlashHandler>('slashHandler');
-    const guardian = this.client.getModule<Guardian>('client');
+    const commandHandler = this.client.getModule<CommandModule>('commandHandler');
+    const eventHandler = this.client.getModule<EventsModule>('eventHandler');
+    const slashHandler = this.client.getModule<SlashModule>('slashHandler');
+    const guardian = this.client.getModule<GuardianModule>('client');
 
     eventHandler.on('messageDelete', this.onMessageDelete.bind(this));
     eventHandler.on('messageDeleteBulk', this.onMessageBulkDelete.bind(this));

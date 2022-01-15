@@ -5,7 +5,7 @@
 import { CommandInteraction, Message } from 'discord.js';
 import CatalystClient from 'core/client';
 import Command, { CommandArgs } from 'structs/command';
-import CommandHandler from '@modules/commands';
+import CommandModule from '@modules/commands';
 
 export default class OptionParser {
   async getOption(name: string) {
@@ -46,7 +46,7 @@ export default class OptionParser {
         // handler's parser can handle it.
         const raw = this.given.options.getString(name);
         if (!raw) return;
-        const commandHandler = client.getModule<CommandHandler>('commandHandler');
+        const commandHandler = client.getModule<CommandModule>('commandHandler');
         return commandHandler.parseArg(null, option, raw);
       }
     }

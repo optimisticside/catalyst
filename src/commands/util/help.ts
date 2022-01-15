@@ -11,7 +11,7 @@ import Command, { CommandArgs, CommandGiven } from 'structs/command';
 import * as Fluid from 'libs/fluid';
 import HelpMenu from '@components/helpMenu';
 import CatalystClient from 'core/client';
-import CommandHandler from '@modules/commands';
+import CommandModule from '@modules/commands';
 
 const { NAME, PREFIX, SUPPORT_SERVER, CLIENT_ID, DEFAULT_COLOR } = config;
 const { warning } = formatter('Help Command');
@@ -33,7 +33,7 @@ export default class HelpCommand extends Command {
   }
 
   async commandHelp(given: CommandGiven, parser: OptionParser, commandName: string) {
-    const commandHandler = this.client.getModule<CommandHandler>('commandHandler');
+    const commandHandler = this.client.getModule<CommandModule>('commandHandler');
     const command = commandHandler.findCommand(commandName);
     if (!command) {
       return given.reply(warning('Unable to find command.'));
@@ -64,7 +64,7 @@ export default class HelpCommand extends Command {
   }
 
   async run(given: CommandGiven, args: CommandArgs) {
-    const commandHandler = this.client.getModule<CommandHandler>('commandHandler');
+    const commandHandler = this.client.getModule<CommandModule>('commandHandler');
     const parser = new OptionParser(this, given, args);
     const commandName = (await parser.getOption('command')) as string | undefined;
     const argumentName = (await parser.getOption('argument')) as string | undefined;
