@@ -26,7 +26,7 @@ export default class Module extends EventEmitter {
   }
 
   constructor(info: ModuleOptions) {
-    super({ captureRejections: false });
+    super();
     this.name = info.name;
     this.desc = info.desc ?? this.desc;
     this.client = info.client;
