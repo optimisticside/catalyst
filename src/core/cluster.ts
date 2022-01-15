@@ -29,7 +29,7 @@ export default class CatalystCluster extends BaseCluster {
 
     this.client.login(TOKEN);
     if (this.client.isReady()) {
-      await new Promise(res => this.client.on('ready', res));
+      await new Promise(res => this.client.once('ready', res));
     }
 
     this.updateStatus();
