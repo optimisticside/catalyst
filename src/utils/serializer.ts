@@ -2,6 +2,8 @@
 // Copyright 2022 Catalyst contributors
 // See LICENSE for details
 
+export type Deserializable = string | number | boolean;
+
 // This was created under the assumption that it would
 // be a temporary solution, until someone gets an idea
 // on how to replace it.

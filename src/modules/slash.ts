@@ -23,12 +23,13 @@ import {
 import Module from 'structs/module';
 import Command, { CommandArgs, CommandGiven, CommandValidator } from 'structs/command';
 import CatalystClient from 'core/client';
-import CommandHandler from './commands';
+import CommandHandler from '@modules/commands';
+import EventHandler from '@modules/events';
 
 const { TOKEN, CREATORS } = config;
 const { warning, denial } = formatter('Slash Command Handler');
 
-export default class SlashModule extends Module {
+export default class SlashHandler extends Module {
   validator?: CommandValidator;
 
   buildCommand(command: Command, isSubCommand?: boolean) {
@@ -127,7 +128,7 @@ export default class SlashModule extends Module {
   }
 
   createPerms(guild: Guild, command: Command) {
-    const perms: Array<any> = [];
+    const perms: Array<{ id: string; type: 'ROLE' | 'USER'; permission: boolean }> = [];
 
     guild.roles.cache.map(role => {
       const missing = command.userPerms.filter(p => !role.permissions.has(p));
@@ -315,9 +316,11 @@ export default class SlashModule extends Module {
     }
   }
 
-  load({ eventHandler, commandHandler }) {
-    eventHandler.on('interactionCreate', this.handleInteraction.bind(this));
+  load() {
+    const eventHandler = this.client.getModule<EventHandler>('eventHandler');
+    const commandHandler = this.client.getModule<CommandHandler>('commandHandler');
 
+    eventHandler.on('interactionCreate', this.handleInteraction.bind(this));
     commandHandler.on('commandsLoad', async () => {
       this.logger.info('Setting up slash commands');
       eventHandler.on('guildCreate', this.setupGuild.bind(this));

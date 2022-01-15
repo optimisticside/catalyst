@@ -15,7 +15,7 @@ export default class DadJokeCommand extends Command {
     const res = await fetch('https://icanhazdadjoke.com/', {
       headers: { Accept: 'application/json' }
     });
-    const joke = ((await res.json()) as any)?.joke as string;
+    const joke = (await res.json())?.joke as string;
 
     given.reply(neutral(joke));
   }
