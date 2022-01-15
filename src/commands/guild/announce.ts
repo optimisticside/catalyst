@@ -11,7 +11,7 @@ import OptionParser from 'utils/optionParser';
 const { success, alert } = formatter('Announce Command');
 
 export default class AnnounceCommand extends Command {
-  async run(_client: CatalystClient, given: CommandGiven, args: CommandArgs) {
+  async run(given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
     const channelId = (await parser.getOption('channel')) as string;
     const message = (await parser.getOption('message')) as string;

@@ -11,7 +11,7 @@ import CatalystClient from 'core/client';
 const { alert, success } = formatter('Slowmode Command');
 
 export default class SlowmodeCommand extends Command {
-  async run(_client: CatalystClient, given: CommandGiven, args: CommandArgs) {
+  async run(given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
     const time = await parser.getOption('time');
 

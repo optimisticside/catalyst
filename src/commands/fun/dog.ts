@@ -8,7 +8,7 @@ import CatalystClient from 'core/client';
 import fetch from 'node-fetch';
 
 export default class DogCommand extends Command {
-  async run(_client: CatalystClient, given: CommandGiven, _args: CommandArgs) {
+  async run(given: CommandGiven, _args: CommandArgs) {
     const res = await fetch('https://dog.ceo/api/breeds/image/random/');
     const url = ((await res.json()) as any)?.message as string;
 

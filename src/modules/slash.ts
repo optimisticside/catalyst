@@ -206,7 +206,7 @@ export default class SlashModule extends Module {
     return command ?? commandHandler.commands.find(c => c.name.toLowerCase() === interaction.commandName);
   }
 
-  async executeCommand(command: Command, ...params: [CatalystClient, CommandGiven, CommandArgs]) {
+  async executeCommand(command: Command, ...params: [CommandGiven, CommandArgs]) {
     return await command.run(...params);
   }
 
@@ -276,7 +276,7 @@ export default class SlashModule extends Module {
     }
 
     // if (!interaction.client) interaction.client = this.client;
-    this.executeCommand(command, this.client, interaction, [])
+    this.executeCommand(command, interaction, [])
       .then(() => {
         commandHandler.saveCooldown(interaction.user, command);
         this.emit('commandRun', interaction, command);

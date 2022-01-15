@@ -27,7 +27,7 @@ const toHrMinSec = (time: number) => {
 };
 
 export default class StatsCommand extends Command {
-  async run(client: CatalystClient, given: CommandGiven) {
+  async run(given: CommandGiven) {
     const mem = process.memoryUsage();
     const load = os.loadavg();
 
@@ -36,8 +36,8 @@ export default class StatsCommand extends Command {
     const uptime = toHrMinSec(process.uptime() * 1000);
 
     const result = (await Promise.all([
-      client.shard?.fetchClientValues('guilds.cache.size'),
-      client.shard?.broadcastEval(c => c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0))
+      this.client.shard?.fetchClientValues('guilds.cache.size'),
+      this.client.shard?.broadcastEval(c => c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0))
     ])) as Array<Array<number>>;
     const totalGuilds = result[0].reduce((acc, count) => acc + count, 0);
     const totalUsers = result[1].reduce((acc, count) => acc + count, 0);
@@ -50,7 +50,7 @@ export default class StatsCommand extends Command {
       .addField('Uptime', `${uptime}`, true)
       .addField('Avg Load', load.map(n => n.toFixed(3)).join(', '))
       .addField('Memory Usage', `${usedMem} GB / ${totalMem} GB`, true)
-      .setFooter({ text: `PID: ${process.pid} | Cluster: ${client.shard?.id} | Shard: ${client.shard?.shardCount}` });
+      .setFooter({ text: `PID: ${process.pid} | Cluster: ${this.client.shard?.id} | Shard: ${this.client.shard?.shardCount}` });
     given.reply({ embeds: [embed] });
   }
 

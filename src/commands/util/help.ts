@@ -17,7 +17,7 @@ const { NAME, PREFIX, SUPPORT_SERVER, CLIENT_ID, DEFAULT_COLOR } = config;
 const { warning } = formatter('Help Command');
 
 export default class HelpCommand extends Command {
-  async argumentHelp(_client: CatalystClient, given: CommandGiven, command: Command, argumentName: string) {
+  async argumentHelp(given: CommandGiven, command: Command, argumentName: string) {
     const option = command.options.find(o => o.name === argumentName);
     if (!option) {
       return given.reply(warning('Unable to find argument.'));
@@ -32,8 +32,8 @@ export default class HelpCommand extends Command {
     given.reply({ embeds: [embed] });
   }
 
-  async commandHelp(client: CatalystClient, given: CommandGiven, parser: OptionParser, commandName: string) {
-    const commandHandler = client.getModule<CommandHandler>('commandHandler');
+  async commandHelp(given: CommandGiven, parser: OptionParser, commandName: string) {
+    const commandHandler = this.client.getModule<CommandHandler>('commandHandler');
     const command = commandHandler.findCommand(commandName);
     if (!command) {
       return given.reply(warning('Unable to find command.'));
@@ -41,7 +41,7 @@ export default class HelpCommand extends Command {
 
     const argumentName = await parser.getOption('argument');
     if (argumentName) {
-      return await this.argumentHelp(client, given, command, argumentName);
+      return await this.argumentHelp(given, command, argumentName);
     }
 
     const argumentInfo: Array<string> = [];
@@ -63,14 +63,14 @@ export default class HelpCommand extends Command {
     given.reply({ embeds: [embed] });
   }
 
-  async run(client: CatalystClient, given: CommandGiven, args: CommandArgs) {
-    const commandHandler = client.getModule<CommandHandler>('commandHandler');
+  async run(given: CommandGiven, args: CommandArgs) {
+    const commandHandler = this.client.getModule<CommandHandler>('commandHandler');
     const parser = new OptionParser(this, given, args);
     const commandName = (await parser.getOption('command')) as string | undefined;
     const argumentName = (await parser.getOption('argument')) as string | undefined;
 
     if (commandName) {
-      return await this.commandHelp(client, given, parser, commandName);
+      return await this.commandHelp(given, parser, commandName);
     }
     if (argumentName) {
       return given.reply(warning('No command provided.'));

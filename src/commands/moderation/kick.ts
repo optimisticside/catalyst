@@ -11,7 +11,7 @@ import CatalystClient from 'core/client';
 const { success, alert } = formatter('Kick Command');
 
 export default class KickCommand extends Command {
-  async run(_client: CatalystClient, given: CommandGiven, args: CommandArgs) {
+  async run(given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
     const target = (await parser.getOption('target')) as GuildMember;
     const reason = (await parser.getOption('reason')) as string | undefined;
