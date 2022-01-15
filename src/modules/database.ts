@@ -9,7 +9,7 @@ import CatalystClient from 'core/client';
 
 const { MONGODB_SRV } = config;
 
-export default class Database extends Module {
+export default class DatabaseModule extends Module {
   connected = false;
 
   load() {
