@@ -3,7 +3,7 @@
 // See LICENSE for details
 
 import { Permissions } from 'discord.js';
-import Command, { CommandArgs, CommandGiven } from 'structs/command';
+import Command, { CommandGiven } from 'structs/command';
 import CatalystClient from 'core/client';
 import fetch from 'node-fetch';
 import formatter from 'utils/formatter';
@@ -11,7 +11,7 @@ import formatter from 'utils/formatter';
 const { neutral } = formatter('Dadjoke Command');
 
 export default class DadJokeCommand extends Command {
-  async run(given: CommandGiven, _args: CommandArgs) {
+  async run(given: CommandGiven) {
     const res = await fetch('https://icanhazdadjoke.com/', {
       headers: { Accept: 'application/json' }
     });

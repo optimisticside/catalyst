@@ -302,7 +302,7 @@ export default class CommandModule extends Module {
             message.reply(warning('An error occured during command execution.'));
           });
       })
-      .catch(_err => {
+      .catch(() => {
         // TODO: Fix this bad error handling.
         // We don't have to do anything here.
         // This is just to mute errors from handling arguments.

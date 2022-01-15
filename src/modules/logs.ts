@@ -17,7 +17,7 @@ import {
 import Module from 'structs/module';
 import GuildData, { GuildDocument } from 'models/guildData';
 import Serializer, { Deserializable } from 'utils/serializer';
-import Command, { CommandArgs, CommandOption } from 'structs/command';
+import Command, { CommandOption } from 'structs/command';
 import CatalystClient from 'core/client';
 import EventsModule from '@modules/events';
 import SlashModule from '@modules/slash';
@@ -184,7 +184,7 @@ export default class LogsModules extends Module {
     });
   }
 
-  async onCommandRun(message: Message, command: Command, _args: CommandArgs) {
+  async onCommandRun(message: Message, command: Command) {
     if (command.passive) return;
     if (command.tags?.find(t => t === 'fun')) return;
     if (message.author.bot || !message.guild) return;
