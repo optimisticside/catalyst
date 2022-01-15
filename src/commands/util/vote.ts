@@ -4,7 +4,7 @@
 
 import config from 'core/config';
 import { Permissions } from 'discord.js';
-import Command, { CommandGiven, CommandArgs } from 'structs/command';
+import Command, { CommandGiven } from 'structs/command';
 import * as Fluid from 'libs/fluid';
 import VoteMenu from '@components/voteMenu';
 import CatalystClient from 'core/client';
@@ -12,7 +12,7 @@ import CatalystClient from 'core/client';
 const { NAME, CLIENT_ID, TOPGG_TOKEN, DBL_TOKEN, DISCORDS_TOKEN } = config;
 
 export default class HelpCommand extends Command {
-  async run(given: CommandGiven, _args: CommandArgs) {
+  async run(given: CommandGiven) {
     const voteMenu = new VoteMenu({
       clientId: CLIENT_ID,
       name: NAME,

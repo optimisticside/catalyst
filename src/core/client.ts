@@ -30,7 +30,7 @@ export default class CatalystClient<Ready extends boolean = boolean> extends Cli
 
   initModule(module: Module) {
     if (!module.load) return;
-    module.load(this.modules);
+    module.load();
   }
 
   async load() {
