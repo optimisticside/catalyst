@@ -326,7 +326,7 @@ export default class SlashModule extends Module {
       eventHandler.on('guildCreate', this.setupGuild.bind(this));
 
       if (!this.client.isReady()) {
-        await new Promise(res => this.client.on('ready', res));
+        await new Promise(res => this.client.once('ready', res));
       }
       this.client.guilds.cache.map(this.setupGuild.bind(this));
     });
