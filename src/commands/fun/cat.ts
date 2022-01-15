@@ -8,7 +8,7 @@ import CatalystClient from 'core/client';
 import fetch from 'node-fetch';
 
 export default class CatCommand extends Command {
-  async run(_client: CatalystClient, given: CommandGiven, _args: CommandArgs) {
+  async run(given: CommandGiven, _args: CommandArgs) {
     const res = await fetch('https://aws.random.cat/meow');
     const url = ((await res.json()) as any)?.file as string;
 

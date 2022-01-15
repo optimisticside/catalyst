@@ -41,7 +41,7 @@ export default class CommandHandler extends Module {
     });
   }
 
-  async executeCommand(command: Command, ...params: [CatalystClient, CommandGiven, CommandArgs]) {
+  async executeCommand(command: Command, ...params: [CommandGiven, CommandArgs]) {
     if (!command.run) return;
     this.emit('commandExecute', command, ...params);
     return await command.run(...params);
@@ -291,7 +291,7 @@ export default class CommandHandler extends Module {
 
     await this.handleArgs(message, command, args)
       .then(finalArgs => {
-        this.executeCommand(command, this.client, message, finalArgs)
+        this.executeCommand(command, message, finalArgs)
           .then(() => {
             this.saveCooldown(message.author, command);
             this.emit('commandRun', message, command, finalArgs);

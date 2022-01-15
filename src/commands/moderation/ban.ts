@@ -10,7 +10,7 @@ import CatalystClient from 'core/client';
 const { alert, success } = formatter('Ban Command');
 
 export default class BanCommand extends Command {
-  async run(_client: CatalystClient, given: CommandGiven, args: CommandArgs) {
+  async run(given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
     const target = (await parser.getOption('target')) as GuildMember;
     const reason = (await parser.getOption('reason')) as string | undefined;

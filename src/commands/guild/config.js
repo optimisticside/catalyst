@@ -257,7 +257,7 @@ exports.default = class ConfigCommand extends Command {
     return setting.handler(client, given, reply);
   }
 
-  async run(client, given, args) {
+  async run(given, args) {
     const parser = new OptionParser(this, given, args);
     //const path = await parser.getOption('path');
 
@@ -269,7 +269,7 @@ exports.default = class ConfigCommand extends Command {
         position = position.menu[e];
       });
       if (!position || !position.menu) return;
-      await this.loadMenu(client, given, null, position.name,
+      await this.loadMenu(this.client, given, null, position.name,
         position.desc, position.menu);
     }*/
 
@@ -277,7 +277,7 @@ exports.default = class ConfigCommand extends Command {
       return given.reply(warning('The config command cannot be run as a slash command'));
     }
 
-    return await this.loadMenu(client, given, null, NAME,
+    return await this.loadMenu(this.client, given, null, NAME,
       `React with the corresponding emoji to configure ${NAME}.`, this.settings);
   }
 
