@@ -14,7 +14,7 @@ export default class Service extends EventEmitter {
   }
 
   constructor(public name: string) {
-    super({ captureRejections: false });
+    super();
     this.logger = createLogger({
       service: this.name
     });
