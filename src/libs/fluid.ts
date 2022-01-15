@@ -45,7 +45,7 @@ export abstract class Component extends EventEmitter {
   reply?: Message;
 
   constructor(props?: ComponentProps) {
-    super({ captureRejections: false });
+    super();
     this.alive = true;
     this.state = {};
     this.props = props ?? {};
