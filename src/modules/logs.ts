@@ -308,7 +308,7 @@ export default class LogsModules extends Module {
     const commandHandler = this.client.getModule<CommandModule>('commandHandler');
     const eventHandler = this.client.getModule<EventsModule>('eventHandler');
     const slashHandler = this.client.getModule<SlashModule>('slashHandler');
-    const guardian = this.client.getModule<GuardianModule>('client');
+    const guardian = this.client.getModule<GuardianModule>('guardian');
 
     eventHandler.on('messageDelete', this.onMessageDelete.bind(this));
     eventHandler.on('messageDeleteBulk', this.onMessageBulkDelete.bind(this));
