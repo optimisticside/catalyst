@@ -10,7 +10,7 @@ import fetch from 'node-fetch';
 export default class DogCommand extends Command {
   async run(given: CommandGiven, _args: CommandArgs) {
     const res = await fetch('https://dog.ceo/api/breeds/image/random/');
-    const url = ((await res.json()) as any)?.message as string;
+    const url = (await res.json())?.message as string;
 
     const embed = new MessageEmbed().setTitle(':dog: Woof!').setURL(url).setImage(url);
     given.reply({ embeds: [embed] });

@@ -5,6 +5,8 @@
 import { createLogger as winstonCreateLogger, format, transports, Logger as WinstonLogger } from 'winston';
 
 export type Logger = WinstonLogger;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createLogger(defaultMeta?: any) {
   let formatting = [format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), format.errors({ stack: true })];
   if (process.env.NODE_ENV === 'production') {

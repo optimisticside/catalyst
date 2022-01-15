@@ -20,7 +20,8 @@ export default class BanCommand extends Command {
     // We can remove this after slash command
     // support is added.
     if (days && (days < 0 || days > 7)) {
-      return given.reply(alert('Ban duration must be between 1 and 7 days'));
+      given.reply(alert('Ban duration must be between 1 and 7 days'));
+      return
     }
 
     const username = `${target.user.username}#${target.user.discriminator}`;

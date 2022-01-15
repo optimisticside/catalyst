@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Catalyst
 // Copyright 2022 Catalyst contributors
 // See LICENSE for details

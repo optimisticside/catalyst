@@ -10,7 +10,7 @@ import fetch from 'node-fetch';
 export default class CatCommand extends Command {
   async run(given: CommandGiven, _args: CommandArgs) {
     const res = await fetch('https://aws.random.cat/meow');
-    const url = ((await res.json()) as any)?.file as string;
+    const url = (await res.json())?.file as string;
 
     const embed = new MessageEmbed().setTitle(':cat: Meowww...').setURL(url).setImage(url);
     given.reply({ embeds: [embed] });

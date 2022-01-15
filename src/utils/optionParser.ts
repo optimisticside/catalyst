@@ -4,14 +4,10 @@
 
 import { CommandInteraction, Message } from 'discord.js';
 import CatalystClient from 'core/client';
-import Command from 'structs/command';
+import Command, { CommandArgs } from 'structs/command';
 import CommandHandler from '@modules/commands';
 
 export default class OptionParser {
-  given: Message | CommandInteraction;
-  command: Command;
-  args: { [key: string]: any };
-
   async getOption(name: string) {
     const client: CatalystClient = this.given.client as CatalystClient;
     const option = this.command.options.find(o => o.name === name);
@@ -56,9 +52,5 @@ export default class OptionParser {
     }
   }
 
-  constructor(command: Command, given: Message | CommandInteraction, args) {
-    this.command = command;
-    this.given = given;
-    this.args = args;
-  }
+  constructor(public command: Command, public given: Message | CommandInteraction, public args: CommandArgs) {}
 }

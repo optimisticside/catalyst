@@ -24,8 +24,8 @@ export type Mounter = (
   options?: RenderOptions
 ) => Promise<InteractionCollector<MessageComponentInteraction> | undefined>;
 
-export type ComponentState = { [key: string]: any };
-export type ComponentProps = { [key: string]: any };
+export type ComponentState = { [key: string]: any }; // eslint-disable-line @typescript-eslint/no-explicit-any
+export type ComponentProps = { [key: string]: any }; // eslint-disable-line @typescript-eslint/no-explicit-any
 export type ComponentListener = (interaction: MessageComponentInteraction) => void;
 
 export type Redirector = (redirect: Component) => void;

@@ -8,6 +8,7 @@ import Module from 'structs/module';
 import GuildData, { GuildDocument } from 'models/guildData';
 import { setTimeout as wait } from 'timers/promises';
 import CatalystClient from 'core/client';
+import EventHandler from '@modules/events';
 
 const { warning } = formatter('Guardian');
 
@@ -140,7 +141,8 @@ export default class Guardian extends Module {
     if (isBlacklisted) await this.delete(message, 'blacklist');
   }
 
-  load({ eventHandler }) {
+  load() {
+    const eventHandler = this.client.getModule<EventHandler>('eventHandler');
     eventHandler.on('messageCreate', this.handleMessage.bind(this));
   }
 

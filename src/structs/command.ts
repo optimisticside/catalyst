@@ -10,7 +10,7 @@ const { DEFAULT_COOLDOWN } = config;
 
 export type CommandGiven = CommandInteraction | Message;
 export type CommandValidator = (given: CommandGiven, command: Command) => Promise<boolean>;
-export type CommandArgs = { [key: string]: any };
+export type CommandArgs = { [key: string]: any }; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 export interface CommandOption {
   name: string;
@@ -19,8 +19,8 @@ export interface CommandOption {
   prompt?: string;
   required?: boolean;
   choices?: Array<ApplicationCommandOptionChoice>;
-  minimum?: any;
-  maximum?: any;
+  minimum?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  maximum?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   autoComplete?: (current: AutocompleteInteraction) => Promise<Array<ApplicationCommandOptionChoice>>;
 }
 
@@ -77,7 +77,7 @@ export default abstract class Command {
     return given !== null;
   }
 
-  async run(_given: CommandGiven, _args: CommandArgs): Promise<any> {
+  async run(_given: CommandGiven, _args: CommandArgs): Promise<void> {
     throw new Error(`${this.name} doesn't have a run() method.`);
   }
 

@@ -8,13 +8,14 @@ import * as path from 'path';
 import glob from 'glob-promise';
 import CatalystClient from 'core/client';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type EventCallback = (...args: any[]) => void | Promise<void>;
 export interface EventHandler {
   name: string;
   run: EventCallback;
 }
 
-export default class Events extends Module {
+export default class EventHalder extends Module {
   on(name: string, run: EventCallback) {
     this.client.on(name, run);
     return this;

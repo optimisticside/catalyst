@@ -16,9 +16,13 @@ import {
 } from 'discord.js';
 import Module from 'structs/module';
 import GuildData, { GuildDocument } from 'models/guildData';
-import Serializer from 'utils/serializer';
+import Serializer, { Deserializable } from 'utils/serializer';
 import Command, { CommandArgs, CommandOption } from 'structs/command';
 import CatalystClient from 'core/client';
+import CommandHandler from '@modules/commands';
+import EventHandler from '@modules/events';
+import Guardian from '@modules/guardian';
+import SlashHandler from './slash';
 
 const { DEFAULT_COLOR } = config;
 
@@ -208,7 +212,7 @@ export default class Logs extends Module {
 
     // TODO: This could be simpler if the `Serializer`
     // library was better built.
-    const deserialize = async (given: any, option: CommandOption) => {
+    const deserialize = async (given: Deserializable, option: CommandOption) => {
       switch (option.type) {
         case 'text':
         case 'raw':
@@ -300,7 +304,12 @@ export default class Logs extends Module {
     channel.send({ embeds: [embed] });
   }
 
-  load({ commandHandler, eventHandler, slashHandler, guardian }) {
+  load() {
+    const commandHandler = this.client.getModule<CommandHandler>('commandHandler');
+    const eventHandler = this.client.getModule<EventHandler>('eventHandler');
+    const slashHandler = this.client.getModule<SlashHandler>('slashHandler');
+    const guardian = this.client.getModule<Guardian>('client');
+
     eventHandler.on('messageDelete', this.onMessageDelete.bind(this));
     eventHandler.on('messageDeleteBulk', this.onMessageBulkDelete.bind(this));
     eventHandler.on('messageUpdate', this.onMessageEdit.bind(this));

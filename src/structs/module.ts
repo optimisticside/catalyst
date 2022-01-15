@@ -20,7 +20,7 @@ export default class Module extends EventEmitter {
   client: CatalystClient;
   logger: Logger;
 
-  load(_modules: { [key: string]: any }): void {
+  load(_modules: { [key: string]: Module }): void {
     // TODO: Fix the typedef for the `modules` parameter.
     // Nothing to do here.
   }
