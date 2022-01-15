@@ -23,13 +23,13 @@ import {
 import Module from 'structs/module';
 import Command, { CommandArgs, CommandGiven, CommandValidator } from 'structs/command';
 import CatalystClient from 'core/client';
-import CommandHandler from '@modules/commands';
-import EventHandler from '@modules/events';
+import CommandModule from '@modules/commands';
+import EventModule from '@modules/events';
 
 const { TOKEN, CREATORS } = config;
 const { warning, denial } = formatter('Slash Command Handler');
 
-export default class SlashHandler extends Module {
+export default class SlashModule extends Module {
   validator?: CommandValidator;
 
   buildCommand(command: Command, isSubCommand?: boolean) {
@@ -90,7 +90,7 @@ export default class SlashHandler extends Module {
   }
 
   buildCommands() {
-    const commandHandler = this.client.getModule<CommandHandler>('commandHandler');
+    const commandHandler = this.client.getModule<CommandModule>('commandHandler');
     const commands: Array<SlashCommandBuilder> = [];
     const addedSubs: Array<string> = [];
 
@@ -183,7 +183,7 @@ export default class SlashHandler extends Module {
   }
 
   findCommand(interaction: CommandInteraction | AutocompleteInteraction) {
-    const commandHandler = this.client.getModule<CommandHandler>('commandHandler');
+    const commandHandler = this.client.getModule<CommandModule>('commandHandler');
     let command: Command | undefined = undefined;
 
     commandHandler.groups.map(group => {
@@ -213,7 +213,7 @@ export default class SlashHandler extends Module {
 
   async handleCommand(interaction: CommandInteraction) {
     if (!interaction.isCommand() || !(interaction.channel instanceof TextChannel)) return;
-    const commandHandler = this.client.getModule<CommandHandler>('commandHandler');
+    const commandHandler = this.client.getModule<CommandModule>('commandHandler');
     const command = this.findCommand(interaction);
     const lastRun = command && (await commandHandler.getCooldown(interaction.user, command));
     const member = await interaction.guild?.members.fetch(interaction.user.id);
@@ -317,8 +317,8 @@ export default class SlashHandler extends Module {
   }
 
   load() {
-    const eventHandler = this.client.getModule<EventHandler>('eventHandler');
-    const commandHandler = this.client.getModule<CommandHandler>('commandHandler');
+    const eventHandler = this.client.getModule<EventModule>('eventHandler');
+    const commandHandler = this.client.getModule<CommandModule>('commandHandler');
 
     eventHandler.on('interactionCreate', this.handleInteraction.bind(this));
     commandHandler.on('commandsLoad', async () => {

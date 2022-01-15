@@ -15,12 +15,12 @@ import glob from 'glob-promise';
 import * as path from 'path';
 import CatalystClient from 'core/client';
 import { resolveFile } from 'utils/file';
-import EventHandler from '@modules/events';
+import EventModule from '@modules/events';
 
 const { PREFIX, CREATORS, COOLDOWN_PERSISTANCE_THRESHOLD } = config;
 const { warning, denial, prompt, alert } = formatter('Command Handler');
 
-export default class CommandHandler extends Module {
+export default class CommandModule extends Module {
   commands: Array<Command> = [];
   groups: Array<CommandGroup> = [];
   subGroups: Array<SubCommandGroup> = [];
@@ -345,7 +345,7 @@ export default class CommandHandler extends Module {
   }
 
   load() {
-    const eventHandler = this.client.getModule<EventHandler>('eventHandler');
+    const eventHandler = this.client.getModule<EventModule>('eventHandler');
 
     this.loadCommands();
     eventHandler.on('messageCreate', this.handleMessage.bind(this));

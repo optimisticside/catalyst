@@ -8,7 +8,7 @@ import Module from 'structs/module';
 import GuildData, { GuildDocument } from 'models/guildData';
 import { setTimeout as wait } from 'timers/promises';
 import CatalystClient from 'core/client';
-import EventHandler from '@modules/events';
+import EventsModule from '@modules/events';
 
 const { warning } = formatter('Guardian');
 
@@ -32,7 +32,7 @@ interface AntispamConfig {
   notifyInterval: number;
 }
 
-export default class Guardian extends Module {
+export default class GuardianModule extends Module {
   messages: { [key: string]: string };
   reasons: { [key: string]: string };
   messageTrackers: Map<Snowflake, MessageTracker>;
@@ -142,7 +142,7 @@ export default class Guardian extends Module {
   }
 
   load() {
-    const eventHandler = this.client.getModule<EventHandler>('eventHandler');
+    const eventHandler = this.client.getModule<EventsModule>('eventHandler');
     eventHandler.on('messageCreate', this.handleMessage.bind(this));
   }
 
