@@ -46,6 +46,7 @@ export default class WhoisCommand extends Command {
     super({
       client,
       name: 'whois',
+      aliases: ['userInfo'],
       desc: 'Gets information about a user.',
       options: [
         {
