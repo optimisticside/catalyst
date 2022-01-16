@@ -24,5 +24,6 @@ export default {
   deserializeRole: str => str.match(/^<@&?(\d+)>$/)[1],
   serializeMentionable: mentionable => `<@${mentionable}>`,
   deserializeMentionable: str => str.match(/^<@&?(\d+)>$/)[1],
-  serializeTimestamp: (timestamp, type) => `<${Math.floor(timestamp / 1000)}:${type}>`
+  serializeTimestamp: (timestamp, type) => `<${Math.floor(timestamp / 1000)}:${type}>`,
+  deserializeTimestamp: str => str.match(/^<t:(\d+):[tTdDfFR]>$/)[1] * 1000
 };
