@@ -23,5 +23,6 @@ export default {
   serializeRole: role => `<@${role}>`,
   deserializeRole: str => str.match(/^<@&?(\d+)>$/)[1],
   serializeMentionable: mentionable => `<@${mentionable}>`,
-  deserializeMentionable: str => str.match(/^<@&?(\d+)>$/)[1]
+  deserializeMentionable: str => str.match(/^<@&?(\d+)>$/)[1],
+  serializeTimestamp: (timestamp, type) => `<${Math.floor(timestamp / 1000)}:${type}>`
 };
