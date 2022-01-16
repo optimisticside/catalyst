@@ -34,7 +34,7 @@ export default class WhoisCommand extends Command {
       .setThumbnail(target.user.displayAvatarURL())
       .setDescription(Serializer.serializeUser(target.user.id))
       .addField('Joined', joinedAt, true)
-      .addField('Registered', `<t:${Math.floor(target.user.createdTimestamp / 1000)}:f>`, true)
+      .addField('Registered', Serializer.serializeTimestamp(target.user.createdTimestamp, 'f'), true)
       .addField(`Roles[${target.roles.cache.size}]`, roles.join(' '))
       .addField('Key Permissions', keyPermissions.join(' '))
       .setFooter({ text: `ID: ${target.user.id}` })
