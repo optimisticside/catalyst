@@ -32,7 +32,7 @@ export default class WhoisCommand extends Command {
       .setAuthor({ name: target.user.username, iconURL: target.user.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setThumbnail(target.user.displayAvatarURL())
-      .setDescription(Serializer.serializeUser(target.user.id))
+      .setDescription(`<@${target.user.id}>`)
       .addField('Joined', joinedAt, true)
       .addField('Registered', Serializer.serializeTimestamp(target.user.createdTimestamp, 'f'), true)
       .addField(`Roles[${target.roles.cache.size}]`, roles.join(' '))
