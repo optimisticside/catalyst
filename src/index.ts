@@ -4,7 +4,7 @@
 
 import 'module-alias/register';
 import config from 'core/config';
-import { ShardingManager, Cluster, SharderEvents } from 'kurasuta';
+import { ShardingManager, SharderEvents } from 'kurasuta';
 import cluster from 'cluster';
 import glob from 'glob-promise';
 import * as path from 'path';
@@ -25,6 +25,7 @@ const shardingManager = new ShardingManager(path.join(__dirname, 'core/cluster')
   clientOptions: {
     partials: ['GUILD_MEMBER', 'REACTION'],
     restTimeOffset: REST_TIME_OFFSET ?? 500,
+    makeCache: Options.cacheWithLimits({ MessageManager: 25 }),
     intents: [
       Intents.FLAGS.GUILDS,
       Intents.FLAGS.GUILD_MESSAGES,
@@ -38,22 +39,20 @@ const shardingManager = new ShardingManager(path.join(__dirname, 'core/cluster')
         lifetime: 21600,
         interval: 43200
       }
-    },
-    makeCache: Options.cacheWithLimits({
-      MessageManager: 25
-    })
+    }
   }
 });
 
-shardingManager.on(SharderEvents.READY, (cluster: Cluster) => {
-  logger.info(`Cluster ${cluster.id} spawned`);
-});
+shardingManager
+  .on(SharderEvents.READY, cluster => logger.info(`Cluster ${cluster.id} spawned`))
+  .on(SharderEvents.SHARD_READY, shard => logger.info(`Shard ${shard} connected`))
+  .on(SharderEvents.SHARD_DISCONNECT, (_, shard) => logger.warn(`Shard ${shard} disconnected`))
+  .on(SharderEvents.SHARD_RECONNECT, shard => logger.info(`Shard ${shard} reconnected`))
+  .spawn();
 
-shardingManager.on(SharderEvents.SHARD_READY, (shard: number) => {
-  logger.info(`Shard ${shard} connected to Discord`);
-});
-
-shardingManager.spawn();
+if (process.env.NODE_ENV !== 'production') {
+  shardingManager.on(SharderEvents.DEBUG, logger.debug.bind(logger));
+}
 
 if (cluster.isPrimary) {
   if (LIFETIME) {
