@@ -35,9 +35,7 @@ export default class HelpMenuComponent extends Component {
 
     const commandsList = new ListMenu({
       header: 'Commands',
-      body: this.props.commands.map(({ name }) => {
-        return { name };
-      })
+      body: this.props.commands.map(({ name }) => ({ name }))
     });
 
     const commandsRedirect = redirect(this, commandsList as Component);
