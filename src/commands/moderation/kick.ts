@@ -17,14 +17,13 @@ export default class KickCommand extends Command {
     const reason = (await parser.getOption('reason')) as string | undefined;
     if (!target) return;
 
-    const username = `${target.user.username}#${target.user.discriminator}`;
     target
       .kick(reason)
       .then(() => {
-        given.reply(success(`Successfully kicked ${username}`));
+        given.reply(success(`Successfully kicked ${target.user.tag}`));
       })
       .catch(err => {
-        given.reply(alert(`Unable to kick ${username}`));
+        given.reply(alert(`Unable to kick ${target.user.tag}`));
         this.logger.error(`Unable to kick user: ${err}`);
       });
   }

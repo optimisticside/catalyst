@@ -42,9 +42,8 @@ export default class LogsModules extends Module {
     const channel = await this.getData('logMessageDelete', message.guild, config);
     if (!channel || !(channel instanceof TextChannel)) return;
 
-    const username = `${message.author.username}#${message.author.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor({ name: username, iconURL: message.author.displayAvatarURL() })
+      .setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`Message sent by <@${message.author.id}> deleted in <#${message.channel.id}>\n${message.content}`)
       .setFooter({ text: `ID: ${message.id}` })
@@ -62,9 +61,8 @@ export default class LogsModules extends Module {
     const channel = await this.getData('logMessageDelete', last.guild, config);
     if (!channel || !(channel instanceof TextChannel)) return;
 
-    const username = `${last.author.username}#${last.author.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor({ name: username, iconURL: last.author.displayAvatarURL() })
+      .setAuthor({ name: last.author.tag, iconURL: last.author.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`${messages.size} messages bulk-deleted in <#${last.channel.id}>`)
       .setTimestamp(Date.now());
@@ -82,10 +80,9 @@ export default class LogsModules extends Module {
     if (oldMessage.content === newMessage.content) return;
 
     const url = `https://discordapp.com/channels/${newMessage.guild.id}/${newMessage.channel.id}/${newMessage.id}`;
-    const username = `${newMessage.author.username}#${newMessage.author.discriminator}`;
     const embed = new MessageEmbed()
       .setAuthor({
-        name: username,
+        name: newMessage.author.tag,
         iconURL: newMessage.author.displayAvatarURL()
       })
       .setColor(DEFAULT_COLOR as ColorResolvable)
@@ -105,9 +102,8 @@ export default class LogsModules extends Module {
     const channel = await this.getData('logMemberJoin', member.guild, config);
     if (!channel || !(channel instanceof TextChannel)) return;
 
-    const username = `${member.user.username}#${member.user.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor({ name: username, iconURL: member.user.displayAvatarURL() })
+      .setAuthor({ name: member.user.tag, iconURL: member.user.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`<@${member.user.id}> joined the server`)
       .setFooter({ text: `ID: ${member.user.id}` })
@@ -123,9 +119,8 @@ export default class LogsModules extends Module {
     const channel = await this.getData('logMemberLeave', member.guild, config);
     if (!channel || !(channel instanceof TextChannel)) return;
 
-    const username = `${user.username}#${user.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor({ name: username, iconURL: user.displayAvatarURL() })
+      .setAuthor({ name: user.tag, iconURL: user.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`<@${user.id}> left the server`)
       .setFooter({ text: `ID: ${user.id}` })
@@ -139,11 +134,10 @@ export default class LogsModules extends Module {
     const channel = await this.getData('logMemberUpdate', newMember.guild, config);
     if (!channel || !(channel instanceof TextChannel)) return;
 
-    const username = `${newMember.user.username}#${newMember.user.discriminator}`;
     if (oldMember.nickname != newMember.nickname) {
       const embed = new MessageEmbed()
         .setAuthor({
-          name: username,
+          name: newMember.user.tag,
           iconURL: newMember.user.displayAvatarURL()
         })
         .setColor(DEFAULT_COLOR as ColorResolvable)
@@ -159,7 +153,7 @@ export default class LogsModules extends Module {
       if (newMember.roles.cache.has(role.id)) return;
       const embed = new MessageEmbed()
         .setAuthor({
-          name: username,
+          name: newMember.user.tag,
           iconURL: newMember.user.displayAvatarURL()
         })
         .setColor(DEFAULT_COLOR as ColorResolvable)
@@ -173,7 +167,7 @@ export default class LogsModules extends Module {
       if (oldMember.roles.cache.has(role.id)) return;
       const embed = new MessageEmbed()
         .setAuthor({
-          name: username,
+          name: newMember.user.tag,
           iconURL: newMember.user.displayAvatarURL()
         })
         .setColor(DEFAULT_COLOR as ColorResolvable)
@@ -194,9 +188,8 @@ export default class LogsModules extends Module {
     const channel = await this.getData('logCommmands', message.guild, config);
     if (!channel || !(channel instanceof TextChannel)) return;
 
-    const username = `${message.author.username}#${message.author.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor({ name: username, iconURL: message.author.displayAvatarURL() })
+      .setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`Used ${command.name} command in <#${message.channel.id}>\n${message.content}`)
       .setFooter({ text: `Author ID: ${message.author.id} | Message ID: ${message.id}` })
@@ -255,10 +248,9 @@ export default class LogsModules extends Module {
       })
     );
 
-    const username = `${interaction.user.username}#${interaction.user.discriminator}`;
     const embed = new MessageEmbed()
       .setAuthor({
-        name: username,
+        name: interaction.user.tag,
         iconURL: interaction.user.displayAvatarURL()
       })
       .setColor(DEFAULT_COLOR as ColorResolvable)
@@ -275,9 +267,8 @@ export default class LogsModules extends Module {
     const channel = await this.getData('logGuardian', message.guild, config);
     if (!channel || !(channel instanceof TextChannel)) return;
 
-    const username = `${message.author.username}#${message.author.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor({ name: username, iconURL: message.author.displayAvatarURL() })
+      .setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`Guardian deleted a message sent by <@${message.author.id}> in <#${message.channel.id}>`)
       .addField('Reason', reason)
@@ -293,9 +284,8 @@ export default class LogsModules extends Module {
     const channel = await this.getData('logGuardian', last.guild, config);
     if (!channel || !(channel instanceof TextChannel)) return;
 
-    const username = `${last.author.username}#${last.author.discriminator}`;
     const embed = new MessageEmbed()
-      .setAuthor({ name: username, iconURL: last.author.displayAvatarURL() })
+      .setAuthor({ name: last.author.tag, iconURL: last.author.displayAvatarURL() })
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(`Guardian bulk-deleted ${messages.size} sent by <@${last.author.id}> in <#${last.channel.id}>`)
       .addField('Reason', reason)
