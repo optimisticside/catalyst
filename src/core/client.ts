@@ -15,7 +15,7 @@ export default class CatalystClient<Ready extends boolean = boolean> extends Cli
   cluster?: CatalystCluster;
   logger: Logger;
 
-  getModule<T extends Module>(name: string): T {
+  getModule<T extends Module>(name: string) {
     return this.modules[name] as T;
   }
 
