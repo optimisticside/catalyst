@@ -284,9 +284,9 @@ export default class SlashModule extends Module {
 
         // TODO: Since most commands do not await for their interaction response,
         // this sometimes replies before they get the chance to.
-        /*if (!interaction.replied && !interaction.deferred) {
-          interaction.reply(success('The command completed execution.'));
-        }*/
+        // if (!interaction.replied && !interaction.deferred) {
+        //   interaction.reply(success('The command completed execution.'));
+        // }
       })
       .catch(err => {
         this.logger.error(`Unable to run ${command.name} command: ${err}`);
