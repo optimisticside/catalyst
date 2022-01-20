@@ -78,7 +78,7 @@ export default class CommandModule extends Module {
         const parts = given.match(/(\d+[A-Za-z]+)/g);
         parts?.map(part => {
           const numPart = part?.match(/\d+/g)?.at(0);
-          const unitName = numPart && part.substring(numPart.length + 1);
+          const unitName = numPart && part.substring(numPart.length);
 
           // TODO: This code can be greatly improved.
           const unitEntries = Object.entries(units);
@@ -86,7 +86,7 @@ export default class CommandModule extends Module {
           if (!unit || !numPart) throw new TypeError('Invalid unit');
           result += parseInt(numPart) * unit[1];
         });
-        return result;
+        return result * 1000;
       }
       case 'integer': {
         if (option.choices) return this.handleArgChoices(option, given);
