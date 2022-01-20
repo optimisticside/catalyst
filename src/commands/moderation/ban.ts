@@ -24,14 +24,13 @@ export default class BanCommand extends Command {
       return;
     }
 
-    const username = `${target.user.username}#${target.user.discriminator}`;
     target
       .ban({ days, reason })
       .then(() => {
-        given.reply(success(`Successfully banned ${username}`));
+        given.reply(success(`Successfully banned ${target.user.tag}`));
       })
       .catch(err => {
-        given.reply(alert(`Unable to ban ${username}`));
+        given.reply(alert(`Unable to ban ${target.user.tag}`));
         this.logger.error(`Unable to ban user: ${err}`);
       });
   }

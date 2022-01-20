@@ -18,22 +18,21 @@ export default class SoftbanCommand extends Command {
     const guild = given.guild;
     if (!target || !guild) return;
 
-    const username = `${target.user.username}#${target.user.discriminator}`;
     target
       .ban({ reason })
       .then(() => {
         guild.members
           .unban(target.user)
           .then(() => {
-            given.reply(success(`Successfully soft-banned ${username}`));
+            given.reply(success(`Successfully soft-banned ${target.user.tag}`));
           })
           .catch(err => {
-            given.reply(alert(`Unable to unban ${username}`));
+            given.reply(alert(`Unable to unban ${target.user.tag}`));
             this.logger.error(`Unable to unban user: ${err}`);
           });
       })
       .catch(err => {
-        given.reply(alert(`Unable to ban ${username}`));
+        given.reply(alert(`Unable to ban ${target.user.tag}`));
         this.logger.error(`Unable to ban user: ${err}`);
       });
   }
