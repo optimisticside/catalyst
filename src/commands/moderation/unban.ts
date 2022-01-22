@@ -13,7 +13,7 @@ const { alert, success } = formatter('Ban Command');
 export default class UnbanCommand extends Command {
   async run(given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
-    const id = await parser.getOption('target');
+    const id = parser.getOption('target');
 
     const guild = given.guild;
     const user = given instanceof CommandInteraction ? given.user : given.author;

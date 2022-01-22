@@ -9,7 +9,7 @@ import OptionParser from 'utils/optionParser';
 export default class EchoCommand extends Command {
   async run(given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
-    given.reply((await parser.getOption('message')) as string);
+    given.reply(parser.getOption('message') as string);
   }
 
   constructor(client: CatalystClient) {

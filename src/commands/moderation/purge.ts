@@ -13,7 +13,7 @@ const { alert, success } = formatter('Purge Command');
 export default class PurgeCommand extends Command {
   async run(given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
-    const amount = (await parser.getOption('amount')) as number;
+    const amount = parser.getOption('amount') as number;
     const channel = given.channel;
 
     if (!(channel instanceof TextChannel)) return;

@@ -259,7 +259,7 @@ exports.default = class ConfigCommand extends Command {
 
   async run(given, args) {
     const parser = new OptionParser(this, given, args);
-    //const path = await parser.getOption('path');
+    //const path = parser.getOption('path');
 
     /*if (path) { this.logger.info(path.split(PATH_DELIM))
       const elements = path.split(PATH_DELIM);
