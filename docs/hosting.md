@@ -10,3 +10,11 @@ Now you need to set up the configuration/env file. Go to the directory and creat
 Catalyst is written in Typescript but Node.js only runs Javascript. We can compile Typescript to Javascript by running `tsc`, which will output a lot of stuff, but will compile successfully (if done correctly).
 
 Once you've done all of the above, all you have to do is start the MongoDB server and run `npm start`. This will start running Catalyst. Congratulations, you are now self-hosting Catalyst!
+
+# Config File
+The configuration file is where you tell Catalyst how to run. It contains things such as the bot's token. Here is an example configuration file:
+```env
+CLIENT_ID=123456789
+TOKEN=BOT_TOKEN_HERE
+MONGODB_SRV=mongodb+srv://catalyst:abcdef@catalyst.abcdef.mongodb.net/abcd
+```
