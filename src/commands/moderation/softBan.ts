@@ -13,8 +13,8 @@ const { alert, success } = formatter('Soft-ban Command');
 export default class SoftbanCommand extends Command {
   async run(given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
-    const target = (await parser.getOption('target')) as GuildMember;
-    const reason = (await parser.getOption('reason')) as string | undefined;
+    const target = parser.getOption('target') as GuildMember;
+    const reason = parser.getOption('reason') as string | undefined;
     const guild = given.guild;
     if (!target || !guild) return;
 

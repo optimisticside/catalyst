@@ -10,7 +10,7 @@ import OptionParser from 'utils/optionParser';
 export default class EchoCommand extends Command {
   async run(_client: CatalystClient, given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
-    given.reply(await parser.getOption('message'));
+    given.reply(parser.getOption('message'));
   }
 
   constructor() {
@@ -51,7 +51,7 @@ If you look inside the `EchoCommand` class, you will see an asynchronous functio
 ```ts
 async run(_client: CatalystClient, given: CommandGiven, args: CommandArgs) {
   const parser = new OptionParser(this, given, args);
-  given.reply(await parser.getOption('message'));
+  given.reply(parser.getOption('message'));
 }
 ```
 In the the function's parameters, `client` has an underscore in the beginning only to mute TypeScript compiler warnings about it being unused.

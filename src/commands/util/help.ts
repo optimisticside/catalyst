@@ -39,7 +39,7 @@ export default class HelpCommand extends Command {
       return given.reply(warning('Unable to find command.'));
     }
 
-    const argumentName = await parser.getOption('argument');
+    const argumentName = parser.getOption('argument');
     if (argumentName) {
       return await this.argumentHelp(given, command, argumentName);
     }
@@ -66,8 +66,8 @@ export default class HelpCommand extends Command {
   async run(given: CommandGiven, args: CommandArgs) {
     const commandHandler = this.client.getModule<CommandModule>('commandHandler');
     const parser = new OptionParser(this, given, args);
-    const commandName = (await parser.getOption('command')) as string | undefined;
-    const argumentName = (await parser.getOption('argument')) as string | undefined;
+    const commandName = parser.getOption('command') as string | undefined;
+    const argumentName = parser.getOption('argument') as string | undefined;
 
     if (commandName) {
       return await this.commandHelp(given, parser, commandName);

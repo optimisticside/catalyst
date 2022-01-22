@@ -13,7 +13,7 @@ const { alert, success } = formatter('Slowmode Command');
 export default class SlowmodeCommand extends Command {
   async run(given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
-    const time = await parser.getOption('time');
+    const time = parser.getOption('time');
 
     const member = given.member;
     const channel = given.channel;

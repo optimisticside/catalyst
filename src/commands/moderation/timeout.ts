@@ -13,9 +13,9 @@ const { success, alert } = formatter('Mute Command');
 export default class MuteCommand extends Command {
   async run(given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
-    const target = (await parser.getOption('target')) as GuildMember;
-    const time = (await parser.getOption('time')) as number;
-    const reason = (await parser.getOption('reason')) as string | undefined;
+    const target = parser.getOption('target') as GuildMember;
+    const time = parser.getOption('time') as number;
+    const reason = parser.getOption('reason') as string | undefined;
     if (!target) return;
 
     target

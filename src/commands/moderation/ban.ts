@@ -12,9 +12,9 @@ const { alert, success } = formatter('Ban Command');
 export default class BanCommand extends Command {
   async run(given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
-    const target = (await parser.getOption('target')) as GuildMember;
-    const reason = (await parser.getOption('reason')) as string | undefined;
-    const days = (await parser.getOption('days')) as number | undefined;
+    const target = parser.getOption('target') as GuildMember;
+    const reason = parser.getOption('reason') as string | undefined;
+    const days = parser.getOption('days') as number | undefined;
     if (!target) return;
 
     // We can remove this after slash command

@@ -15,7 +15,7 @@ const { DEFAULT_COLOR } = config;
 export default class WhoisCommand extends Command {
   async run(given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
-    const target = (await parser.getOption('user')) as GuildMember;
+    const target = parser.getOption('user') as GuildMember;
 
     const joinedAt = target.joinedTimestamp ? Serializer.serializeTimestamp(target.joinedTimestamp, 'f') : 'unknown';
     const keyPermissions = target.permissions

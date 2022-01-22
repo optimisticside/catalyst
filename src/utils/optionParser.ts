@@ -8,7 +8,7 @@ import Command, { CommandArgs } from 'structs/command';
 import CommandModule from '@modules/commands';
 
 export default class OptionParser {
-  async getOption(name: string) {
+  getOption(name: string) {
     const client: CatalystClient = this.given.client as CatalystClient;
     const option = this.command.options.find(o => o.name === name);
     if (!option) return;
