@@ -3,7 +3,7 @@
 // See LICENSE for details
 // This is legacy code and will be replaced soon
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, '__esModule', { value: true });
 const tslib = require('tslib');
 const { Permissions, MessageEmbed, Interaction } = require('discord.js');
 const formatter = tslib.__importDefault(require('utils/formatter.js')).default;
@@ -12,7 +12,10 @@ const Command = tslib.__importDefault(require('structs/command.js')).default;
 const OptionParser = tslib.__importDefault(require('utils/optionParser.js')).default;
 const Serializer = tslib.__importDefault(require('utils/serializer.js')).default;
 const GuildData = tslib.__importDefault(require('models/guildData.js')).default;
-const promisify = (fn) => async (...given) => fn(...given);
+const promisify =
+  fn =>
+  async (...given) =>
+    fn(...given);
 const { alert, success, warning, prompt, neutral, denial } = formatter('Config Command');
 
 exports.default = class ConfigCommand extends Command {
@@ -24,18 +27,14 @@ exports.default = class ConfigCommand extends Command {
   }
 
   async promptBool(given, reply, title, desc, footer) {
-    const embed = new MessageEmbed()
-      .setTitle(title)
-      .setColor(DEFAULT_COLOR)
-      .setDescription(desc)
-      .setFooter(footer);
+    const embed = new MessageEmbed().setTitle(title).setColor(DEFAULT_COLOR).setDescription(desc).setFooter(footer);
     reply.reactions.removeAll();
-    reply.edit({ embeds: [ embed ] });
+    reply.edit({ embeds: [embed] });
 
     await reply.react('✅');
     await reply.react('❌');
     const filter = r => r.users.cache.find(u => u === given.author);
-    const collector = reply.createReactionCollector({ filter, time: 30000 })
+    const collector = reply.createReactionCollector({ filter, time: 30000 });
     const reaction = await this.awaitCollection(collector).catch(() => {
       reply.reply(warning('Timed out.'));
     });
@@ -51,17 +50,19 @@ exports.default = class ConfigCommand extends Command {
     reply.react('❌');
 
     let exited = false;
-    const reactionFilter = r => r.users.cache.find(u => u === given.author)
+    const reactionFilter = r => r.users.cache.find(u => u === given.author);
     const reactionCollector = reply.createReactionCollector({ filter: reactionFilter, time: 30000 });
-    this.awaitCollection(reactionCollector).then(reaction => {
-      if (!reaction || reaction.emoji.name !== '❌') return;
-      exited = true;
-      reply.reactions.removeAll();
-      reply.edit(neutral('Prompt has exited', 'embed'));
-    }).catch(() => {
-      // There is nothing to do here, since reacting
-      // was optional.
-    });
+    this.awaitCollection(reactionCollector)
+      .then(reaction => {
+        if (!reaction || reaction.emoji.name !== '❌') return;
+        exited = true;
+        reply.reactions.removeAll();
+        reply.edit(neutral('Prompt has exited', 'embed'));
+      })
+      .catch(() => {
+        // There is nothing to do here, since reacting
+        // was optional.
+      });
 
     const messageFilter = m => m.author === given.author;
     const messageCollector = reply.channel.createMessageCollector({ filter: messageFilter, time: 30000 });
@@ -72,9 +73,11 @@ exports.default = class ConfigCommand extends Command {
 
     if (exited || !message) return;
     let failed = false;
-    const result = !encoder ? message.content : await encoder(message.content).catch(err => {
-      failed = true;
-    });
+    const result = !encoder
+      ? message.content
+      : await encoder(message.content).catch(err => {
+          failed = true;
+        });
     if (failed) {
       reply.reactions.removeAll();
       reply.edit(alert(`Invalid ${name.toLowerCase()} provided`, 'embed'));
@@ -86,18 +89,25 @@ exports.default = class ConfigCommand extends Command {
 
   boolSetting(name, desc, key) {
     return async (client, given, reply) => {
-      const config = await GuildData.findOne({ id: given.guild.id })
-        ?? await GuildData.create({ id: given.guild.id });
+      const config =
+        (await GuildData.findOne({ id: given.guild.id })) ?? (await GuildData.create({ id: given.guild.id }));
       const current = config[key];
       const newDesc = current != null ? `${desc}\nIt is currently ${current === true ? 'on' : 'off'}` : desc;
 
-      const answer = await this.promptBool(given, reply, name, newDesc, `Would you like to ${current === true ? 'disable' : 'enable'} it?`);
+      const answer = await this.promptBool(
+        given,
+        reply,
+        name,
+        newDesc,
+        `Would you like to ${current === true ? 'disable' : 'enable'} it?`
+      );
       if (answer === null) return;
 
       if (answer) {
         config[key] = !current;
         config.markModified(key);
-        await config.save()
+        await config
+          .save()
           .finally(() => reply.reactions.removeAll())
           .then(() => reply.edit(success(`Successfully ${current === true ? 'disabled' : 'enabled'} ${name}`, 'embed')))
           .catch(err => {
@@ -105,20 +115,25 @@ exports.default = class ConfigCommand extends Command {
             reply.edit(alert(`Unable to change ${name}`, 'embed'));
           });
       } else {
-          reply.reactions.removeAll();
-          reply.edit(neutral(`${name} was not changed`, 'embed'));
+        reply.reactions.removeAll();
+        reply.edit(neutral(`${name} was not changed`, 'embed'));
       }
-    }
+    };
   }
 
   stringSetting(name, desc, encoder, decoder, promptMessage, key) {
     return async (client, given, reply) => {
-      const config = await GuildData.findOne({ id: given.guild.id })
-        ?? await GuildData.create({ id: given.guild.id });
+      const config =
+        (await GuildData.findOne({ id: given.guild.id })) ?? (await GuildData.create({ id: given.guild.id }));
       let current = config[key];
-        if (current && decoder) current = await decoder(current);
-      const shouldContinue = await this.promptBool(given, reply, name, `${desc}\nThe current ${name.toLowerCase()} is ${current}`,
-        'Would you like to change it?');
+      if (current && decoder) current = await decoder(current);
+      const shouldContinue = await this.promptBool(
+        given,
+        reply,
+        name,
+        `${desc}\nThe current ${name.toLowerCase()} is ${current}`,
+        'Would you like to change it?'
+      );
       if (shouldContinue === null) return;
 
       if (!shouldContinue) {
@@ -130,12 +145,13 @@ exports.default = class ConfigCommand extends Command {
 
         config[key] = answer;
         config.markModified(key);
-        await config.save()
+        await config
+          .save()
           .finally(() => reply.reactions.removeAll())
           .then(() => reply.edit(success('Successfully updated database', 'embed')))
           .catch(err => reply.edit(alert('Unable to update database', 'embed')));
       }
-    }
+    };
   }
 
   listSetting(title, elementName, elementPlural, encoder, decoder, key) {
@@ -145,19 +161,26 @@ exports.default = class ConfigCommand extends Command {
         desc: `Add a ${elementName} to the list.`,
         emoji: '✏️',
         handler: async (client, given, reply) => {
-          const config = await GuildData.findOne({ id: given.guild.id })
-            ?? await GuildData.create({ id: given.guild.id });
+          const config =
+            (await GuildData.findOne({ id: given.guild.id })) ?? (await GuildData.create({ id: given.guild.id }));
           const list = config[key];
-          const answer = await this.promptString(given, reply, elementName, `What ${elementName} would you like to add`, encoder);
+          const answer = await this.promptString(
+            given,
+            reply,
+            elementName,
+            `What ${elementName} would you like to add`,
+            encoder
+          );
           if (!answer) return;
 
           if (list.find(e => e === answer)) {
-            return reply.edit(warning(`That ${elementName} is already in the list`, 'embed'))
+            return reply.edit(warning(`That ${elementName} is already in the list`, 'embed'));
           }
 
           list.push(answer);
           config.markModified(key);
-          await config.save()
+          await config
+            .save()
             .finally(() => reply.reactions.removeAll())
             .then(() => reply.edit(success('Successfully updated database', 'embed')))
             .catch(err => reply.edit(alert('Unable to update database', 'embed')));
@@ -168,20 +191,27 @@ exports.default = class ConfigCommand extends Command {
         desc: `Remove a ${elementName} from the list.`,
         emoji: '🗑️',
         handler: async (client, given, reply) => {
-          const config = await GuildData.findOne({ id: given.guild.id })
-            ?? await GuildData.create({ id: given.guild.id });
+          const config =
+            (await GuildData.findOne({ id: given.guild.id })) ?? (await GuildData.create({ id: given.guild.id }));
           const list = config[key];
-          const answer = await this.promptString(given, reply, 'word', `What ${elementName} would you like to remove`, encoder);
+          const answer = await this.promptString(
+            given,
+            reply,
+            'word',
+            `What ${elementName} would you like to remove`,
+            encoder
+          );
           if (!answer) return;
 
           const index = list.findIndex(e => e === answer);
           if (index === -1) {
-            return reply.edit(warning(`That ${elementName} is not in the list`, 'embed'))
+            return reply.edit(warning(`That ${elementName} is not in the list`, 'embed'));
           }
 
           list.splice(index, 1);
           config.markModified(key);
-          await config.save()
+          await config
+            .save()
             .finally(() => reply.reactions.removeAll())
             .then(() => reply.edit(success('Successfully updated database', 'embed')))
             .catch(err => reply.edit(alert('Unable to update database', 'embed')));
@@ -192,41 +222,39 @@ exports.default = class ConfigCommand extends Command {
         desc: `See the list of ${elementPlural} in your DMs.`,
         emoji: '👁️',
         handler: async (client, given, reply) => {
-          const config = await GuildData.findOne({ id: given.guild.id })
-            ?? await GuildData.create({ id: given.guild.id });
+          const config =
+            (await GuildData.findOne({ id: given.guild.id })) ?? (await GuildData.create({ id: given.guild.id }));
           const list = config[key];
-          const data = await Promise.all(list.map(async e => {
-            if (decoder) {
-              e = await decoder(e);
-            }
-            return e;
-          }));
+          const data = await Promise.all(
+            list.map(async e => {
+              if (decoder) {
+                e = await decoder(e);
+              }
+              return e;
+            })
+          );
 
-          const embed = new MessageEmbed()
-            .setTitle(title)
-            .setColor(DEFAULT_COLOR)
-            .setDescription(data.join('\n'));
+          const embed = new MessageEmbed().setTitle(title).setColor(DEFAULT_COLOR).setDescription(data.join('\n'));
 
-          const dmChannel = await given.author.createDM()
+          const dmChannel = await given.author
+            .createDM()
             .catch(err => reply.edit(alert('Unable to create DM', 'embed')));
           if (!dmChannel) return;
-          await dmChannel.send({ embeds: [ embed ] })
+          await dmChannel
+            .send({ embeds: [embed] })
             .finally(() => reply.reactions.removeAll())
             .then(() => reply.edit(success('Check your DMs', 'embed')))
             .catch(err => reply.edit(alert('Unable to send DM', 'embed')));
         }
       }
-    ]
+    ];
   }
 
   async loadMenu(client, given, reply, title, desc, settings) {
-    const embed = new MessageEmbed()
-      .setTitle(title)
-      .setColor(DEFAULT_COLOR)
-      .setDescription(desc);
+    const embed = new MessageEmbed().setTitle(title).setColor(DEFAULT_COLOR).setDescription(desc);
 
     settings.map(c => embed.addField(`${c.emoji} ${c.name}`, c.desc));
-    const replyContent = { embeds: [ embed ] };
+    const replyContent = { embeds: [embed] };
     if (reply) {
       reply.reactions.removeAll();
       await reply.edit(replyContent);
@@ -277,8 +305,14 @@ exports.default = class ConfigCommand extends Command {
       return given.reply(warning('The config command cannot be run as a slash command'));
     }
 
-    return await this.loadMenu(this.client, given, null, NAME,
-      `React with the corresponding emoji to configure ${NAME}.`, this.settings);
+    return await this.loadMenu(
+      this.client,
+      given,
+      null,
+      NAME,
+      `React with the corresponding emoji to configure ${NAME}.`,
+      this.settings
+    );
   }
 
   constructor(client) {
@@ -286,11 +320,11 @@ exports.default = class ConfigCommand extends Command {
       client,
       name: 'config',
       desc: 'Lets you manage the guild configuration.',
-      userPerms: [ Permissions.FLAGS.MANAGE_GUILD ],
-      botPerms: [ Permissions.FLAGS.SEND_MESSAGES ],
+      userPerms: [Permissions.FLAGS.MANAGE_GUILD],
+      botPerms: [Permissions.FLAGS.SEND_MESSAGES],
       guildOnly: true,
-      tags: [ 'guild' ]
-    })
+      tags: ['guild']
+    });
 
     this.settings = [
       {
@@ -310,38 +344,65 @@ exports.default = class ConfigCommand extends Command {
             desc: 'Automatically deletes messages that contain blacklisted words.',
             menuDesc: 'React with the corresponding emoji to configure Guardian Blacklist.',
             emoji: '🚫',
-            menu: this.listSetting('Guardian Blacklist', 'word', 'words', async w => w.toLowerCase(), null, 'blacklistedWords')
+            menu: this.listSetting(
+              'Guardian Blacklist',
+              'word',
+              'words',
+              async w => w.toLowerCase(),
+              null,
+              'blacklistedWords'
+            )
           },
           {
             name: 'Antispam',
             desc: 'Automatically mute users who spam in the chat.',
             emoji: '🔨',
-            handler: this.boolSetting('Antispam', 'Antispam will automatically mute users who spam in the chat.', 'antiSpamEnabled')
+            handler: this.boolSetting(
+              'Antispam',
+              'Antispam will automatically mute users who spam in the chat.',
+              'antiSpamEnabled'
+            )
           },
           {
             name: 'URL Filter',
             desc: 'Remove messages that contain links.',
             emoji: '🌐',
-            handler: this.boolSetting('URL Filter', 'URL Filter will remove messages that contain links.', 'filterLinks')
+            handler: this.boolSetting(
+              'URL Filter',
+              'URL Filter will remove messages that contain links.',
+              'filterLinks'
+            )
           },
           {
             name: 'Invite Filter',
             desc: 'Remove messages that contain a Discord invite.',
             emoji: '📧',
-            handler: this.boolSetting('Invite Filter', 'Invite filter will remove messages that contain Discord invites.', 'filterInvites')
+            handler: this.boolSetting(
+              'Invite Filter',
+              'Invite filter will remove messages that contain Discord invites.',
+              'filterInvites'
+            )
           },
           {
             name: 'IP Filter',
             desc: 'Removes messages that contain an IP address.',
             emoji: '❗',
-            handler: this.boolSetting('IP Filter', 'IP filter will remove messages that contain IP addresses.', 'filterIps')
+            handler: this.boolSetting(
+              'IP Filter',
+              'IP filter will remove messages that contain IP addresses.',
+              'filterIps'
+            )
           },
           {
             name: 'Zalgo Filter',
             desc: 'Removes messages that contain zalgo.',
             emoji: '🗑️',
-            handler: this.boolSetting('Zalgo Filter', 'Zalgo filter will remove messages that contain zalgo.', 'filterZalgo')
-          },
+            handler: this.boolSetting(
+              'Zalgo Filter',
+              'Zalgo filter will remove messages that contain zalgo.',
+              'filterZalgo'
+            )
+          }
           /*{
             name: 'Self-Bot Detector',
             desc: 'Bans users who have self-bots.',
@@ -366,21 +427,37 @@ exports.default = class ConfigCommand extends Command {
                 name: 'Toggle',
                 desc: 'Whether channel greeting will be enabled.',
                 emoji: '🔧',
-                handler: this.boolSetting('Greeting', 'Greeting will greet new users that join the server.', 'greetingEnabled')
+                handler: this.boolSetting(
+                  'Greeting',
+                  'Greeting will greet new users that join the server.',
+                  'greetingEnabled'
+                )
               },
               {
                 name: 'Message',
                 desc: 'The message that users will be greeted with.',
                 emoji: '✉️',
-                handler: this.stringSetting('Greeting Message', 'The greeting message is the message users will be greeted with.', null, null,
-                  'How would you like to greet users? You can mention the user through {mention}, and access the user\'s name through `{user}`, the server name through `{guild}`, and the member count through `{count}`', 'greetingMessage')
+                handler: this.stringSetting(
+                  'Greeting Message',
+                  'The greeting message is the message users will be greeted with.',
+                  null,
+                  null,
+                  "How would you like to greet users? You can mention the user through {mention}, and access the user's name through `{user}`, the server name through `{guild}`, and the member count through `{count}`",
+                  'greetingMessage'
+                )
               },
               {
                 name: 'Channel',
                 desc: 'The channel that new users will be greeted on.',
                 emoji: '#️⃣',
-                handler: this.stringSetting('Greeting Channel', 'The greeting channel is the channel users will be greeted on.',
-                  promisify(Serializer.deserializeChannel), promisify(Serializer.serializeChannel), null, 'greetingChannel')
+                handler: this.stringSetting(
+                  'Greeting Channel',
+                  'The greeting channel is the channel users will be greeted on.',
+                  promisify(Serializer.deserializeChannel),
+                  promisify(Serializer.serializeChannel),
+                  null,
+                  'greetingChannel'
+                )
               }
             ]
           },
@@ -400,8 +477,14 @@ exports.default = class ConfigCommand extends Command {
                 name: 'Message',
                 desc: 'The DM that users will be greeted with.',
                 emoji: '✉️',
-                handler: this.stringSetting('Join DM Message', 'This is the message users will be DMed with when they join.', null, null,
-                  'How would you like to greet messages. You can mention the user through {mention}, and access the user\'s name through `{user}`, the server name through `{guild}`, and the member count through `{count}`', 'joinDmMessage')
+                handler: this.stringSetting(
+                  'Join DM Message',
+                  'This is the message users will be DMed with when they join.',
+                  null,
+                  null,
+                  "How would you like to greet messages. You can mention the user through {mention}, and access the user's name through `{user}`, the server name through `{guild}`, and the member count through `{count}`",
+                  'joinDmMessage'
+                )
               }
             ]
           },
@@ -415,21 +498,37 @@ exports.default = class ConfigCommand extends Command {
                 name: 'Toggle',
                 desc: 'Whether goodbyes will be enabled.',
                 emoji: '🔧',
-                handler: this.boolSetting('Goodbye', 'Goodbye will say goodbye to users that leave the server.', 'goodbyeEnabled')
+                handler: this.boolSetting(
+                  'Goodbye',
+                  'Goodbye will say goodbye to users that leave the server.',
+                  'goodbyeEnabled'
+                )
               },
               {
                 name: 'Message',
                 desc: 'The message that users will be said goodbye with.',
                 emoji: '✉️',
-                handler: this.stringSetting('Goodbye Message', 'The goodbye message is how users will be said goodbye to.', null, null,
-                'How would you like to say goodbye to users? You can access the user\'s name through `{user}`, the server name through `{guild}`, and the member count through `{count}`', 'goodbyeMessage')
+                handler: this.stringSetting(
+                  'Goodbye Message',
+                  'The goodbye message is how users will be said goodbye to.',
+                  null,
+                  null,
+                  "How would you like to say goodbye to users? You can access the user's name through `{user}`, the server name through `{guild}`, and the member count through `{count}`",
+                  'goodbyeMessage'
+                )
               },
               {
                 name: 'Channel',
                 desc: 'The channel that new users will be said goodbye on.',
                 emoji: '#️⃣',
-                handler: this.stringSetting('Goodbye Channel', 'The goodbye channel is the channel where will be said goodbye to.',
-                  promisify(Serializer.deserializeChannel), promisify(Serializer.serializeChannel), null, 'goodbyeChannel')
+                handler: this.stringSetting(
+                  'Goodbye Channel',
+                  'The goodbye channel is the channel where will be said goodbye to.',
+                  promisify(Serializer.deserializeChannel),
+                  promisify(Serializer.serializeChannel),
+                  null,
+                  'goodbyeChannel'
+                )
               }
             ]
           }
@@ -451,8 +550,14 @@ exports.default = class ConfigCommand extends Command {
             name: 'Channel',
             desc: 'The channel in which logs will be posted.',
             emoji: '#️⃣',
-            handler: this.stringSetting('Log Channel', 'The log channel is the channel where logs will be posted.',
-              promisify(Serializer.deserializeChannel), promisify(Serializer.serializeChannel), null, 'logChannel')
+            handler: this.stringSetting(
+              'Log Channel',
+              'The log channel is the channel where logs will be posted.',
+              promisify(Serializer.deserializeChannel),
+              promisify(Serializer.serializeChannel),
+              null,
+              'logChannel'
+            )
           },
           {
             name: 'Message Logs',
@@ -464,13 +569,21 @@ exports.default = class ConfigCommand extends Command {
                 name: 'Message Delete',
                 desc: 'Keeping track of when messages are deleted.',
                 emoji: '🗑️',
-                handler: this.boolSetting('Message Delete', 'Message deletes are whenever someone deletes a message.', 'logMessageDelete')
+                handler: this.boolSetting(
+                  'Message Delete',
+                  'Message deletes are whenever someone deletes a message.',
+                  'logMessageDelete'
+                )
               },
               {
                 name: 'Message Edit',
                 desc: 'Keeping track of when messages are edited.',
                 emoji: '✏️',
-                handler: this.boolSetting('Message Edit', 'Message edits are whenever someone edits a message.', 'logMessageEdit')
+                handler: this.boolSetting(
+                  'Message Edit',
+                  'Message edits are whenever someone edits a message.',
+                  'logMessageEdit'
+                )
               }
             ]
           },
@@ -484,7 +597,11 @@ exports.default = class ConfigCommand extends Command {
             name: 'Guardian Logs',
             desc: 'Keeping track of what Guardian does.',
             emoji: '🔒',
-            handler: this.boolSetting('Guardian Logs', 'Guardian Logs are whenever Guardian does something.', 'logGuardian')
+            handler: this.boolSetting(
+              'Guardian Logs',
+              'Guardian Logs are whenever Guardian does something.',
+              'logGuardian'
+            )
           },
           {
             name: 'User Logs',
@@ -496,14 +613,22 @@ exports.default = class ConfigCommand extends Command {
                 name: 'User Join',
                 desc: 'Keeping track of when users join the server.',
                 emoji: '📥',
-                handler: this.boolSetting('User Join', 'User Joins are whenever someone joins the server.', 'logMemberJoin')
+                handler: this.boolSetting(
+                  'User Join',
+                  'User Joins are whenever someone joins the server.',
+                  'logMemberJoin'
+                )
               },
               {
                 name: 'User Leave',
                 desc: 'Keeping track of when users leave the server.',
                 emoji: '📤',
-                handler: this.boolSetting('User Leave', 'Message edits are whenever someone leaves the server.', 'logMemberLeave')
-              },
+                handler: this.boolSetting(
+                  'User Leave',
+                  'Message edits are whenever someone leaves the server.',
+                  'logMemberLeave'
+                )
+              }
               /*{
                 name: 'User Update',
                 desc: 'Keeping track of when a user is updated.',
@@ -537,10 +662,17 @@ exports.default = class ConfigCommand extends Command {
             desc: 'The roles that Auto Role will assign.',
             menuDesc: 'React with the corresponding emoji to configure roles.',
             emoji: '✏️',
-            menu: this.listSetting('Auto Role', 'role', 'roles', promisify(Serializer.deserializeRole), promisify(Serializer.serializeRole), 'autoRoles')
+            menu: this.listSetting(
+              'Auto Role',
+              'role',
+              'roles',
+              promisify(Serializer.deserializeRole),
+              promisify(Serializer.serializeRole),
+              'autoRoles'
+            )
           }
         ]
-      },
+      }
       /*
       {
         name: 'Reaction Roles',
@@ -593,6 +725,6 @@ exports.default = class ConfigCommand extends Command {
         ]
       }
       */
-    ]
+    ];
   }
 };
