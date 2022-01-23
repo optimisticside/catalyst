@@ -4,7 +4,7 @@
   "description": "A modular Discord bot",
   "main": "src/index.js",
   "scripts": {
-    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
+    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' 'src/**/*.js' --write",
     "lint": "eslint src --ext .ts",
     "start": "node dist/index.js"
   },
