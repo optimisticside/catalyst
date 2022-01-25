@@ -11,13 +11,13 @@ export interface ListElement {
   name: string;
   buttonName?: string;
   emoji?: string;
-  desc?: string;
+  description?: string;
   action?: ActionCallback;
 }
 
 export interface ListProps {
   header: string;
-  desc?: string;
+  description?: string;
   body: Array<ListElement>;
 }
 
@@ -48,35 +48,40 @@ export default class ListComponent extends Component {
   render() {
     const embed = new MessageEmbed().setTitle(this.props.header).setColor(DEFAULT_COLOR as ColorResolvable);
 
-    if (this.props.desc) {
-      embed.setDescription(this.props.desc);
+    if (this.props.description) {
+      embed.setDescription(this.props.description);
     }
 
     // We use fields only if we have names and values,
     // Otherwise, we just add it to the description.
-    const description: Array<string> = [];
-    this.state.body.map(({ name, desc }) => {
-      if (desc) {
-        embed.addField(name, desc);
+    const fullDescription: Array<string> = [];
+    this.state.body.map(({ name, description, emoji }) => {
+      if (emoji) {
+        name = `${emoji} ${name}`;
+      }
+
+      if (description) {
+        embed.addField(name, description);
       } else {
-        description.push(name);
+        fullDescription.push(name);
       }
     });
-    if (description.length > 0) {
-      embed.setDescription(description.join('\n'));
+    if (fullDescription.length > 0) {
+      embed.setDescription(fullDescription.join('\n'));
     }
 
     // Components will only be added if the body-element
     // has a callback.
     const buttons = this.state.body
       .filter(c => c.action)
-      .map(({ buttonName, name, action: callback }) => {
+      .map(({ buttonName, name, emoji, action: callback }) => {
         const customId = callback && action(this, callback);
         if (!customId) return;
         return new MessageButton({
           label: buttonName ?? name,
           style: 'SECONDARY',
-          customId
+          customId,
+          emoji
         });
       })
       .filter(mb => mb) as Array<MessageButton>;
