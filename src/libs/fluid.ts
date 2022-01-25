@@ -50,6 +50,7 @@ export abstract class Component extends EventEmitter {
     this.state = {};
     this.props = props ?? {};
 
+    this.setMaxListeners(0);
     if (this.defaultProps) {
       const defaults = Object.entries(this.defaultProps);
       // We cannot do [ name, default ] because `default` is
