@@ -168,7 +168,6 @@ export const mount = async (component: Component, point: MountPoint, options?: R
 export const action = (component: Component, callback: ActionCallback) => {
   // Sometimes the callbacks will be optional
   // props of the component.
-  if (!callback) return;
   const customId: string = uuidv4();
 
   const redirector = (interaction: MessageComponentInteraction, redirect: Component) => {

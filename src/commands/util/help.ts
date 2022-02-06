@@ -12,6 +12,7 @@ import * as Fluid from 'libs/fluid';
 import HelpMenu from '@components/helpMenu';
 import CatalystClient from 'core/client';
 import CommandModule from '@modules/commands';
+//import PagedListComponent from '@components/pagedList';
 
 const { NAME, PREFIX, SUPPORT_SERVER, CLIENT_ID, DEFAULT_COLOR } = config;
 const { warning } = formatter('Help Command');
@@ -90,6 +91,12 @@ export default class HelpCommand extends Command {
       supportServer: SUPPORT_SERVER
     });
     Fluid.mount(helpMenu, given, { time: 15_000 });
+    /*if (!given.guild) return;
+    const list = new PagedListComponent({ header: 'Stuff', pageSize: 10 })
+      .addSection('Members', given.guild.members.cache.map(m => m.user.username))
+      .addSection('Roles', given.guild.roles.cache.map(r => r.name))
+      .addSection('Channels', given.guild.channels.cache.map(c => c.name));
+    Fluid.mount(list, given, { time: 15_000 });*/
   }
 
   constructor(client: CatalystClient) {
