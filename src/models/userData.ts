@@ -2,12 +2,22 @@
 // Copyright 2022 Catalyst contributors
 // See LICENSE for details
 
-import { Schema, model } from 'mongoose';
+import { Schema, Document, model } from 'mongoose';
+
+export interface CooldownDocument extends Document {
+  command: string;
+  since: Date;
+}
 
 const cooldownSchema = new Schema({
   command: { type: String, require: true, unique: true },
   since: { type: Date, require: true }
 });
+
+export interface UserDocument extends Document {
+  id: string;
+  cooldowns: Array<CooldownDocument>;
+}
 
 const userDataSchema = new Schema({
   id: { type: String, require: true, unique: true },

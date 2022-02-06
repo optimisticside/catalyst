@@ -10,7 +10,7 @@ import Command, { CommandArgs, CommandGiven, CommandOption, CommandValidator } f
 import { CommandGroup, SubCommandGroup } from 'structs/group';
 import Serializer from 'utils/serializer';
 import GuildData from 'models/guildData';
-import UserData from 'models/userData';
+import UserData, { UserDocument } from 'models/userData';
 import glob from 'glob-promise';
 import * as path from 'path';
 import CatalystClient from 'core/client';
@@ -225,7 +225,8 @@ export default class CommandModule extends Module {
       return;
     }
 
-    const userData = (await UserData.findOne({ id: user.id })) ?? (await UserData.create({ id: user.id }));
+    const userData = ((await UserData.findOne({ id: user.id })) ??
+      (await UserData.create({ id: user.id }))) as UserDocument;
     userData.cooldowns.filter(cl => cl.command === command.name);
     userData.markModified('cooldowns');
     await userData.save();
