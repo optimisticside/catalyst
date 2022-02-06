@@ -26,7 +26,8 @@ export default class WhoisCommand extends Command {
     const roles = target.roles.cache
       .filter(r => r !== given.guild?.roles.everyone)
       .sort((a, b) => a.position - b.position)
-      .map(r => Serializer.serializeRole(r.id));
+      .map(r => Serializer.serializeRole(r.id))
+      .map(r => r.replace(/\w\S*/g, m => m.charAt(0).toUpperCase() + m.substring(1).toLowerCase()));
 
     const embed = new MessageEmbed()
       .setAuthor({ name: target.user.username, iconURL: target.user.displayAvatarURL() })
@@ -49,6 +50,7 @@ export default class WhoisCommand extends Command {
       name: 'whois',
       aliases: ['userInfo'],
       desc: 'Gets information about a user.',
+      hidden: true, // TODO: Fix this command
       options: [
         {
           name: 'user',

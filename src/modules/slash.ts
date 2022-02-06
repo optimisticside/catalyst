@@ -94,6 +94,7 @@ export default class SlashModule extends Module {
     const commands: Array<SlashCommandBuilder> = [];
     const addedSubs: Array<string> = [];
 
+    // TODO: Commands that are hidden should not be added
     commandHandler.groups.map(group => {
       const builder = new SlashCommandBuilder().setName(group.name.toLowerCase()).setDescription(group.desc);
       const subGroups = commandHandler.subGroups.filter(sg => sg.group === group.name);
