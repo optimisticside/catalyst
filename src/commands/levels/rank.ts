@@ -14,8 +14,9 @@ const { neutral, alert } = formatter('Rank Command');
 export default class RankCommand extends Command {
   async run(given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
-    const member = parser.getOption('user') as GuildMember ?? given.member;
-    const userData: UserDocument = (await UserData.findOne({ id: member.user.id })) ?? (await UserData.create({ id: member.user.id }))
+    const member = (parser.getOption('user') as GuildMember) ?? given.member;
+    const userData: UserDocument =
+      (await UserData.findOne({ id: member.user.id })) ?? (await UserData.create({ id: member.user.id }));
 
     if (userData.xpData.has(member.guild.id)) {
       const levelHandler = this.client.getModule<LevelModule>('levelHandler');
@@ -42,7 +43,7 @@ export default class RankCommand extends Command {
           desc: 'The user to get the rank of.',
           prompt: 'Who do you want to see the rank of?',
           required: false
-        },
+        }
       ]
     });
   }

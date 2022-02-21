@@ -110,7 +110,7 @@ export default class LevelModule extends Module {
       userLevels.forEach((levelData, guildId) => {
         if (!levelData.dirty) return;
         levelData.dirty = false;
-        xpData.set(guildId, levelData.xp)
+        xpData.set(guildId, levelData.xp);
       });
 
       if (!Object.entries(xpData).length) return;
