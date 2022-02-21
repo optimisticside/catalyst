@@ -42,13 +42,11 @@ export default class LevelModule extends Module {
     return xp;
   }
 
-  async handleMessage(message: Message) {
-    if (message.author.bot ?? !message.guild) return;
-
-    if (!this.dataCache.has(message.author.id)) {
+  async getLevelData(userId: string, guildId: string) {
+    if (!this.dataCache.has(userId)) {
       const userLevels = new Map<string, MemberData>();
       const userData: UserDocument =
-        (await UserData.findOne({ id: message.author.id })) ?? (await UserData.create({ id: message.author.id }));
+        (await UserData.findOne({ id: userId })) ?? (await UserData.create({ id: userId }));
 
       userData.xpData.forEach((xp, guildId) => {
         const level = this.calcLevel(xp);
@@ -61,14 +59,14 @@ export default class LevelModule extends Module {
         });
       });
 
-      this.dataCache.set(message.author.id, userLevels);
+      this.dataCache.set(userId, userLevels);
     }
 
-    const userLevels = this.dataCache.get(message.author.id);
+    const userLevels = this.dataCache.get(userId);
     if (!userLevels) return; // Make typescript happy.
 
-    if (!userLevels.has(message.guild.id)) {
-      userLevels.set(message.guild.id, {
+    if (!userLevels.has(guildId)) {
+      userLevels.set(guildId, {
         lastUpdate: 0,
         needed: this.calcNeeded(1),
         dirty: false,
@@ -77,8 +75,14 @@ export default class LevelModule extends Module {
       });
     }
 
-    const levelData = userLevels.get(message.guild.id);
-    if (!levelData) return; // Make typescript happy.
+    return userLevels.get(guildId);
+  }
+
+  async handleMessage(message: Message) {
+    if (message.author.bot ?? !message.guild) return;
+
+    const levelData = await this.getLevelData(message.author.id, message.guild.id);
+    if (!levelData) return;
 
     if (Date.now() - levelData.lastUpdate < 60_000) return;
     levelData.xp += (Math.abs(await randomNumber()) + 50) % 100;
