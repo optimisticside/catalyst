@@ -646,6 +646,33 @@ exports.default = class ConfigCommand extends Command {
         handler: this.stringSetting('Prefix', 'You can set a custom prefix for this guild', null, null, null, 'prefix')
       },
       {
+        name: 'Levels',
+        desc: 'Reward people for being active.',
+        menuDesc: 'Select the corresponding emoji to configure Leveling.',
+        emoji: '📈',
+        menu: [
+          {
+            name: 'Toggle',
+            desc: 'Enable or disable level-up messages.',
+            emoji: '🔧',
+            handler: this.boolSetting('Level-up Message', 'Displayes messages when users level up.', 'levelupMessageEnabled')
+          },
+          {
+            name: 'Message',
+            desc: 'The message that users will be said goodbye with.',
+            emoji: '✉️',
+            handler: this.stringSetting(
+              'Goodbye Message',
+              'The message for when users level up.',
+              null,
+              null,
+              "How would you like to to tell users they leveled up? You can mention the user's through `{mention}`, their level through `{level}`, and their xp through `{xp}`",
+              'levelupMessage'
+            )
+          }
+        ]
+      },
+      {
         name: 'Auto Role',
         desc: 'Automatically assign roles to people that join.',
         menuDesc: 'Select the corresponding emoji to configure Auto Role.',

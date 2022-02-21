@@ -156,7 +156,7 @@ const guildDataSchema = new Schema({
   boostMessageChannel: { type: String },
   boostMessage: { type: String, default: '{user} just boosted the server!' },
 
-  levelupMessageEnabled: { type: Boolean, default: true },
+  levelupMessageEnabled: { type: Boolean, default: false },
   levelupMessage: { type: String, default: ':tada: {mention} just leveled up to level **{level}**!' },
 
   logsEnabled: { type: Boolean, default: false },
