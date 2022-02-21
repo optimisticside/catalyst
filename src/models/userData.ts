@@ -17,11 +17,13 @@ const cooldownSchema = new Schema({
 export interface UserDocument extends Document {
   id: string;
   cooldowns: Array<CooldownDocument>;
+  xpData: Map<string, number>;
 }
 
 const userDataSchema = new Schema({
   id: { type: String, require: true, unique: true },
-  cooldowns: { type: Array, of: cooldownSchema, default: [] }
+  cooldowns: { type: Array, of: cooldownSchema, default: [] },
+  xpData: { type: Map, of: Number, default: new Map() }
 });
 
 export default model('UserDataModels', userDataSchema);
