@@ -4,9 +4,7 @@
 
 import config from 'core/config';
 import { MessageEmbed, MessageActionRow, MessageButton, ColorResolvable } from 'discord.js';
-import { Component, redirect } from 'libs/fluid';
-import ListMenu from '@components/listMenu';
-import Command from 'structs/command';
+import { Component, action } from 'libs/fluid';
 
 const { DEFAULT_COLOR } = config;
 
@@ -14,11 +12,12 @@ export type PagedListItems = Array<string>;
 export interface PagedListProps {
   header: string;
   pageSize: number;
+  page: number;
   sections: { [key: string]: PagedListItems };
 }
 
 export interface PagedListState {
-  page: 0;
+  page: number;
 }
 
 export default class PagedListComponent extends Component {
@@ -27,6 +26,7 @@ export default class PagedListComponent extends Component {
 
   constructor(props: PagedListProps) {
     super(props);
+    this.state.page = this.props.page;
   }
 
   renderPages() {
@@ -71,7 +71,7 @@ export default class PagedListComponent extends Component {
         } else {
           // If we run out of space in page the loop will cycle once to
           // just create the page, and then cycle again to continue writing.
-          pages.push(new MessageEmbed());
+          pages.push(new MessageEmbed().setColor(DEFAULT_COLOR as ColorResolvable));
         }
       }
 
@@ -82,7 +82,44 @@ export default class PagedListComponent extends Component {
   }
 
   render() {
-    // TODO: Make this work
-    return {};
+    const pages = this.renderPages();
+    const page = pages[this.state.page].setFooter({ text: `Viewing page ${this.state.page + 1} of ${pages.length}` });
+    // This is quite hacky and should be built into Fluid through setState().
+    const changePage = (n: number) =>
+      action(this, redirector => {
+        this.state.page = n;
+        redirector(this);
+      });
+
+    const components = [
+      new MessageButton()
+        .setLabel('First')
+        .setStyle('SECONDARY')
+        .setDisabled(this.state.page === 0)
+        .setCustomId(changePage(0)),
+
+      new MessageButton()
+        .setLabel('Last')
+        .setStyle('SECONDARY')
+        .setDisabled(this.state.page === 0)
+        .setCustomId(changePage(this.state.page - 1)),
+
+      new MessageButton()
+        .setLabel('Next')
+        .setStyle('SECONDARY')
+        .setDisabled(this.state.page < pages.length)
+        .setCustomId(changePage(this.state.page + 1)),
+
+      new MessageButton()
+        .setLabel('End')
+        .setStyle('SECONDARY')
+        .setDisabled(this.state.page < pages.length)
+        .setCustomId(changePage(pages.length))
+    ];
+
+    return {
+      embeds: [page],
+      components: [new MessageActionRow().addComponents(components)]
+    };
   }
 }
