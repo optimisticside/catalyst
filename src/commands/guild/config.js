@@ -655,7 +655,11 @@ exports.default = class ConfigCommand extends Command {
             name: 'Toggle',
             desc: 'Enable or disable level-up messages.',
             emoji: '🔧',
-            handler: this.boolSetting('Level-up Message', 'Displayes messages when users level up.', 'levelupMessageEnabled')
+            handler: this.boolSetting(
+              'Level-up Message',
+              'Displayes messages when users level up.',
+              'levelupMessageEnabled'
+            )
           },
           {
             name: 'Message',
