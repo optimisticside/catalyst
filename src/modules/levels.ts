@@ -10,7 +10,7 @@ import randomNumber from 'utils/random';
 import { Message } from 'discord.js';
 import EventsModule from '@modules/events';
 
-export interface MemberData {
+export interface LevelData {
   level: number;
   lastUpdate: number;
   dirty: boolean;
@@ -19,7 +19,7 @@ export interface MemberData {
 }
 
 export default class LevelModule extends Module {
-  dataCache = new Map<string, Map<string, MemberData>>();
+  dataCache = new Map<string, Map<string, LevelData>>();
 
   calcNeededDelta(level: number) {
     return 5 * Math.pow(level, 2) + 50 * level + 100;
@@ -44,7 +44,7 @@ export default class LevelModule extends Module {
 
   async getLevelData(userId: string, guildId: string) {
     if (!this.dataCache.has(userId)) {
-      const userLevels = new Map<string, MemberData>();
+      const userLevels = new Map<string, LevelData>();
       const userData: UserDocument =
         (await UserData.findOne({ id: userId })) ?? (await UserData.create({ id: userId }));
 
