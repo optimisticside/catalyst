@@ -96,6 +96,9 @@ export interface GuildDocument extends Document {
   boostMessageChannel: string;
   boostMessage: string;
 
+  levelupMessageEnabled: boolean;
+  levelupMessage: string;
+
   logsEnabled: boolean;
   logChannel: string;
   logMemberJoin: boolean;
@@ -152,6 +155,9 @@ const guildDataSchema = new Schema({
   boostMessageEnabled: { type: Boolean, default: false },
   boostMessageChannel: { type: String },
   boostMessage: { type: String, default: '{user} just boosted the server!' },
+
+  levelupMessageEnabled: { type: Boolean, default: true },
+  levelupMessage: { type: String, default: ':tada: {mention} just leveled up to level **{level}**!' },
 
   logsEnabled: { type: Boolean, default: false },
   logChannel: { type: String },
