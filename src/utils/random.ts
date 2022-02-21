@@ -7,8 +7,8 @@ import * as crypto from 'crypto';
 export default async function randomNumber(nbytes = 4) {
   // Pack is just a helper function to pack a tuple into an array so it can be returned.
   const pack =
-    (fn: Function) =>
-    (...args: any[]) =>
+    (fn: (...args: any[]) => any) => // eslint-disable-line @typescript-eslint/no-explicit-any
+    (...args: any[]) => // eslint-disable-line @typescript-eslint/no-explicit-any
       fn([...args]);
   const [err, buf] = await new Promise(res => crypto.randomBytes(nbytes, pack(res)));
   if (err) return Promise.reject(err);
