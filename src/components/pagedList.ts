@@ -10,9 +10,9 @@ const { DEFAULT_COLOR } = config;
 
 export type PagedListItems = Array<string>;
 export interface PagedListProps {
-  header: string;
+  //header: string;
   pageSize: number;
-  page: number;
+  page?: number;
   sections: { [key: string]: PagedListItems };
 }
 
@@ -26,7 +26,7 @@ export default class PagedListComponent extends Component {
 
   constructor(props: PagedListProps) {
     super(props);
-    this.state.page = this.props.page;
+    this.state.page = this.props.page ?? 0;
   }
 
   renderPages() {
