@@ -188,9 +188,8 @@ export default class CommandModule extends Module {
     const key = `${user.id}:${command.name}`;
     const fromMap = this.cooldowns.get(key);
     if (fromMap) return fromMap;
-    const userData = await UserData.findOne({ id: user.id });
-    const cooldown = userData?.cooldowns.find(cd => cd.command == command.name);
-    return cooldown?.since;
+    const userData: UserDocument | null = await UserData.findOne({ id: user.id });
+    return userData?.cooldowns.get(command.name)?.getTime();
   }
 
   async saveCooldown(user: User, command: Command) {
@@ -201,11 +200,8 @@ export default class CommandModule extends Module {
     // If the cooldown is longer than a certain threshold,
     // we will store it in MongoDB in case we have to restart.
     if (command.cooldown > COOLDOWN_PERSISTANCE_THRESHOLD) {
-      const userData = (await UserData.findOne({ id: user.id })) ?? (await UserData.create({ id: user.id }));
-      const current =
-        userData.cooldowns.find(cl => cl.command === command.name) ??
-        userData.cooldowns.push({ command: command.name });
-      current.since = now;
+      const userData: UserDocument = (await UserData.findOne({ id: user.id })) ?? (await UserData.create({ id: user.id }));
+      userData.cooldowns.set(command.name, new Date(now));
       userData.markModified('cooldowns');
       await userData.save();
     } else {
@@ -227,7 +223,7 @@ export default class CommandModule extends Module {
 
     const userData = ((await UserData.findOne({ id: user.id })) ??
       (await UserData.create({ id: user.id }))) as UserDocument;
-    userData.cooldowns.filter(cl => cl.command === command.name);
+    userData.cooldowns.delete(command.name);
     userData.markModified('cooldowns');
     await userData.save();
   }
