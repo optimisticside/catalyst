@@ -27,7 +27,11 @@ exports.default = class ConfigCommand extends Command {
   }
 
   async promptBool(given, reply, title, desc, footer) {
-    const embed = new MessageEmbed().setTitle(title).setColor(DEFAULT_COLOR).setDescription(desc).setFooter(footer);
+    const embed = new MessageEmbed()
+      .setTitle(title)
+      .setColor(DEFAULT_COLOR)
+      .setDescription(desc)
+      .setFooter({ text: footer });
     reply.reactions.removeAll();
     reply.edit({ embeds: [embed] });
 
