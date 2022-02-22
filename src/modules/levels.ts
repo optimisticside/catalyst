@@ -79,7 +79,6 @@ export default class LevelModule extends Module {
   }
 
   async handleMessage(message: Message) {
-    console.log(message.content);
     if (message.author.bot || !message.guild) return;
 
     const levelData = await this.getLevelData(message.author.id, message.guild.id);
