@@ -12,8 +12,8 @@ export interface UserDocument extends Document {
 
 const userDataSchema = new Schema({
   id: { type: String, require: true, unique: true },
-  cooldowns: { type: Map, of: Date, default: new Map() },
-  xpData: { type: Map, of: Number, default: new Map() }
+  cooldowns: { type: Map, of: Date, default: new Map },
+  xpData: { type: Map, of: Number, default: new Map }
 });
 
 export default model('UserDataModels', userDataSchema);
