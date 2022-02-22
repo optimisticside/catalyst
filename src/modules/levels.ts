@@ -114,6 +114,7 @@ export default class LevelModule extends Module {
         xpData.set(guildId, levelData.xp);
       });
 
+      // TODO: this will NOT work with sharding.
       if (!xpData.size) return;
       await UserData.updateOne({ id: userId }, { xpData });
     });
