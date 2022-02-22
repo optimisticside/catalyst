@@ -114,7 +114,7 @@ export default class LevelModule extends Module {
         xpData.set(guildId, levelData.xp);
       });
 
-      if (!Object.entries(xpData).length) return;
+      if (!xpData.size) return;
       await UserData.updateOne({ id: userId }, { xpData });
     });
   }
