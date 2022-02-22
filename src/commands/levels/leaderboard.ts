@@ -17,7 +17,8 @@ export default class LeaderboardCommand extends Command {
       given.guild.members.cache.map(async member => {
         if (!given.guild || member.user.bot) return;
         const data = await levelHandler.getLevelData(member.user.id, given.guild.id);
-        return { member, data: (data ?? { xp: 0, level: 0 }) as LevelData };
+        if (!data) return;
+        return { member, data };
       })
     );
 
@@ -41,6 +42,7 @@ export default class LeaderboardCommand extends Command {
       name: 'leaderboard',
       desc: 'Displays the leaderboard of the most messages sent.',
       tags: ['levels'],
+      hidden: true,
       guildOnly: true
     });
   }
