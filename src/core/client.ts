@@ -41,6 +41,7 @@ export default class CatalystClient<Ready extends boolean = boolean> extends Cli
   }
 
   constructor(options: ClientOptions) {
+    // TODO: Log rateLimit events.
     super(options);
     this.logger = createLogger({
       cluster: this.shard?.clusterCount ?? this.cluster?.id,
