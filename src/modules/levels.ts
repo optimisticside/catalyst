@@ -79,6 +79,7 @@ export default class LevelModule extends Module {
   }
 
   async handleMessage(message: Message) {
+    console.log(message.content);
     if (message.author.bot || !message.guild) return;
 
     const levelData = await this.getLevelData(message.author.id, message.guild.id);
@@ -98,6 +99,7 @@ export default class LevelModule extends Module {
 
     const levelupMessage = guildData.levelupMessage
       .replaceAll('{mention}', `<@${message.author.id}>`)
+      .replaceAll('{needed}', levelData.needed.toString())
       .replaceAll('{level}', levelData.level.toString())
       .replaceAll('{xp}', levelData.xp.toString());
 
