@@ -6,8 +6,8 @@ import { ColorResolvable, MessageEmbed, Permissions } from 'discord.js';
 import Command, { CommandGiven } from 'structs/command';
 import config from 'core/config';
 import CatalystClient from 'core/client';
+import * as si from 'systeminformation';
 import * as process from 'process';
-import * as os from 'os';
 
 const GIGA_BYTE = Math.pow(1024, 3);
 const { NAME, DEFAULT_COLOR } = config;
@@ -28,31 +28,37 @@ const toHrMinSec = (time: number) => {
 
 export default class StatsCommand extends Command {
   async run(given: CommandGiven) {
-    const mem = process.memoryUsage();
-    const load = os.loadavg();
+    if (!this.client.user) return;
 
-    const usedMem = (mem.heapUsed / GIGA_BYTE).toFixed(3);
-    const totalMem = (mem.heapTotal / GIGA_BYTE).toFixed(3);
+    const cpuLoad = (await si.currentLoad()).currentLoad;
+    const mem = await si.mem();
+
+    const usedMem = (mem.used / GIGA_BYTE).toFixed(3);
+    const totalMem = (mem.total / GIGA_BYTE).toFixed(3);
     const uptime = toHrMinSec(process.uptime() * 1000);
 
     const result = (await Promise.all([
       this.client.shard?.fetchClientValues('guilds.cache.size'),
+      this.client.shard?.fetchClientValues('channels.cache.size'),
       this.client.shard?.broadcastEval(c => c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0))
     ])) as Array<Array<number>>;
     const totalGuilds = result[0].reduce((acc, count) => acc + count, 0);
-    const totalUsers = result[1].reduce((acc, count) => acc + count, 0);
+    const totalChannels = result[1].reduce((acc, count) => acc + count, 0);
+    const totalUsers = result[2].reduce((acc, count) => acc + count, 0);
 
     const embed = new MessageEmbed()
       .setTitle(NAME)
       .setColor(DEFAULT_COLOR as ColorResolvable)
-      .addField('Guilds', totalGuilds.toString(), true)
-      .addField('Users', totalUsers.toString(), true)
-      .addField('Uptime', `${uptime}`, true)
-      .addField('Avg Load', load.map(n => n.toFixed(3)).join(', '))
-      .addField('Memory Usage', `${usedMem} GB / ${totalMem} GB`, true)
-      .setFooter({
-        text: `PID: ${process.pid} | Cluster: ${this.client.shard?.id} | Shard: ${this.client.shard?.shardCount}`
-      });
+      .setThumbnail(this.client.user?.displayAvatarURL())
+      .setDescription(`Cluster ${this.client.cluster?.id} on shard ${this.client.shard?.id}`)
+      .addField('Stats', `Guilds: \`${totalGuilds}\`\nUsers: \`${totalUsers}\`\nChannels: \`${totalChannels}\``, true)
+      .addField(
+        'Node',
+        `CPU: \`${cpuLoad.toFixed(2)}%\`\nMemory: \`${usedMem}/${totalMem} GB\`\nUptime: \`${uptime}\``,
+        true
+      )
+      .setFooter({ text: `PID: ${process.pid}` })
+      .setTimestamp(Date.now());
     given.reply({ embeds: [embed] });
   }
 
