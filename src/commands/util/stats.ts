@@ -50,14 +50,13 @@ export default class StatsCommand extends Command {
       .setTitle(NAME)
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setThumbnail(this.client.user?.displayAvatarURL())
-      .setDescription(`Cluster ${this.client.cluster?.id} on shard ${this.client.shard?.id}`)
       .addField('Stats', `Guilds: \`${totalGuilds}\`\nUsers: \`${totalUsers}\`\nChannels: \`${totalChannels}\``, true)
       .addField(
         'Node',
         `CPU: \`${cpuLoad.toFixed(2)}%\`\nMemory: \`${usedMem}/${totalMem} GB\`\nUptime: \`${uptime}\``,
         true
       )
-      .setFooter({ text: `PID: ${process.pid}` })
+      .setFooter({ text: `PID: ${process.pid} | Cluster ${this.client.cluster?.id} | Shard: ${this.client.shard?.id}` })
       .setTimestamp(Date.now());
     given.reply({ embeds: [embed] });
   }
