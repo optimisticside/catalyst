@@ -3,7 +3,7 @@
 // See LICENSE for details
 
 import CatalystClient from 'core/client';
-import LevelModule from '@modules/levels';
+import LevelModule, { LevelData } from '@modules/levels';
 import * as Fluid from 'libs/fluid';
 import Command, { CommandArgs, CommandGiven } from 'structs/command';
 import PagedListComponent from '@components/pagedList';
@@ -17,8 +17,7 @@ export default class LeaderboardCommand extends Command {
       given.guild.members.cache.map(async member => {
         if (!given.guild || member.user.bot) return;
         const data = await levelHandler.getLevelData(member.user.id, given.guild.id);
-        if (!data) return;
-        return { member, data };
+        return { member, data: (data ?? { xp: 0, level: 0 }) as LevelData };
       })
     );
 
