@@ -13,25 +13,27 @@ export default class LeaderboardCommand extends Command {
     if (!given.guild) return;
 
     const levelHandler = this.client.getModule<LevelModule>('levelHandler');
-    const levelData = await Promise.all(given.guild.members.cache.map(async member => {
-      if (!given.guild || member.user.bot) return;
-      const data = await levelHandler.getLevelData(member.user.id, given.guild.id);
-      if (!data) return;
-      return { member, data };
-    }));
+    const levelData = await Promise.all(
+      given.guild.members.cache.map(async member => {
+        if (!given.guild || member.user.bot) return;
+        const data = await levelHandler.getLevelData(member.user.id, given.guild.id);
+        if (!data) return;
+        return { member, data };
+      })
+    );
 
     const leaderboard = [...levelData.values()]
-      .filter(<T>(x: T|undefined): x is T => x !== undefined)   
+      .filter(<T>(x: T | undefined): x is T => x !== undefined)
       .sort((a, b) => a.data.xp - b.data.xp)
       .map(({ member, data }, index) => [`${index + 1}. ${member.user.tag}`, `Level ${data.level} (${data.xp} xp)`])
-      .reduce((o, [key, value]) => Object.assign(o, {[key]: [value]}), {});
+      .reduce((o, [key, value]) => Object.assign(o, { [key]: [value] }), {});
 
     const list = new PagedListComponent({
       pageSize: 15,
       sections: leaderboard
     });
 
-    Fluid.mount(list, given);      
+    Fluid.mount(list, given);
   }
 
   constructor(client: CatalystClient) {

@@ -200,7 +200,8 @@ export default class CommandModule extends Module {
     // If the cooldown is longer than a certain threshold,
     // we will store it in MongoDB in case we have to restart.
     if (command.cooldown > COOLDOWN_PERSISTANCE_THRESHOLD) {
-      const userData: UserDocument = (await UserData.findOne({ id: user.id })) ?? (await UserData.create({ id: user.id }));
+      const userData: UserDocument =
+        (await UserData.findOne({ id: user.id })) ?? (await UserData.create({ id: user.id }));
       userData.cooldowns.set(command.name, new Date(now));
       userData.markModified('cooldowns');
       await userData.save();
@@ -221,8 +222,8 @@ export default class CommandModule extends Module {
       return;
     }
 
-    const userData = ((await UserData.findOne({ id: user.id })) ??
-      (await UserData.create({ id: user.id }))) as UserDocument;
+    const userData: UserDocument =
+      (await UserData.findOne({ id: user.id })) ?? (await UserData.create({ id: user.id }));
     userData.cooldowns.delete(command.name);
     userData.markModified('cooldowns');
     await userData.save();

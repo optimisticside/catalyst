@@ -115,7 +115,7 @@ export default class LevelModule extends Module {
       });
 
       if (!Object.entries(xpData).length) return;
-      await UserData.findOneAndUpdate({ id: userId }, { xpData });
+      await UserData.updateOne({ id: userId }, { xpData });
     });
   }
 
