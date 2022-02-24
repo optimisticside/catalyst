@@ -86,7 +86,7 @@ export default class PagedListComponent extends Component {
     const page = pages[this.state.page].setFooter({ text: `Viewing page ${this.state.page + 1} of ${pages.length}` });
     // This is quite hacky and should be built into Fluid through setState().
     const changePage = (n: number) =>
-      action(this, async redirector => {
+      action(this, redirector => {
         const page = (n + pages.length) % pages.length;
         redirector(new PagedListComponent({ ...this.props, page }));
       });
