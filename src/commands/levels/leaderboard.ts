@@ -14,6 +14,17 @@ export default class LeaderboardCommand extends Command {
     await given.reply('Command not availble');
     return;
 
+    /*const members = this.client.guilds.cache
+      .map(g => [g.name, g.members.cache.map(m => m.user.tag)])
+      .reduce((o, [key, value]) => Object.assign(o, { [key as string]: value as string[] }), {});
+
+    const list = new PagedListComponent({
+      pageSize: 5,
+      sections: members
+    });
+
+    Fluid.mount(list, given);*/
+
     /*if (!given.guild) return;
 
     const levelHandler = this.client.getModule<LevelModule>('levelHandler');
