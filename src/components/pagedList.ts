@@ -4,7 +4,7 @@
 
 import config from 'core/config';
 import { MessageEmbed, MessageActionRow, MessageButton, ColorResolvable } from 'discord.js';
-import { Component, action, reload } from 'libs/fluid';
+import { Component, action } from 'libs/fluid';
 
 const { DEFAULT_COLOR } = config;
 

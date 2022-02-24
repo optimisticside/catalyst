@@ -3,29 +3,14 @@
 // See LICENSE for details
 
 import CatalystClient from 'core/client';
-//import LevelModule from '@modules/levels';
-//import * as Fluid from 'libs/fluid';
+import LevelModule from '@modules/levels';
+import * as Fluid from 'libs/fluid';
 import Command, { CommandArgs, CommandGiven } from 'structs/command';
-//import PagedListComponent from '@components/pagedList';
+import PagedListComponent from '@components/pagedList';
 
 export default class LeaderboardCommand extends Command {
   async run(given: CommandGiven, _args: CommandArgs) {
-    // This is only temporary, until this command can be fixed.
-    await given.reply('Command not availble');
-    return;
-
-    /*const members = this.client.guilds.cache
-      .map(g => [g.name, g.members.cache.map(m => m.user.tag)])
-      .reduce((o, [key, value]) => Object.assign(o, { [key as string]: value as string[] }), {});
-
-    const list = new PagedListComponent({
-      pageSize: 5,
-      sections: members
-    });
-
-    Fluid.mount(list, given);*/
-
-    /*if (!given.guild) return;
+    if (!given.guild) return;
 
     const levelHandler = this.client.getModule<LevelModule>('levelHandler');
     const levelData = await Promise.all(
@@ -48,7 +33,7 @@ export default class LeaderboardCommand extends Command {
       sections: leaderboard
     });
 
-    Fluid.mount(list, given);*/
+    Fluid.mount(list, given);
   }
 
   constructor(client: CatalystClient) {
