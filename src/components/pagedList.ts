@@ -4,7 +4,7 @@
 
 import config from 'core/config';
 import { MessageEmbed, MessageActionRow, MessageButton, ColorResolvable } from 'discord.js';
-import { Component, action } from 'libs/fluid';
+import { Component, action, reload } from 'libs/fluid';
 
 const { DEFAULT_COLOR } = config;
 
@@ -86,9 +86,9 @@ export default class PagedListComponent extends Component {
     const page = pages[this.state.page].setFooter({ text: `Viewing page ${this.state.page + 1} of ${pages.length}` });
     // This is quite hacky and should be built into Fluid through setState().
     const changePage = (n: number) =>
-      action(this, redirector => {
-        this.state.page = n;
-        redirector(this);
+      action(this, async (redirector) => {
+        const page = (n + pages.length) % pages.length;
+        redirector(new PagedListComponent({ ...this.props, page }));
       });
 
     const components = [
@@ -107,13 +107,13 @@ export default class PagedListComponent extends Component {
       new MessageButton()
         .setLabel('Next')
         .setStyle('SECONDARY')
-        .setDisabled(this.state.page < pages.length)
+        .setDisabled(this.state.page + 1 >= pages.length)
         .setCustomId(changePage(this.state.page + 1)),
 
       new MessageButton()
         .setLabel('End')
         .setStyle('SECONDARY')
-        .setDisabled(this.state.page < pages.length)
+        .setDisabled(this.state.page + 1 >= pages.length)
         .setCustomId(changePage(pages.length))
     ];
 

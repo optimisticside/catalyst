@@ -176,10 +176,9 @@ export default class SlashModule extends Module {
   }
 
   async setupGuild(guild: Guild) {
-    await this.refreshCommands(guild, this.buildCommands()).catch(err => {
-      // TODO: `refreshCommands` fails if the bot does not have permission
-      // to create slash commands. This should be removed.
-      this.logger.error(`Unable to load slash commands to guild ${guild.id}: ${err}`);
+    await this.refreshCommands(guild, this.buildCommands()).catch(() => {
+      // `refreshCommands` fails if the bot does not have permission
+      // to create slash commands, so nothing needs to be done.
     });
   }
 
