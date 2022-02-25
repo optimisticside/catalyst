@@ -43,8 +43,8 @@ export default class WhoisCommand extends Command {
       .setDescription(`<@${target.user.id}>`)
       .addField('Joined', joinedAt, true)
       .addField('Registered', moment(target.user.createdTimestamp).format('MMMM Do YYYY, h:mm:ss a'), true)
-      .addField(`Roles[${target.roles.cache.size}]`, roles.join(', '))
-      .addField('Key Permissions', keyPermissions.join(' '))
+      .addField(`Roles[${roles.length}]`, roles.join(' '))
+      .addField('Key Permissions', keyPermissions.join(', '))
       .setFooter({ text: `ID: ${target.user.id}` })
       .setTimestamp(Date.now());
 
