@@ -13,9 +13,7 @@ const PERMISSION_KEYWORDS = ['MANAGE', 'ADMINISTRATOR', 'KICK', 'BAN', 'MENTION'
 const { DEFAULT_COLOR } = config;
 
 function constantToReadable(string: string) {
-  return string
-    .replaceAll('_', ' ')
-    .replace(/\w\S*/g, m => m.charAt(0).toUpperCase() + m.substring(1).toLowerCase());
+  return string.replaceAll('_', ' ').replace(/\w\S*/g, m => m.charAt(0).toUpperCase() + m.substring(1).toLowerCase());
 }
 
 export default class WhoisCommand extends Command {
@@ -36,7 +34,7 @@ export default class WhoisCommand extends Command {
     const roles = target.roles.cache
       .filter(r => r !== given.guild?.roles.everyone)
       .sort((a, b) => a.position - b.position)
-      .map(r => `<@&${r.id}>`)
+      .map(r => `<@&${r.id}>`);
 
     const embed = new MessageEmbed()
       .setAuthor({ name: target.user.username, iconURL: target.user.displayAvatarURL() })
