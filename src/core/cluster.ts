@@ -29,7 +29,7 @@ export default class CatalystCluster extends BaseCluster {
 
     this.client.login(TOKEN);
     this.client.on('rateLimit', data => {
-      this.client.logger.warn(`Rate limited for ${data.timeout - Date.now()} ms at ${data.method} ${data.route}`);
+      this.client.logger.warn(`Rate limited for ${data.timeout} ms at ${data.method} ${data.route}`);
     });
 
     if (this.client.isReady()) {
