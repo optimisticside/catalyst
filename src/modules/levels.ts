@@ -6,7 +6,7 @@ import Module from 'structs/module';
 import CatalystClient from 'core/client';
 import GuildData, { GuildDocument } from 'models/guildData';
 import UserData, { UserDocument } from 'models/userData';
-import randomNumber from 'utils/random';
+import { randomInt } from 'utils/random';
 import { Message } from 'discord.js';
 import EventsModule from '@modules/events';
 
@@ -85,7 +85,7 @@ export default class LevelModule extends Module {
     if (!levelData) return;
 
     if (Date.now() - levelData.lastUpdate < 60_000) return;
-    levelData.xp += (Math.abs(await randomNumber()) + 50) % 100;
+    levelData.xp += await randomInt(50, 100);
     levelData.dirty = true;
     levelData.lastUpdate = Date.now();
 

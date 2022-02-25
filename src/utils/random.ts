@@ -24,3 +24,7 @@ export default async function randomNumber(nbytes = 4) {
   }
   return num;
 }
+
+export async function randomInt(a: number, b: number) {
+  return (Math.abs(await randomNumber()) % (b - a)) + a;
+}
