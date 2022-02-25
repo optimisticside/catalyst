@@ -48,7 +48,7 @@ shardingManager
   .on(SharderEvents.SHARD_READY, shard => logger.info(`Shard ${shard} connected`))
   .on(SharderEvents.SHARD_DISCONNECT, (_, shard) => logger.warn(`Shard ${shard} disconnected`))
   .on(SharderEvents.SHARD_RECONNECT, shard => logger.info(`Shard ${shard} reconnected`))
-  .on(SharderEvents.SHARD_RESUME, (_, shard) => logger.warn(`Shard ${shard} resumed`))
+  .on(SharderEvents.SHARD_RESUME, (_, shard) => logger.info(`Shard ${shard} resumed`))
   .spawn();
 
 if (process.env.NODE_ENV !== 'production') {

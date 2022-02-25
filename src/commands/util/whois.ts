@@ -6,28 +6,37 @@ import CatalystClient from 'core/client';
 import { ColorResolvable, GuildMember, MessageEmbed } from 'discord.js';
 import Command, { CommandArgs, CommandGiven } from 'structs/command';
 import OptionParser from 'utils/optionParser';
-import Serializer from 'utils/serializer';
+import moment from 'moment';
 import config from 'core/config';
 
-const PERMISSION_KEYWORDS = ['MANAGE', 'ADMINISTRATOR', 'KICK', 'BAN'];
+const PERMISSION_KEYWORDS = ['MANAGE', 'ADMINISTRATOR', 'KICK', 'BAN', 'MENTION'];
 const { DEFAULT_COLOR } = config;
+
+function constantToReadable(string: string) {
+  return string
+    .replaceAll('_', ' ')
+    .replace(/\w\S*/g, m => m.charAt(0).toUpperCase() + m.substring(1).toLowerCase());
+}
 
 export default class WhoisCommand extends Command {
   async run(given: CommandGiven, args: CommandArgs) {
     const parser = new OptionParser(this, given, args);
     const target = parser.getOption('user') as GuildMember;
 
-    const joinedAt = target.joinedTimestamp ? Serializer.serializeTimestamp(target.joinedTimestamp, 'f') : 'unknown';
+    const joinedAt = target.joinedTimestamp
+      ? moment(target.joinedTimestamp).format('MMMM Do YYYY, h:mm:ss a')
+      : 'unknown';
+
     const keyPermissions = target.permissions
       .toArray()
       .filter(p => !given.guild?.roles.everyone.permissions.has(p))
-      .filter(p => !!PERMISSION_KEYWORDS.find(kw => p.includes(kw)));
+      .filter(p => !!PERMISSION_KEYWORDS.find(kw => p.includes(kw)))
+      .map(p => constantToReadable(p));
 
     const roles = target.roles.cache
       .filter(r => r !== given.guild?.roles.everyone)
       .sort((a, b) => a.position - b.position)
-      .map(r => Serializer.serializeRole(r.id))
-      .map(r => r.replace(/\w\S*/g, m => m.charAt(0).toUpperCase() + m.substring(1).toLowerCase()));
+      .map(r => `<@&${r.id}>`)
 
     const embed = new MessageEmbed()
       .setAuthor({ name: target.user.username, iconURL: target.user.displayAvatarURL() })
@@ -35,8 +44,8 @@ export default class WhoisCommand extends Command {
       .setThumbnail(target.user.displayAvatarURL())
       .setDescription(`<@${target.user.id}>`)
       .addField('Joined', joinedAt, true)
-      .addField('Registered', Serializer.serializeTimestamp(target.user.createdTimestamp, 'f'), true)
-      .addField(`Roles[${target.roles.cache.size}]`, roles.join(' '))
+      .addField('Registered', moment(target.user.createdTimestamp).format('MMMM Do YYYY, h:mm:ss a'), true)
+      .addField(`Roles[${target.roles.cache.size}]`, roles.join(', '))
       .addField('Key Permissions', keyPermissions.join(' '))
       .setFooter({ text: `ID: ${target.user.id}` })
       .setTimestamp(Date.now());
