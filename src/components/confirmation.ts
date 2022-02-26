@@ -11,6 +11,7 @@ const { DEFAULT_COLOR } = config;
 export interface ConfirmationProps {
   header: string;
   body: string;
+  footer?: string;
   ifYes: ActionCallback;
   ifNo: ActionCallback;
 }
@@ -27,6 +28,10 @@ export default class ConfirmationComponent extends Component {
       .setTitle(this.props.header)
       .setColor(DEFAULT_COLOR as ColorResolvable)
       .setDescription(this.props.body);
+    
+    if (this.props.footer) {
+      embed.setFooter({ text: this.props.footer });
+    }
 
     const components: Array<MessageButton> = [];
     const yesAction = action(this, this.props.ifYes);
