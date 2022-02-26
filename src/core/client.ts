@@ -33,6 +33,12 @@ export default class CatalystClient<Ready extends boolean = boolean> extends Cli
     module.load();
   }
 
+  async waitForReady() {
+    if (!this.isReady()) {
+      await new Promise(res => this.on('ready', res));
+    }
+  }
+
   async load() {
     const moduleFiles = await glob(path.join(__dirname + '/../modules/**/*.js'));
     await Promise.all(moduleFiles.map(this.loadModule.bind(this)));

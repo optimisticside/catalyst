@@ -32,10 +32,7 @@ export default class CatalystCluster extends BaseCluster {
       this.client.logger.warn(`Rate limited for ${data.timeout} ms at ${data.method} ${data.route}`);
     });
 
-    if (this.client.isReady()) {
-      await new Promise(res => this.client.once('ready', res));
-    }
-
+    await this.client.waitForReady();
     this.updateStatus();
     setInterval(this.updateStatus.bind(this), 5000);
   }

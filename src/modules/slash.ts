@@ -320,15 +320,18 @@ export default class SlashModule extends Module {
     const eventHandler = this.client.getModule<EventModule>('eventHandler');
     const commandHandler = this.client.getModule<CommandModule>('commandHandler');
 
-    eventHandler.on('interactionCreate', this.handleInteraction.bind(this));
     commandHandler.on('commandsLoad', async () => {
       this.logger.info('Setting up slash commands');
       eventHandler.on('guildCreate', this.setupGuild.bind(this));
 
-      if (!this.client.isReady()) {
-        await new Promise(res => this.client.once('ready', res));
-      }
+      await this.client.waitForReady();
       this.client.guilds.cache.map(this.setupGuild.bind(this));
+    });
+
+    // Waiting for the client to be ready before accepting interactions
+    // prevents invalid-interaction errors.
+    this.client.waitForReady().then(() => {
+      eventHandler.on('interactionCreate', this.handleInteraction.bind(this));
     });
   }
 
