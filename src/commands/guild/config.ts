@@ -67,7 +67,14 @@ export default class ConfigCommand extends Command {
               redirect: {
                 title: 'Greeting',
                 description: 'Select the buttons below to configure greetings',
-                items: []
+                items: [
+                  {
+                    name: 'Toggle',
+                    emoji: '⚙︎',
+                    description: 'Enable/disable greeting messages',
+                    redirect: this.boolSetting('Gretting Messages', 'greetingEnabled')
+                  }
+                ]
               }
             },
 
@@ -118,7 +125,21 @@ export default class ConfigCommand extends Command {
               redirect: {
                 title: 'Message Logs',
                 description: 'Select the buttons below to configure message logging',
-                items: []
+                items: [
+                  {
+                    name: 'Message Deletes',
+                    emoji: '🗑️',
+                    description: 'Keep track of deleted messages',
+                    redirect: this.boolSetting('Delete Logs', 'logMessageDelete')
+                  },
+
+                  {
+                    name: 'Message Edits',
+                    emoji: '✏️',
+                    description: 'Keep track of edited messages',
+                    redirect: this.boolSetting('Edit Logs', 'logMessageEdit')
+                  }
+                ]
               }
             },
 
@@ -126,11 +147,7 @@ export default class ConfigCommand extends Command {
               name: 'Guardian Logs',
               emoji: '🔒',
               description: 'Keeps track of what Guardian does',
-              redirect: {
-                title: 'Guardian Logs',
-                description: 'Select the butons below to configure Guardia logging',
-                items: []
-              }
+              redirect: this.boolSetting('Guardian Logs', 'logGuardian')
             },
 
             {
@@ -140,7 +157,21 @@ export default class ConfigCommand extends Command {
               redirect: {
                 title: 'User Logs',
                 description: 'Select the butons below to cnofigure user logging',
-                items: []
+                items: [
+                  {
+                    name: 'User Join',
+                    emoji: '📥',
+                    description: 'Keep track of users joining the server',
+                    redirect: this.boolSetting('Join Logs', 'logMemberJoin')
+                  },
+
+                  {
+                    name: 'User Leave',
+                    emoji: '📤',
+                    description: 'Keep track of users leaving the server',
+                    redirect: this.boolSetting('Leave Logs', 'logMemberLeave')
+                  }
+                ]
               }
             }
           ]
@@ -172,7 +203,14 @@ export default class ConfigCommand extends Command {
         redirect: {
           title: 'Auto Role',
           description: 'Select the buttons below to configure auto role assignment',
-          items: []
+          items: [
+            {
+              name: 'Toggle',
+              emoji: '⚙︎',
+              description: 'Enable/disable auto roles',
+              redirect: this.boolSetting('Auto role-assignment', 'autoRoleEnabled')
+            }
+          ]
         }
       }
     ]
