@@ -326,11 +326,9 @@ export default class SlashModule extends Module {
 
       await this.client.waitForReady();
       this.client.guilds.cache.map(this.setupGuild.bind(this));
-    });
 
-    // Waiting for the client to be ready before accepting interactions
-    // prevents invalid-interaction errors.
-    this.client.waitForReady().then(() => {
+      // Waiting for the client to be ready before accepting interactions
+      // prevents invalid-interaction errors.
       eventHandler.on('interactionCreate', this.handleInteraction.bind(this));
     });
   }
