@@ -66,11 +66,7 @@ export abstract class Component extends EventEmitter {
     this.emit('interaction', interaction);
   }
 
-  render(): MessageEditOptions {
-    // This will throw an error only if the component's sub-class
-    // does not have a render method.
-    throw new Error('No Render method provided');
-  }
+  abstract render(): MessageEditOptions;
 
   componentDidUpdate(oldProps: ComponentProps, oldState: ComponentState) {
     return oldProps !== this.props || oldState !== this.state;
@@ -135,10 +131,15 @@ export const reload = async (
   oldComponent.alive = false;
   oldComponent.collector?.stop();
   newComponent.mounter = oldComponent.mounter;
-  if (oldComponent !== newComponent && newComponent !== oldComponent.previous) {
+  if (oldComponent === newComponent) {
+    newComponent.previous = oldComponent.previous;
+  } else if (newComponent !== oldComponent.previous) {
     newComponent.previous = oldComponent;
   } else {
-    newComponent.previous = oldComponent.previous;
+    // We are moving back to the previous component, so
+    // oldComponent comes after newComponent. Therefore we must
+    // go back two elements to get the new previous component.
+    newComponent.previous = oldComponent.previous?.previous;
   }
   // We need to set the redirect to be alive explicitly, in case
   // it was once alive but later removed.
