@@ -59,8 +59,6 @@ export default class PagedListComponent extends Component {
             if (last + written + size >= pages.length * this.props.pageSize) break;
             if (accumulation.map(x => x.length).reduce((a, b) => a + b + 1) > 1023) break;
 
-            // TODO: this will break if a section item's size is greater than a page's size
-            // but let's just ignore it.
             items.push(item);
             written += size;
           }

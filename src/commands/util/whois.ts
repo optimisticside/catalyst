@@ -57,7 +57,6 @@ export default class WhoisCommand extends Command {
       name: 'whois',
       aliases: ['userInfo'],
       desc: 'Gets information about a user.',
-      hidden: true, // TODO: Fix this command
       options: [
         {
           name: 'user',
