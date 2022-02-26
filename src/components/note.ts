@@ -30,7 +30,7 @@ export default class NoteComponent extends Component {
       .setTitle(this.props.header)
       .setColor(this.props.color ?? (DEFAULT_COLOR as ColorResolvable))
       .setDescription(this.props.body);
-    
+
     const backRedirect = this.props.backButton && this.previous && redirect(this, this.previous);
     if (backRedirect && buttons.length < 5) {
       buttons.push(

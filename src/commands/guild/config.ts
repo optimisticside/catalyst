@@ -252,7 +252,7 @@ export default class ConfigCommand extends Command {
       const config: GuildDocument =
         (await GuildData.findOne({ id: interaction.guild.id })) ??
         (await GuildData.create({ id: interaction.guild.id }));
-      
+
       const confirmation = new ConfirmationComponent({
         header: name,
         body: `${name} is currently ${config[index] ? 'on' : 'off'}`,
@@ -269,7 +269,6 @@ export default class ConfigCommand extends Command {
           )
       });
 
-      //confirmation.previousFreeze = true;
       redirector(confirmation);
     };
   }
