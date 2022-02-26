@@ -40,6 +40,7 @@ export abstract class Component extends EventEmitter {
   collector?: InteractionCollector<MessageComponentInteraction>;
   mounter?: Mounter;
   previous?: Component;
+  previousFreeze = false;
   renderOptions?: RenderOptions;
   mountPoint?: MountPoint;
   reply?: Message;
@@ -53,8 +54,6 @@ export abstract class Component extends EventEmitter {
     this.setMaxListeners(0);
     if (this.defaultProps) {
       const defaults = Object.entries(this.defaultProps);
-      // We cannot do [ name, default ] because `default` is
-      // a keyword in Javascript.
       defaults.map(([index, value]) => {
         this.props[index] = this.props[index] ?? value;
       });
@@ -131,7 +130,7 @@ export const reload = async (
   oldComponent.alive = false;
   oldComponent.collector?.stop();
   newComponent.mounter = oldComponent.mounter;
-  if (oldComponent === newComponent) {
+  if (oldComponent === newComponent || newComponent.previousFreeze) {
     newComponent.previous = oldComponent.previous;
   } else if (newComponent !== oldComponent.previous) {
     newComponent.previous = oldComponent;

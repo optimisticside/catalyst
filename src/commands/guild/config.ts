@@ -226,7 +226,9 @@ export default class ConfigCommand extends Command {
           redirector(
             new NoteComponent({
               header: 'Success',
-              body: ':white_check_mark: The change was successful.'
+              body: ':white_check_mark: The change was successful.',
+              previousFreeze: true,
+              backButton: true
             })
           );
         })
@@ -235,7 +237,9 @@ export default class ConfigCommand extends Command {
           redirector(
             new NoteComponent({
               header: 'Uh oh!',
-              body: 'An error occured and the change could not be made.'
+              body: 'An error occured and the change could not be made.',
+              previousFreeze: true,
+              backButton: true
             })
           );
         });
@@ -248,7 +252,7 @@ export default class ConfigCommand extends Command {
       const config: GuildDocument =
         (await GuildData.findOne({ id: interaction.guild.id })) ??
         (await GuildData.create({ id: interaction.guild.id }));
-
+      
       const confirmation = new ConfirmationComponent({
         header: name,
         body: `${name} is currently ${config[index] ? 'on' : 'off'}`,
@@ -258,11 +262,14 @@ export default class ConfigCommand extends Command {
           redirector(
             new NoteComponent({
               header: 'Not changed',
-              body: `${name} has not been changed.`
+              body: `${name} has not been changed.`,
+              previousFreeze: true,
+              backButton: true
             })
           )
       });
 
+      //confirmation.previousFreeze = true;
       redirector(confirmation);
     };
   }
