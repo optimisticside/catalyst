@@ -244,6 +244,7 @@ export default class ConfigCommand extends Command {
     ]
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   configChanger(config: GuildDocument, index: string, value: any): Fluid.ActionCallback {
     return redirector => {
       config[index] = value;
