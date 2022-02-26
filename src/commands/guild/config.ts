@@ -163,7 +163,7 @@ export default class ConfigCommand extends Command {
             }
           ]
         }
-      }
+      },
 
       {
         name: 'Auto Role',
@@ -182,19 +182,24 @@ export default class ConfigCommand extends Command {
     return redirector => {
       config[index] = value;
       config.markModified(index);
-      config.save()
+      config
+        .save()
         .then(() => {
-          redirector(new NoteComponent({
-            header: 'Success',
-            body: ':white_check_mark: The change was successful.'
-          }));
+          redirector(
+            new NoteComponent({
+              header: 'Success',
+              body: ':white_check_mark: The change was successful.'
+            })
+          );
         })
         .catch(err => {
           this.logger.error(`Unable to save data: ${err}`);
-          redirector(new NoteComponent({
-            header: 'Uh oh!',
-            body: 'An error occured and the change could not be made.'
-          }));
+          redirector(
+            new NoteComponent({
+              header: 'Uh oh!',
+              body: 'An error occured and the change could not be made.'
+            })
+          );
         });
     };
   }
@@ -202,18 +207,22 @@ export default class ConfigCommand extends Command {
   boolSetting(name: string, index: string): Fluid.ActionCallback {
     return async (redirector, interaction) => {
       if (!interaction.guild) return;
-      const config: GuildDocument = 
-        (await GuildData.findOne({ id: interaction.guild.id })) ?? (await GuildData.create({ id: interaction.guild.id }));
+      const config: GuildDocument =
+        (await GuildData.findOne({ id: interaction.guild.id })) ??
+        (await GuildData.create({ id: interaction.guild.id }));
 
       const confirmation = new ConfirmationComponent({
         header: name,
         body: `${name} is currently ${config[index] ? 'on' : 'off'}`,
         footer: `Would you like to ${config[index] ? 'disable' : 'enable'} it?`,
         ifYes: this.configChanger(config, index, !config[index]),
-        ifNo: redirector => redirector(new NoteComponent({
-          header: 'Not changed',
-          body: `${name} has not been changed.`
-        }))
+        ifNo: redirector =>
+          redirector(
+            new NoteComponent({
+              header: 'Not changed',
+              body: `${name} has not been changed.`
+            })
+          )
       });
 
       redirector(confirmation);
