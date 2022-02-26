@@ -77,9 +77,7 @@ export default abstract class Command {
     return given !== null;
   }
 
-  async run(_given: CommandGiven, _args: CommandArgs): Promise<void> {
-    throw new Error(`${this.name} doesn't have a run() method.`);
-  }
+  abstract run(given: CommandGiven, args: CommandArgs): Promise<void>;
 
   constructor(info: CommandInfo) {
     this.name = info.name;

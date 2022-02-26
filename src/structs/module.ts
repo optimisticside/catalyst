@@ -13,17 +13,14 @@ interface ModuleOptions {
   client: CatalystClient;
 }
 
-export default class Module extends EventEmitter {
+export default abstract class Module extends EventEmitter {
   name: string;
   desc = 'No description';
   authors: Array<string> = [];
   client: CatalystClient;
   logger: Logger;
 
-  load(): void {
-    // TODO: Fix the typedef for the `modules` parameter.
-    // Nothing to do here.
-  }
+  abstract load(): void;
 
   constructor(info: ModuleOptions) {
     super();

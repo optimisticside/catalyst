@@ -6,12 +6,10 @@ import { ShardingManager } from 'kurasuta';
 import { EventEmitter } from 'events';
 import { createLogger, Logger } from 'utils/logger';
 
-export default class Service extends EventEmitter {
+export default abstract class Service extends EventEmitter {
   logger: Logger;
 
-  async run(_manager: ShardingManager): Promise<void> {
-    throw new Error('No run method implemented');
-  }
+  abstract run(manager: ShardingManager): Promise<void>;
 
   constructor(public name: string) {
     super();
