@@ -24,7 +24,7 @@ export default class LeaderboardCommand extends Command {
 
     const leaderboard = [...levelData.values()]
       .filter(<T>(x: T | undefined): x is T => x !== undefined)
-      .sort((a, b) => a.data.xp - b.data.xp)
+      .sort((a, b) => b.data.xp - a.data.xp)
       .map(({ member, data }, index) => [`${index + 1}. ${member.user.tag}`, `Level ${data.level} (${data.xp} xp)`])
       .reduce((o, [key, value]) => Object.assign(o, { [key]: [value] }), {});
 
