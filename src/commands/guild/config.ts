@@ -17,8 +17,10 @@ import PromptComponent from '@components/prompt';
 const PATH_DELIM = ':';
 const { NAME } = config;
 
-export type Encoder<T> = (data: T) => Promise<string> | string;
-export type Decoder<T> = (data: string) => Promise<T> | T;
+const blank = () => void 0;
+
+export type Encoder<T> = (data: T) => Promise<string>;
+export type Decoder<T> = (data: string) => Promise<T>;
 
 export interface ConfigMenuItem {
   name: string;
@@ -358,7 +360,7 @@ export default class ConfigCommand extends Command {
                   (await GuildData.findOne({ id: interaction.guild.id })) ??
                   (await GuildData.create({ id: interaction.guild.id }));
 
-                const decoded = decoder ? await decoder(collected) : collected;
+                const decoded = decoder ? await decoder(collected).catch(blank) : collected;
                 if (decoded === undefined) {
                   return redirector(
                     new NoteComponent({
@@ -414,7 +416,7 @@ export default class ConfigCommand extends Command {
                   (await GuildData.findOne({ id: interaction.guild.id })) ??
                   (await GuildData.create({ id: interaction.guild.id }));
                 
-                const decoded = decoder ? await decoder(collected) : collected;
+                const decoded = decoder ? await decoder(collected).catch(blank) : collected;
                 if (decoded === undefined) {
                   return redirector(
                     new NoteComponent({
@@ -458,9 +460,15 @@ export default class ConfigCommand extends Command {
               (await GuildData.create({ id: interaction.guild.id }));
             
             const channel = await interaction.user.createDM();
+            
+            let data = config[index];
+            if (encoder) {
+              data = await Promise.all(data.map(x => encoder(x)))
+            }
+            
             const embed = new MessageEmbed()
               .setTitle(title)
-              .setDescription(config[index].join('\n')); // TODO: use encoder.
+              .setDescription(data.join('\n')); // TODO: use encoder.
 
             await channel.send({ embeds: [embed] })
             redirector(
@@ -504,7 +512,7 @@ export default class ConfigCommand extends Command {
             body: `Enter the new value of ${name}`,
             onEnd: redirector => redirector(notChanged),
             onCollect: async (collected, redirector, interaction) => {
-              const decoded = decoder ? await decoder(collected) : collected;
+              const decoded = decoder ? await decoder(collected).catch(blank) : collected;
               if (decoded !== undefined) {
                 const actionCallback = this.configChanger(config, index, decoded);
                 actionCallback(redirector, interaction);
