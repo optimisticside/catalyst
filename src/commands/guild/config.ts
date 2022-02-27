@@ -247,7 +247,9 @@ export default class ConfigCommand extends Command {
                     redirect: this.listSetting(
                       'Auto roles',
                       'Auto-roles are automatically given to users that join',
-                      'autoRoles'
+                      'autoRoles',
+                      promisify(Serializer.serializeRole),
+                      promisify(Serializer.deserializeRole)
                     )
                   }
                 ]
