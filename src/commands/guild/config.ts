@@ -267,6 +267,13 @@ export default class ConfigCommand extends Command {
               emoji: '⚙️',
               description: 'Enable/disable level-up messages',
               redirect: this.boolSetting('Level-up Messages', 'levelupMessageEnabled')
+            },
+
+            {
+              name: 'Message',
+              emoji: '✉️',
+              description: 'Change the level-up message',
+              redirect: this.dataSetting<string>('Level-up Message', 'levelupMessage')
             }
           ]
         }
