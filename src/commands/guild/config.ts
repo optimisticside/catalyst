@@ -17,8 +17,8 @@ import PromptComponent from '@components/prompt';
 const PATH_DELIM = ':';
 const { NAME } = config;
 
-export type Encoder<T> = (data: T) => Promise<string>;
-export type Decoder<T> = (data: string) => Promise<T>;
+export type Encoder<T> = (data: T) => Promise<string> | string;
+export type Decoder<T> = (data: string) => Promise<T> | T;
 
 export interface ConfigMenuItem {
   name: string;
@@ -102,9 +102,15 @@ export default class ConfigCommand extends Command {
                 items: [
                   {
                     name: 'Toggle',
-                    emoji: '⚙︎',
+                    emoji: '⚙️',
                     description: 'Enable/disable greeting messages',
                     redirect: this.boolSetting('Gretting Messages', 'greetingEnabled')
+                  },
+                  {
+                    name: 'Message',
+                    emoji: '✉️',
+                    description: 'Change the greeting message',
+                    redirect: this.dataSetting<string>('Greeting Message', 'greetingMessage')
                   }
                 ]
               }
@@ -120,7 +126,7 @@ export default class ConfigCommand extends Command {
                 items: [
                   {
                     name: 'Toggle',
-                    emoji: '⚙︎',
+                    emoji: '⚙️',
                     description: 'Enable/disable goodbye messages',
                     redirect: this.boolSetting('Goodbye Messages', 'goodbyeEnabled')
                   }
@@ -220,7 +226,7 @@ export default class ConfigCommand extends Command {
           items: [
             {
               name: 'Toggle',
-              emoji: '⚙︎',
+              emoji: '⚙️',
               description: 'Enable/disable level-up messages',
               redirect: this.boolSetting('Level-up Messages', 'levelupMessageEnabled')
             }
@@ -238,7 +244,7 @@ export default class ConfigCommand extends Command {
           items: [
             {
               name: 'Toggle',
-              emoji: '⚙︎',
+              emoji: '⚙️',
               description: 'Enable/disable auto roles',
               redirect: this.boolSetting('Auto role-assignment', 'autoRoleEnabled')
             }
@@ -279,9 +285,10 @@ export default class ConfigCommand extends Command {
     };
   }
 
-  dataSetting<T>(name: string, index: string, encoder: Encoder<T>, decoder: Decoder<T>): Fluid.ActionCallback {
+  dataSetting<T>(name: string, index: string, encoder?: Encoder<T>, decoder?: Decoder<T>): Fluid.ActionCallback {
     return async (redirector, interaction) => {
       if (!interaction.guild) return;
+
       const config: GuildDocument =
         (await GuildData.findOne({ id: interaction.guild.id })) ??
         (await GuildData.create({ id: interaction.guild.id }));
@@ -295,7 +302,9 @@ export default class ConfigCommand extends Command {
 
       const confirmation = new ConfirmationComponent({
         header: name,
-        body: `${name} is currently ${await encoder(config[index])}. Would you like to change it?`,
+        body: `${name} is currently ${
+          encoder ? await encoder(config[index]) : config[index]
+        }. Would you like to change it?`,
         ifNo: redirector => redirector(notChanged),
         ifYes: redirector => {
           const prompt = new PromptComponent({
@@ -303,7 +312,7 @@ export default class ConfigCommand extends Command {
             body: `Enter the new value of ${name}`,
             onEnd: redirector => redirector(notChanged),
             onCollect: async (collected, redirector, interaction) => {
-              const decoded = await decoder(collected);
+              const decoded = decoder ? await decoder(collected) : collected;
               if (decoded !== undefined) {
                 const actionCallback = this.configChanger(config, index, decoded);
                 actionCallback(redirector, interaction);

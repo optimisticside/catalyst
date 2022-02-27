@@ -51,7 +51,11 @@ export default class PromptComponent extends Component {
               const messages = await interaction.channel?.messages.fetch({ limit: 10 });
               if (!messages) return;
 
-              const message = messages.filter(m => m.author === interaction.user).last();
+              const message = messages
+                .filter(m => m.author === interaction.user)
+                .sort((a, b) => a.createdTimestamp - b.createdTimestamp)
+                .last();
+
               if (message) this.props.onCollect(message.content, redirector, interaction);
             })
           }),
