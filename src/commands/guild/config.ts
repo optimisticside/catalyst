@@ -13,11 +13,16 @@ import ConfirmationComponent from '@components/confirmation';
 import GuildData, { GuildDocument } from 'models/guildData';
 import NoteComponent from '@components/note';
 import PromptComponent from '@components/prompt';
+import Serializer from 'utils/serializer';
 
 const PATH_DELIM = ':';
 const { NAME } = config;
 
 const blank = () => void 0;
+const promisify =
+  fn =>
+  async (...given) =>
+    fn(...given);
 
 export type Encoder<T> = (data: T) => Promise<string>;
 export type Decoder<T> = (data: string) => Promise<T>;
@@ -103,83 +108,147 @@ export default class ConfigCommand extends Command {
       },
 
       {
-        name: 'Auto Message',
-        emoji: '✉️',
-        description: 'Automatically sends messages when something happens',
+        name: 'Automation',
+        emoji: '🤖',
+        description: 'Automate tasks such as greetings',
         redirect: {
-          title: 'Auto Message',
-          description: 'Select teh buttons below to configure Auto Messaging',
+          title: 'Automation',
+          description: 'Select the buttons below to configure automation',
           items: [
             {
-              name: 'Greeting',
-              emoji: '👋',
-              description: 'Greets people when they join the server',
+              name: 'Auto Message',
+              emoji: '✉️',
+              description: 'Automatically sends messages when something happens',
               redirect: {
-                title: 'Greeting',
-                description: 'Select the buttons below to configure greetings',
+                title: 'Auto Message',
+                description: 'Select the buttons below to configure Auto Messaging',
                 items: [
                   {
-                    name: 'Toggle',
-                    emoji: '⚙️',
-                    description: 'Enable/disable greeting messages',
-                    redirect: this.boolSetting('Gretting Messages', 'greetingEnabled')
+                    name: 'Greeting',
+                    emoji: '👋',
+                    description: 'Greets people when they join the server',
+                    redirect: {
+                      title: 'Greeting',
+                      description: 'Select the buttons below to configure greetings',
+                      items: [
+                        {
+                          name: 'Toggle',
+                          emoji: '⚙️',
+                          description: 'Enable/disable greeting messages',
+                          redirect: this.boolSetting('Gretting Messages', 'greetingEnabled')
+                        },
+
+                        {
+                          name: 'Channel',
+                          emoji: '#️⃣',
+                          description: 'Change the channel where users will be greeted',
+                          redirect: this.dataSetting(
+                            'Greeting Channel',
+                            'greetingChannel',
+                            promisify(Serializer.serializeChannel),
+                            promisify(Serializer.deserializeChannel)
+                          )
+                        },
+
+                        {
+                          name: 'Message',
+                          emoji: '✉️',
+                          description: 'Change the greeting message',
+                          redirect: this.dataSetting<string>('Greeting Message', 'greetingMessage')
+                        }
+                      ]
+                    }
                   },
 
                   {
-                    name: 'Message',
-                    emoji: '✉️',
-                    description: 'Change the greeting message',
-                    redirect: this.dataSetting<string>('Greeting Message', 'greetingMessage')
+                    name: 'Goodbye',
+                    emoji: '🚪',
+                    description: 'Says goodbye when people leave the server',
+                    redirect: {
+                      title: 'Goodbye',
+                      description: 'Select the butons below to configure goodbyes',
+                      items: [
+                        {
+                          name: 'Toggle',
+                          emoji: '⚙️',
+                          description: 'Enable/disable goodbye messages',
+                          redirect: this.boolSetting('Goodbye Messages', 'goodbyeEnabled')
+                        },
+
+                        {
+                          name: 'Channel',
+                          emoji: '#️⃣',
+                          description: 'Change the channel where users will be said goodbye to',
+                          redirect: this.dataSetting(
+                            'Goodbye Channel',
+                            'goodbyeChannel',
+                            promisify(Serializer.serializeChannel),
+                            promisify(Serializer.deserializeChannel)
+                          )
+                        },
+
+                        {
+                          name: 'Message',
+                          emoji: '✉️',
+                          description: 'Change the goodbye message',
+                          redirect: this.dataSetting<string>('Goodbye Message', 'goodbyeMessage')
+                        }
+                      ]
+                    }
+                  },
+
+                  {
+                    name: 'Join DM',
+                    emoji: '📬',
+                    description: 'Sends a DM when someone joins the server',
+                    redirect: {
+                      title: 'Join DM',
+                      description: 'Select the buttons below to configure Join DMs',
+                      items: [
+                        {
+                          name: 'Toggle',
+                          emoji: '⚙️',
+                          description: 'Enable/disable join DMs',
+                          redirect: this.boolSetting('Join DMs', 'joinDmEnabled')
+                        },
+
+                        {
+                          name: 'Message',
+                          emoji: '✉️',
+                          description: 'Change the goodbye message',
+                          redirect: this.dataSetting<string>('Join DM Message', 'joinDmMessage')
+                        }
+                      ]
+                    }
                   }
                 ]
               }
             },
 
             {
-              name: 'Goodbye',
-              emoji: '🚪',
-              description: 'Says goodbye when people leave the server',
+              name: 'Auto Role',
+              emoji: '🤖',
+              description: 'Automatically assigns users roles',
               redirect: {
-                title: 'Goodbye',
-                description: 'Select the butons below to configure goodbyes',
+                title: 'Auto Role',
+                description: 'Select the buttons below to configure auto role assignment',
                 items: [
                   {
                     name: 'Toggle',
                     emoji: '⚙️',
-                    description: 'Enable/disable goodbye messages',
-                    redirect: this.boolSetting('Goodbye Messages', 'goodbyeEnabled')
+                    description: 'Enable/disable auto roles',
+                    redirect: this.boolSetting('Auto role-assignment', 'autoRoleEnabled')
                   },
 
                   {
-                    name: 'Message',
-                    emoji: '✉️',
-                    description: 'Change the goodbye message',
-                    redirect: this.dataSetting<string>('Goodbye Message', 'goodbyeMessage')
-                  }
-                ]
-              }
-            },
-
-            {
-              name: 'Join DM',
-              emoji: '📬',
-              description: 'Sends a DM when someone joins the server',
-              redirect: {
-                title: 'Join DM',
-                description: 'Select the buttons below to configure Join DMs',
-                items: [
-                  {
-                    name: 'Toggle',
-                    emoji: '⚙️',
-                    description: 'Enable/disable join DMs',
-                    redirect: this.boolSetting('Join DMs', 'joinDmEnabled')
-                  },
-
-                  {
-                    name: 'Message',
-                    emoji: '✉️',
-                    description: 'Change the goodbye message',
-                    redirect: this.dataSetting<string>('Join DM Message', 'joinDmMessage')
+                    name: 'Roles',
+                    emoji: '📝',
+                    description: 'Change the roles that are given',
+                    redirect: this.listSetting(
+                      'Auto roles',
+                      'Auto-roles are automatically given to users that join',
+                      'autoRoles'
+                    )
                   }
                 ]
               }
@@ -196,6 +265,25 @@ export default class ConfigCommand extends Command {
           title: 'Logs',
           description: 'Select the buttons below to configure logs',
           items: [
+            {
+              name: 'Toggle',
+              emoji: '⚙️',
+              description: 'Enable/disable logs',
+              redirect: this.boolSetting('Logs', 'logsEnabled')
+            },
+
+            {
+              name: 'Channel',
+              emoji: '#️⃣',
+              description: 'Change the channel where logs will be kept',
+              redirect: this.dataSetting(
+                'Logs Channel',
+                'logChannel',
+                promisify(Serializer.serializeChannel),
+                promisify(Serializer.deserializeChannel)
+              )
+            },
+
             {
               name: 'Message Logs',
               emoji: '📨',
@@ -229,6 +317,13 @@ export default class ConfigCommand extends Command {
             },
 
             {
+              name: 'Command Logs',
+              emoji: '💡',
+              description: 'Keeps track of commands run',
+              redirect: this.boolSetting('Command Logs', 'logCommands')
+            },
+
+            {
               name: 'User Logs',
               emoji: '🧑',
               description: 'Keeps track of what users are doing',
@@ -257,6 +352,13 @@ export default class ConfigCommand extends Command {
       },
 
       {
+        name: 'Prefix',
+        emoji: '✨',
+        description: 'Change the prefix for commands',
+        redirect: this.dataSetting('Prefix', 'prefix')
+      },
+
+      {
         name: 'Levels',
         emoji: '📈',
         description: 'Reward people for being active',
@@ -276,24 +378,6 @@ export default class ConfigCommand extends Command {
               emoji: '✉️',
               description: 'Change the level-up message',
               redirect: this.dataSetting<string>('Level-up Message', 'levelupMessage')
-            }
-          ]
-        }
-      },
-
-      {
-        name: 'Auto Role',
-        emoji: '🤖',
-        description: 'Automatically assigns users roles',
-        redirect: {
-          title: 'Auto Role',
-          description: 'Select the buttons below to configure auto role assignment',
-          items: [
-            {
-              name: 'Toggle',
-              emoji: '⚙️',
-              description: 'Enable/disable auto roles',
-              redirect: this.boolSetting('Auto role-assignment', 'autoRoleEnabled')
             }
           ]
         }
@@ -332,7 +416,13 @@ export default class ConfigCommand extends Command {
     };
   }
 
-  listSetting<T>(title: string, description: string, index: string, encoder?: Encoder<T>, decoder?: Decoder<T>): ConfigMenu {
+  listSetting<T>(
+    title: string,
+    description: string,
+    index: string,
+    encoder?: Encoder<T>,
+    decoder?: Decoder<T>
+  ): ConfigMenu {
     return {
       title,
       description,
@@ -415,7 +505,7 @@ export default class ConfigCommand extends Command {
                 const config: GuildDocument =
                   (await GuildData.findOne({ id: interaction.guild.id })) ??
                   (await GuildData.create({ id: interaction.guild.id }));
-                
+
                 const decoded = decoder ? await decoder(collected).catch(blank) : collected;
                 if (decoded === undefined) {
                   return redirector(
@@ -458,19 +548,16 @@ export default class ConfigCommand extends Command {
             const config: GuildDocument =
               (await GuildData.findOne({ id: interaction.guild.id })) ??
               (await GuildData.create({ id: interaction.guild.id }));
-            
+
             const channel = await interaction.user.createDM();
-            
             let data = config[index];
             if (encoder) {
-              data = await Promise.all(data.map(x => encoder(x)))
+              data = await Promise.all(data.map(x => encoder(x)));
             }
-            
-            const embed = new MessageEmbed()
-              .setTitle(title)
-              .setDescription(data.join('\n')); // TODO: use encoder.
 
-            await channel.send({ embeds: [embed] })
+            const embed = new MessageEmbed().setTitle(title).setDescription(data.join('\n'));
+
+            await channel.send({ embeds: [embed] });
             redirector(
               new NoteComponent({
                 header: 'Success',
@@ -482,7 +569,7 @@ export default class ConfigCommand extends Command {
           }
         }
       ]
-    }
+    };
   }
 
   dataSetting<T>(name: string, index: string, encoder?: Encoder<T>, decoder?: Decoder<T>): Fluid.ActionCallback {
@@ -503,7 +590,7 @@ export default class ConfigCommand extends Command {
       const confirmation = new ConfirmationComponent({
         header: name,
         body: `${name} is currently ${
-          encoder ? await encoder(config[index]) : config[index]
+          encoder && config[index] ? await encoder(config[index]) : config[index]
         }. Would you like to change it?`,
         ifNo: redirector => redirector(notChanged),
         ifYes: redirector => {
