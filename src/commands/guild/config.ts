@@ -122,6 +122,7 @@ export default class ConfigCommand extends Command {
                     description: 'Enable/disable greeting messages',
                     redirect: this.boolSetting('Gretting Messages', 'greetingEnabled')
                   },
+
                   {
                     name: 'Message',
                     emoji: '✉️',
@@ -145,6 +146,13 @@ export default class ConfigCommand extends Command {
                     emoji: '⚙️',
                     description: 'Enable/disable goodbye messages',
                     redirect: this.boolSetting('Goodbye Messages', 'goodbyeEnabled')
+                  },
+
+                  {
+                    name: 'Message',
+                    emoji: '✉️',
+                    description: 'Change the goodbye message',
+                    redirect: this.dataSetting<string>('Goodbye Message', 'goodbyeMessage')
                   }
                 ]
               }
@@ -157,7 +165,21 @@ export default class ConfigCommand extends Command {
               redirect: {
                 title: 'Join DM',
                 description: 'Select the buttons below to configure Join DMs',
-                items: []
+                items: [
+                  {
+                    name: 'Toggle',
+                    emoji: '⚙️',
+                    description: 'Enable/disable join DMs',
+                    redirect: this.boolSetting('Join DMs', 'joinDmEnabled')
+                  },
+
+                  {
+                    name: 'Message',
+                    emoji: '✉️',
+                    description: 'Change the goodbye message',
+                    redirect: this.dataSetting<string>('Join DM Message', 'joinDmMessage')
+                  }
+                ]
               }
             }
           ]
@@ -328,7 +350,7 @@ export default class ConfigCommand extends Command {
                 const config: GuildDocument =
                   (await GuildData.findOne({ id: interaction.guild.id })) ??
                   (await GuildData.create({ id: interaction.guild.id }));
-                
+
                 const decoded = decoder ? await decoder(collected) : collected;
                 if (decoded === undefined) {
                   return redirector(
