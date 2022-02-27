@@ -2,7 +2,7 @@
 // Copyright 2022 Catalyst contributors
 // See LICENSE for details
 
-import { Permissions } from 'discord.js';
+import { MessageEmbed, Permissions } from 'discord.js';
 import Command, { CommandArgs, CommandGiven } from 'structs/command';
 import CatalystClient from 'core/client';
 import OptionParser from 'utils/optionParser';
@@ -47,38 +47,54 @@ export default class ConfigCommand extends Command {
           description: 'Select the buttons below to configure Guardian',
           items: [
             {
+              name: 'Blacklist',
+              emoji: '📝',
+              description: 'Removes messages that contain blacklisted words',
+              redirect: this.listSetting('Blacklist', 'Words that are banned in the server', 'blacklistedWords')
+            },
+            {
               name: 'Anti-spam',
               emoji: '🔨',
               description: 'Prevents users from spamming in the server',
               redirect: this.boolSetting('Anti-spam', 'antiSpamEnabled')
             },
-
             {
-              name: 'URL Filter',
-              emoji: '🌐',
-              description: 'Removes messages that contain URLs',
-              redirect: this.boolSetting('URL Filter', 'filterLinks')
-            },
+              name: 'Message Filters',
+              emoji: '🔍',
+              description: 'Filters messages that contain blocked content',
+              redirect: {
+                title: 'Message Filters',
+                description: 'Select the buttons below to configure message filtering',
+                items: [
+                  {
+                    name: 'URL Filter',
+                    emoji: '🌐',
+                    description: 'Removes messages that contain URLs',
+                    redirect: this.boolSetting('URL Filter', 'filterLinks')
+                  },
 
-            {
-              name: 'Invite Filter',
-              emoji: '📧',
-              description: 'Removes messages that contain a Discord invite.',
-              redirect: this.boolSetting('Invite Filter', 'filterInvites')
-            },
+                  {
+                    name: 'Invite Filter',
+                    emoji: '📧',
+                    description: 'Removes messages that contain a Discord invite.',
+                    redirect: this.boolSetting('Invite Filter', 'filterInvites')
+                  },
 
-            {
-              name: 'IP Filter',
-              emoji: '❗',
-              description: 'Removes messages that contain an IP address.',
-              redirect: this.boolSetting('IP Filter', 'filterIps')
-            },
+                  {
+                    name: 'IP Filter',
+                    emoji: '❗',
+                    description: 'Removes messages that contain an IP address.',
+                    redirect: this.boolSetting('IP Filter', 'filterIps')
+                  },
 
-            {
-              name: 'Zalgo Filter',
-              emoji: '🗑️',
-              description: 'Removes messages that contain zalgo.',
-              redirect: this.boolSetting('Zalgo Filter', 'filterZalgo')
+                  {
+                    name: 'Zalgo Filter',
+                    emoji: '🗑️',
+                    description: 'Removes messages that contain zalgo.',
+                    redirect: this.boolSetting('Zalgo Filter', 'filterZalgo')
+                  }
+                ]
+              }
             }
           ]
         }
@@ -283,6 +299,153 @@ export default class ConfigCommand extends Command {
           );
         });
     };
+  }
+
+  listSetting<T>(title: string, description: string, index: string, encoder?: Encoder<T>, decoder?: Decoder<T>): ConfigMenu {
+    return {
+      title,
+      description,
+      items: [
+        {
+          name: 'Add',
+          emoji: '✏️',
+          description: 'Add an item to the list',
+          redirect: redirector => {
+            const prompt = new PromptComponent({
+              header: 'Item add prompt',
+              body: 'Enter the item you would like to add to the list',
+              onEnd: redirector =>
+                redirector(
+                  new NoteComponent({
+                    header: 'List not changed',
+                    body: `${title} has not been changed`,
+                    previousFreeze: true,
+                    backButton: true
+                  })
+                ),
+              onCollect: async (collected, redirector, interaction) => {
+                if (!interaction.guild) return;
+                const config: GuildDocument =
+                  (await GuildData.findOne({ id: interaction.guild.id })) ??
+                  (await GuildData.create({ id: interaction.guild.id }));
+                
+                const decoded = decoder ? await decoder(collected) : collected;
+                if (decoded === undefined) {
+                  return redirector(
+                    new NoteComponent({
+                      header: 'Invalid value',
+                      body: 'The value you entered is not valid',
+                      previousFreeze: true,
+                      backButton: true
+                    })
+                  );
+                }
+
+                if (config[index].includes(decoded)) {
+                  return redirector(
+                    new NoteComponent({
+                      header: 'Already in list',
+                      body: 'The value you entered is already in the list',
+                      previousFreeze: true,
+                      backButton: true
+                    })
+                  );
+                }
+
+                const changed = [...config[index], decoded];
+                const actionCallback = this.configChanger(config, index, changed);
+                actionCallback(redirector, interaction);
+              }
+            });
+
+            redirector(prompt);
+          }
+        },
+
+        {
+          name: 'Remove',
+          emoji: '🗑️',
+          description: 'Remove an item from the list',
+          redirect: redirector => {
+            const prompt = new PromptComponent({
+              header: 'Item delete prompt',
+              body: 'Enter the item you would like to delete from the list',
+              onEnd: redirector =>
+                redirector(
+                  new NoteComponent({
+                    header: 'List not changed',
+                    body: `${title} has not been changed`,
+                    previousFreeze: true,
+                    backButton: true
+                  })
+                ),
+              onCollect: async (collected, redirector, interaction) => {
+                if (!interaction.guild) return;
+                const config: GuildDocument =
+                  (await GuildData.findOne({ id: interaction.guild.id })) ??
+                  (await GuildData.create({ id: interaction.guild.id }));
+                
+                const decoded = decoder ? await decoder(collected) : collected;
+                if (decoded === undefined) {
+                  return redirector(
+                    new NoteComponent({
+                      header: 'Invalid value',
+                      body: 'The value you entered is not valid',
+                      previousFreeze: true,
+                      backButton: true
+                    })
+                  );
+                }
+
+                if (!config[index].includes(decoded)) {
+                  return redirector(
+                    new NoteComponent({
+                      header: 'Not in list',
+                      body: 'The value you entered is not in the list',
+                      previousFreeze: true,
+                      backButton: true
+                    })
+                  );
+                }
+
+                const changed = [...config[index]].filter(x => x !== decoded);
+                const actionCallback = this.configChanger(config, index, changed);
+                actionCallback(redirector, interaction);
+              }
+            });
+
+            redirector(prompt);
+          }
+        },
+
+        {
+          name: 'View',
+          emoji: '👁️',
+          description: 'View the contents of the list',
+          redirect: async (redirector, interaction) => {
+            if (!interaction.guild) return;
+            const config: GuildDocument =
+              (await GuildData.findOne({ id: interaction.guild.id })) ??
+              (await GuildData.create({ id: interaction.guild.id }));
+            
+            const channel = await interaction.user.createDM();
+            const embed = new MessageEmbed()
+              .setTitle(title)
+              .setDescription(config[index].join('\n')); // TODO: use encoder.
+
+            await channel.send({ embeds: [embed] })
+            redirector(
+              new NoteComponent({
+                header: 'Success',
+                body: "We've DMed you the list",
+                previousFreeze: true,
+                backButton: true
+              })
+            );
+          }
+        }
+      ]
+    }
   }
 
   dataSetting<T>(name: string, index: string, encoder?: Encoder<T>, decoder?: Decoder<T>): Fluid.ActionCallback {
