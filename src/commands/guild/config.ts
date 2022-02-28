@@ -46,68 +46,6 @@ export default class ConfigCommand extends Command {
     description: `Select the buttons below to configure ${NAME}`,
     items: [
       {
-        name: 'Guardian',
-        emoji: '🔒',
-        description: 'Automatically moderates your server',
-        redirect: {
-          title: 'Guardian',
-          description: 'Select the buttons below to configure Guardian',
-          items: [
-            {
-              name: 'Blacklist',
-              emoji: '📝',
-              description: 'Removes messages that contain blacklisted words',
-              redirect: this.listSetting('Blacklist', 'Words that are banned in the server', 'blacklistedWords')
-            },
-            {
-              name: 'Anti-spam',
-              emoji: '🔨',
-              description: 'Prevents users from spamming in the server',
-              redirect: this.boolSetting('Anti-spam', 'antiSpamEnabled')
-            },
-            {
-              name: 'Message Filters',
-              emoji: '🔍',
-              description: 'Filters messages that contain blocked content',
-              redirect: {
-                title: 'Message Filters',
-                description: 'Select the buttons below to configure message filtering',
-                items: [
-                  {
-                    name: 'URL Filter',
-                    emoji: '🌐',
-                    description: 'Removes messages that contain URLs',
-                    redirect: this.boolSetting('URL Filter', 'filterLinks')
-                  },
-
-                  {
-                    name: 'Invite Filter',
-                    emoji: '📧',
-                    description: 'Removes messages that contain a Discord invite.',
-                    redirect: this.boolSetting('Invite Filter', 'filterInvites')
-                  },
-
-                  {
-                    name: 'IP Filter',
-                    emoji: '❗',
-                    description: 'Removes messages that contain an IP address.',
-                    redirect: this.boolSetting('IP Filter', 'filterIps')
-                  },
-
-                  {
-                    name: 'Zalgo Filter',
-                    emoji: '🗑️',
-                    description: 'Removes messages that contain zalgo.',
-                    redirect: this.boolSetting('Zalgo Filter', 'filterZalgo')
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      },
-
-      {
         name: 'Automation',
         emoji: '🤖',
         description: 'Automate tasks such as greetings',
@@ -115,6 +53,68 @@ export default class ConfigCommand extends Command {
           title: 'Automation',
           description: 'Select the buttons below to configure automation',
           items: [
+            {
+              name: 'Guardian',
+              emoji: '🔒',
+              description: 'Automatically moderates your server',
+              redirect: {
+                title: 'Guardian',
+                description: 'Select the buttons below to configure Guardian',
+                items: [
+                  {
+                    name: 'Blacklist',
+                    emoji: '📝',
+                    description: 'Removes messages that contain blacklisted words',
+                    redirect: this.listSetting('Blacklist', 'Words that are banned in the server', 'blacklistedWords')
+                  },
+                  {
+                    name: 'Anti-spam',
+                    emoji: '🔨',
+                    description: 'Prevents users from spamming in the server',
+                    redirect: this.boolSetting('Anti-spam', 'antiSpamEnabled')
+                  },
+                  {
+                    name: 'Message Filters',
+                    emoji: '🔍',
+                    description: 'Filters messages that contain blocked content',
+                    redirect: {
+                      title: 'Message Filters',
+                      description: 'Select the buttons below to configure message filtering',
+                      items: [
+                        {
+                          name: 'URL Filter',
+                          emoji: '🌐',
+                          description: 'Removes messages that contain URLs',
+                          redirect: this.boolSetting('URL Filter', 'filterLinks')
+                        },
+
+                        {
+                          name: 'Invite Filter',
+                          emoji: '📧',
+                          description: 'Removes messages that contain a Discord invite.',
+                          redirect: this.boolSetting('Invite Filter', 'filterInvites')
+                        },
+
+                        {
+                          name: 'IP Filter',
+                          emoji: '❗',
+                          description: 'Removes messages that contain an IP address.',
+                          redirect: this.boolSetting('IP Filter', 'filterIps')
+                        },
+
+                        {
+                          name: 'Zalgo Filter',
+                          emoji: '🗑️',
+                          description: 'Removes messages that contain zalgo.',
+                          redirect: this.boolSetting('Zalgo Filter', 'filterZalgo')
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+
             {
               name: 'Auto Message',
               emoji: '✉️',
