@@ -49,7 +49,7 @@ export default class CatalystClient<Ready extends boolean = boolean> extends Cli
   constructor(options: ClientOptions) {
     super(options);
     this.logger = createLogger({
-      cluster: this.shard?.clusterCount ?? this.cluster?.id,
+      cluster: this.cluster?.id,
       shard: this.shard?.id
     });
   }
