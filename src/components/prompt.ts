@@ -19,7 +19,7 @@ export interface PromptProps {
   body: string;
   footer?: string;
   onEnd: ActionCallback;
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onCollect: (collected: string, redirector: Redirector, interaction: MessageComponentInteraction) => any;
 }
 
