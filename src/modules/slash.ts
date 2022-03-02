@@ -315,11 +315,11 @@ export default class SlashModule extends Module {
 
   async handleInteraction(interaction: Interaction) {
     if (interaction.isCommand()) {
-      return await this.handleCommand(interaction as CommandInteraction);
+      return await this.handleCommand(interaction);
     }
 
     if (interaction.isAutocomplete()) {
-      return await this.handleAutocomplete(interaction as AutocompleteInteraction);
+      return await this.handleAutocomplete(interaction);
     }
   }
 
