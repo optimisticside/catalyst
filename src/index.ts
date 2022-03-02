@@ -14,7 +14,7 @@ import { Intents, Options } from 'discord.js';
 import { createLogger } from 'utils/logger';
 import Service from 'structs/service';
 
-const { TOKEN, TOTAL_SHARDS, GUILDS_PER_SHARD, LIFETIME, REST_TIME_OFFSET } = config;
+const { NAME, TOKEN, TOTAL_SHARDS, GUILDS_PER_SHARD, LIFETIME, REST_TIME_OFFSET } = config;
 
 const logger = createLogger();
 const shardingManager = new ShardingManager(path.join(__dirname, 'core/cluster'), {
@@ -56,6 +56,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 if (cluster.isPrimary) {
+  logger.info(`${NAME} starting (production: ${process.env.NODE_ENV ?? false})`);
   if (LIFETIME) {
     setTimeout(() => {
       shardingManager.respawn = false;
