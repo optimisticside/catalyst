@@ -2,7 +2,7 @@
 // Copyright 2022 Catalyst contributors
 // See LICENSE for details
 
-import { GuildMember, TextChannel } from 'discord.js';
+import { GuildMember, MessageActionRow, MessageButton, TextChannel } from 'discord.js';
 import Module from 'structs/module';
 import GuildData, { GuildDocument } from 'models/guildData';
 import CatalystClient from 'core/client';
@@ -51,7 +51,19 @@ export default class GuildsModule extends Module {
     // It can force the shard to restart.
     const dmChannel = await member.createDM();
     if (!dmChannel) return;
-    dmChannel.send(formatted);
+    dmChannel.send({
+      content: formatted,
+      components: [
+        new MessageActionRow().addComponents(
+          new MessageButton({
+            label: `Sent from server: ${member.guild.name}`,
+            style: 'SECONDARY',
+            customId: '0',
+            disabled: true
+          })
+        )
+      ]
+    });
   }
 
   async autoRole(member: GuildMember, config: GuildDocument) {
