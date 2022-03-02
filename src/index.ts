@@ -56,7 +56,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 if (cluster.isPrimary) {
-  logger.info(`${NAME} starting (production: ${process.env.NODE_ENV ?? false})`);
+  logger.info(`${NAME} starting (production: ${process.env.NODE_ENV === 'production'})`);
   if (LIFETIME) {
     setTimeout(() => {
       shardingManager.respawn = false;
