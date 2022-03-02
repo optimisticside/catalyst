@@ -150,7 +150,7 @@ export default class SlashModule extends Module {
     return perms;
   }
 
-  async refreshCommands(guild: Guild, commands: Array<SlashCommandBuilder>) {
+  async refreshGuildCommands(guild: Guild, commands: Array<SlashCommandBuilder>) {
     const rest = new REST({ version: '9' }).setToken(TOKEN);
     if (!this.client.user) return;
     const commandRoute = Routes.applicationGuildCommands(this.client.user.id, guild.id);
@@ -161,7 +161,7 @@ export default class SlashModule extends Module {
     // Edit: Upon further thought, I've realized how horrible
     // of an idea this is.
     // await rest.put(commandRoute, { body: [] });
-    const result = await rest.put(commandRoute, { body: commands });
+    await rest.put(commandRoute, { body: commands });
 
     /*
     const perms = [];
@@ -171,15 +171,22 @@ export default class SlashModule extends Module {
     }));
     await rest.put(permRoute, { body: perms });
     */
-
-    return result;
   }
 
-  async setupGuild(guild: Guild) {
-    await this.refreshCommands(guild, this.buildCommands()).catch(() => {
-      // `refreshCommands` fails if the bot does not have permission
-      // to create slash commands, so nothing needs to be done.
-    });
+  async refreshGlobalCommands(commands: Array<SlashCommandBuilder>) {
+    const rest = new REST({ version: '9' }).setToken(TOKEN);
+    if (!this.client.user) return;
+
+    const commandRoute = Routes.applicationCommands(this.client.user.id);
+    await rest.put(commandRoute, { body: commands });
+  }
+
+  async setup(guild?: Guild) {
+    const commands = this.buildCommands();
+    // `refreshCommands` fails if the bot does not have permission
+    // to create slash commands, so nothing needs to be done.
+    if (guild !== undefined) return await this.refreshGuildCommands(guild, commands);
+    return await this.refreshGlobalCommands(commands);
   }
 
   findCommand(interaction: CommandInteraction | AutocompleteInteraction) {
@@ -322,10 +329,16 @@ export default class SlashModule extends Module {
 
     commandHandler.on('commandsLoad', async () => {
       this.logger.info('Setting up slash commands');
-      eventHandler.on('guildCreate', this.setupGuild.bind(this));
 
-      await this.client.waitForReady();
-      this.client.guilds.cache.map(this.setupGuild.bind(this));
+      if (process.env.NODE_ENV === 'production') {
+        await this.client.waitForReady();
+        this.setup();
+      } else {
+        eventHandler.on('guildCreate', this.setup.bind(this));
+
+        await this.client.waitForReady();
+        this.client.guilds.cache.map(this.setup.bind(this));
+      }
 
       // Waiting for the client to be ready before accepting interactions
       // prevents invalid-interaction errors.
