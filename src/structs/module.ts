@@ -34,6 +34,6 @@ export default abstract class Module extends EventEmitter {
       module: this.name
     });
 
-    this.logger.info(`${this.name} module loaded.`);
+    this.logger.info(`${this.name} module loaded`);
   }
 }
