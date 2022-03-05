@@ -28,6 +28,7 @@ export default class CommandModule extends Module {
   validator?: CommandValidator;
 
   checkPerms(required: Array<bigint>, member: GuildMember, channel?: TextChannel) {
+    // if (process.env.NODE_ENV !== 'production' && CREATORS.includes(member.user.id)) return true;
     let perms = member.permissions;
     if (channel) perms = channel.permissionsFor(member);
     return required.every(p => perms.has(p)) || perms.has(Permissions.FLAGS.ADMINISTRATOR);
