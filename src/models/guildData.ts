@@ -16,7 +16,7 @@ export enum ModerationAction {
   TEMP_MUTE = 'Temp Mute'
 }
 
-export interface TimerDocument {
+export interface TimerDocument extends Document {
   user: string;
   date: Date;
 }
@@ -26,7 +26,7 @@ const timerSchema = new Schema({
   date: Date
 });
 
-export interface ModerationCaseDocument {
+export interface ModerationCaseDocument extends Document {
   id: string;
   user: string;
   reason: string;
@@ -46,7 +46,7 @@ const moderationCaseSchema = new Schema({
   type: { type: String, require: true, enum: moderationActions }
 });
 
-export interface StrikePolicyActionDocument {
+export interface StrikePolicyActionDocument extends Document {
   count: number;
   action: ModerationAction;
 }
@@ -56,7 +56,7 @@ const strikePolicyActionSchema = new Schema({
   action: { type: String, reqquire: true, enum: moderationActions }
 });
 
-export interface ReactionRoleDocument {
+export interface ReactionRoleDocument extends Document {
   messageId: string;
   multiSelect: boolean;
   roleData: {
