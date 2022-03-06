@@ -16,11 +16,7 @@ export default class CatalystCluster extends BaseCluster {
     const guildCounts = (await this.client.shard?.fetchClientValues('guilds.cache.size')) as Array<number>;
     const guilds = guildCounts.reduce((acc, count) => acc + count, 0);
 
-    this.client.user?.setPresence({
-      status: 'online',
-      activities: [{ name: `${guilds} servers`, type: 'WATCHING' }],
-      shardId: this.client.shard?.id
-    });
+    this.client.user?.setActivity({ name: `${guilds} servers`, type: 'WATCHING' });
   }
 
   async launch() {
@@ -34,6 +30,6 @@ export default class CatalystCluster extends BaseCluster {
 
     await this.client.waitForReady();
     this.updateStatus();
-    setInterval(this.updateStatus.bind(this), 5000);
+    setInterval(this.updateStatus.bind(this), 10000);
   }
 }
