@@ -33,6 +33,6 @@ export default class CatalystCluster extends BaseCluster {
 
     await this.client.waitForReady();
     this.updateStatus();
-    setInterval(this.updateStatus.bind(this), 5000);
+    setInterval(this.updateStatus.bind(this), 20000);
   }
 }
