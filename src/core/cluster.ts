@@ -16,9 +16,6 @@ export default class CatalystCluster extends BaseCluster {
     const guildCounts = (await this.client.shard?.fetchClientValues('guilds.cache.size')) as Array<number>;
     const guilds = guildCounts.reduce((acc, count) => acc + count, 0);
 
-    // Do not change this to setPresence without changing the interval
-    // for the update. Presences can only be updated once every 20 seconds,
-    // while activities can be changed every 4 seconds.
     this.client.user?.setActivity({ name: `${guilds} servers`, type: 'WATCHING' });
   }
 
