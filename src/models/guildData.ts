@@ -77,6 +77,20 @@ const reactionRoleSchema = new Schema({
   }
 });
 
+export interface WhitelistDocument extends Document {
+  members: Array<string>;
+  channels: Array<string>;
+  categories: Array<string>;
+  roles: Array<string>;
+}
+
+const whitelistSchema = new Schema({
+  members: { type: Array, of: String, default: [] },
+  channels: { type: Array, of: String, default: [] },
+  categories: { type: Array, of: String, default: [] },
+  roles: { type: Array, of: String, default: [] }
+});
+
 export interface GuildDocument extends Document {
   id: string;
   prefix?: string;
@@ -111,7 +125,6 @@ export interface GuildDocument extends Document {
 
   guardianEnabled: boolean;
   blacklistedWords: Array<string>;
-  guardianWhitelist: Array<string>;
   antiSpamEnabled: boolean;
   filterZalgo: boolean;
   filterLinks: boolean;
@@ -119,6 +132,13 @@ export interface GuildDocument extends Document {
   filterDuplicates: boolean;
   filterIps: boolean;
   filterSelfBots: boolean;
+
+  blacklistWhitelist: WhitelistDocument;
+  spamWhitelist: WhitelistDocument;
+  inviteWhitelist: WhitelistDocument;
+  linkWhitelist: WhitelistDocument;
+  ipWhitelist: WhitelistDocument;
+  zalgoWhitelist: WhitelistDocument;
 
   muteRole: string;
   unmuteTimers: Array<TimerDocument>;
@@ -173,6 +193,14 @@ const guildDataSchema = new Schema({
   blacklistedWords: { type: Array, of: String, default: [] },
   guardianWhitelist: { type: Array, of: String, default: [] },
   antiSpamEnabled: { type: Boolean, default: false },
+
+  blacklistWhitelist: { type: whitelistSchema, default: {} },
+  spamWhitelist: { type: whitelistSchema, default: {} },
+  inviteWhitelist: { type: whitelistSchema, default: {} },
+  linkWhitelist: { type: whitelistSchema, default: {} },
+  ipWhitelist: { type: whitelistSchema, default: {} },
+  zalgoWhitelist: { type: whitelistSchema, default: {} },
+
   filterZalgo: { type: Boolean, default: false },
   filterLinks: { type: Boolean, default: false },
   filterInvites: { type: Boolean, default: false },

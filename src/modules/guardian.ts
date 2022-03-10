@@ -5,7 +5,7 @@
 import formatter from 'utils/formatter';
 import { Message, Snowflake, TextChannel } from 'discord.js';
 import Module from 'structs/module';
-import GuildData, { GuildDocument } from 'models/guildData';
+import GuildData, { GuildDocument, WhitelistDocument } from 'models/guildData';
 import { setTimeout as wait } from 'timers/promises';
 import CatalystClient from 'core/client';
 import EventsModule from '@modules/events';
@@ -37,6 +37,14 @@ export default class GuardianModule extends Module {
   reasons: { [key: string]: string };
   messageTrackers: Map<Snowflake, MessageTracker>;
   antispam: AntispamConfig;
+
+  checkWhitelist(message: Message, whitelist: WhitelistDocument) {
+    if (whitelist.roles.find(r => message.member?.roles.cache.has(r))) return true;
+    if (whitelist.channels.find(c => c === message.channel.id)) return true;
+    if (whitelist.categories.find(p => message.channel instanceof TextChannel && message.channel.parentId === p)) return true;
+    if (whitelist.members.find(m => m === message.author.id)) return true;
+    return false;
+  }
 
   async notify(message: Message, reason: string) {
     await message.reply(warning(this.messages[reason] ?? 'Your message(s) were blocked.')).then(reply => {
@@ -70,7 +78,7 @@ export default class GuardianModule extends Module {
     // TODO: Create a new table for this.
 
     //const images = message.attachments.filter(a => a.type === 'image');
-    const hasDuplicates = /^(.+)(?: +\1){3}/.test(content);
+    //const hasDuplicates = /^(.+)(?: +\1){3}/.test(content);
     const hasZalgo = /%CC%/g.test(encodeURIComponent(content));
     const hasInvite = content.includes('discord.gg/') || content.includes('discordapp.com/invite/');
     const hasLink = /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/.test(content);
@@ -79,10 +87,9 @@ export default class GuardianModule extends Module {
     const isBlacklisted = config.blacklistedWords?.find(w => content.includes(w));
 
     //if (message.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) return;
-    if (config.guardianWhitelist?.find(id => message.author.id === id)) return;
     //if (config.ignoredChannels?.find(c => channel.name === c)) return;
 
-    if (config.antiSpamEnabled) {
+    if (config.antiSpamEnabled && !this.checkWhitelist(message, config.spamWhitelist)) {
       const tracker = this.messageTrackers.get(message.author.id);
       if (tracker !== undefined) {
         const lastPressure = tracker.pressure;
@@ -130,15 +137,21 @@ export default class GuardianModule extends Module {
       }
     }
 
+  const filterZalgo = config.filterZalgo && !this.checkWhitelist(message, config.zalgoWhitelist);
+  const filterInvites = config.filterInvites && !this.checkWhitelist(message, config.inviteWhitelist);
+  const filterLinks = config.filterLinks && !this.checkWhitelist(message, config.linkWhitelist);
+  const filterIps = config.filterIps && !this.checkWhitelist(message, config.ipWhitelist);
+  const filterBlacklist = !this.checkWhitelist(message, config.blacklistWhitelist);
+
     // TODO: Ban user instead of deleting when detecting self-bot.
     // if (config.filterSelfBots && hasEmbeds) await this.delete(message, 'selfBot');
-    if (config.filterDuplicates && hasDuplicates) await this.delete(message, 'duplicate');
-    if (config.filterZalgo && hasZalgo) await this.delete(message, 'zalgo');
-    if (config.filterInvites && hasInvite) await this.delete(message, 'invite');
-    if (config.filterLinks && hasLink) await this.delete(message, 'link');
-    if (config.filterIps && hasIp) await this.delete(message, 'ip');
+    // if (config.filterDuplicates && hasDuplicates) await this.delete(message, 'duplicate');
+    if (filterZalgo && hasZalgo) await this.delete(message, 'zalgo');
+    if (filterInvites && hasInvite) await this.delete(message, 'invite');
+    if (filterLinks && hasLink) await this.delete(message, 'link');
+    if (filterIps && hasIp) await this.delete(message, 'ip');
     //if (config.imageLimit && images.length < config.imageLimit) await this.delete(message, 'image');
-    if (isBlacklisted) await this.delete(message, 'blacklist');
+    if (filterBlacklist && isBlacklisted) await this.delete(message, 'blacklist');
   }
 
   load() {
