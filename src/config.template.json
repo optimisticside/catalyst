@@ -21,6 +21,9 @@
   "PROMPT_COLOR": { "type": "string", "default": "PURPLE" },
   "DENIAL_COLOR": { "type": "string", "default": "DARK_RED" },
 
+  "STATUS_ACTIVITY": { "type": "string", "default": "PLAYING" },
+  "STATUS_FORMAT": { "type": "string", "default": "/help" },
+
   "MONGODB_SRV": { "type": "string", "require": true },
   "COOLDOWN_PERSISTANCE_THRESHOLD": { "type": "integer", "default": 10000 },
 
