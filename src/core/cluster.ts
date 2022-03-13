@@ -7,16 +7,22 @@ import config from 'core/config';
 import { BaseCluster } from 'kurasuta';
 import CatalystClient from './client';
 
-const { TOKEN } = config;
+const { TOKEN, STATUS_FORMAT, STATUS_ACTIVITY } = config;
 
 export default class CatalystCluster extends BaseCluster {
   declare client: CatalystClient;
+  status?: string;
 
   async updateStatus() {
     const guildCounts = (await this.client.shard?.fetchClientValues('guilds.cache.size')) as Array<number>;
     const guilds = guildCounts.reduce((acc, count) => acc + count, 0);
 
-    this.client.user?.setActivity({ name: `${guilds} servers`, type: 'WATCHING' });
+    const status = STATUS_FORMAT
+      .replaceAll('{guilds}', guilds.toString());
+
+    if (status === this.status) return;
+    this.status = status;
+    this.client.user?.setActivity({ name: status, type: STATUS_ACTIVITY as 'WATCHING' | 'LISTENING' });
   }
 
   async launch() {

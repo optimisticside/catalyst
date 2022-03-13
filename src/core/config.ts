@@ -42,6 +42,9 @@ interface ParsedConfig {
   PROMPT_COLOR: string;
   DENIAL_COLOR: string;
 
+  STATUS_ACTIVITY: string;
+  STATUS_FORMAT: string;
+
   MONGODB_SRV: string;
   COOLDOWN_PERSISTANCE_THRESHOLD: number;
 
