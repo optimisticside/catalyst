@@ -17,10 +17,9 @@ export default class CatalystCluster extends BaseCluster {
     const guildCounts = (await this.client.shard?.fetchClientValues('guilds.cache.size')) as Array<number>;
     const guilds = guildCounts.reduce((acc, count) => acc + count, 0);
 
-    const status = STATUS_FORMAT
-      .replaceAll('{guilds}', guilds.toString());
-
+    const status = STATUS_FORMAT.replaceAll('{guilds}', guilds.toString());
     if (status === this.status) return;
+
     this.status = status;
     this.client.user?.setActivity({ name: status, type: STATUS_ACTIVITY as 'WATCHING' | 'LISTENING' });
   }

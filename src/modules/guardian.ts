@@ -41,7 +41,8 @@ export default class GuardianModule extends Module {
   checkWhitelist(message: Message, whitelist: WhitelistDocument) {
     if (whitelist.roles.find(r => message.member?.roles.cache.has(r))) return true;
     if (whitelist.channels.find(c => c === message.channel.id)) return true;
-    if (whitelist.categories.find(p => message.channel instanceof TextChannel && message.channel.parentId === p)) return true;
+    if (whitelist.categories.find(p => message.channel instanceof TextChannel && message.channel.parentId === p))
+      return true;
     if (whitelist.members.find(m => m === message.author.id)) return true;
     return false;
   }
@@ -137,11 +138,11 @@ export default class GuardianModule extends Module {
       }
     }
 
-  const filterZalgo = config.filterZalgo && !this.checkWhitelist(message, config.zalgoWhitelist);
-  const filterInvites = config.filterInvites && !this.checkWhitelist(message, config.inviteWhitelist);
-  const filterLinks = config.filterLinks && !this.checkWhitelist(message, config.linkWhitelist);
-  const filterIps = config.filterIps && !this.checkWhitelist(message, config.ipWhitelist);
-  const filterBlacklist = !this.checkWhitelist(message, config.blacklistWhitelist);
+    const filterZalgo = config.filterZalgo && !this.checkWhitelist(message, config.zalgoWhitelist);
+    const filterInvites = config.filterInvites && !this.checkWhitelist(message, config.inviteWhitelist);
+    const filterLinks = config.filterLinks && !this.checkWhitelist(message, config.linkWhitelist);
+    const filterIps = config.filterIps && !this.checkWhitelist(message, config.ipWhitelist);
+    const filterBlacklist = !this.checkWhitelist(message, config.blacklistWhitelist);
 
     // TODO: Ban user instead of deleting when detecting self-bot.
     // if (config.filterSelfBots && hasEmbeds) await this.delete(message, 'selfBot');
