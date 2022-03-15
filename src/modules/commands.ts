@@ -78,7 +78,7 @@ export default class CommandModule extends Module {
         let result = 0;
         const parts = given.match(/(\d+[A-Za-z]+)/g);
         parts?.map(part => {
-          const numPart = part?.match(/\d+/g)?.at(0);
+          const numPart = part?.match(/\d+/g)?.[0];
           const unitName = numPart && part.substring(numPart.length);
 
           // TODO: This code can be greatly improved.
