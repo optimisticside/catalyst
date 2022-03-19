@@ -94,7 +94,6 @@ export default class SlashModule extends Module {
     const commands: Array<SlashCommandBuilder> = [];
     const addedSubs: Array<string> = [];
 
-    // TODO: Commands that are hidden should not be added
     commandHandler.groups.map(group => {
       const builder = new SlashCommandBuilder().setName(group.name.toLowerCase()).setDescription(group.desc);
       const subGroups = commandHandler.subGroups.filter(sg => sg.group === group.name);
@@ -105,6 +104,7 @@ export default class SlashModule extends Module {
           .setName(subGroup.name.toLowerCase())
           .setDescription(subGroup.desc);
         subCommands.map(subCommand => {
+          if (subCommand.hidden) return;
           subBuilder.addSubcommand(this.buildCommand(subCommand, true) as SlashCommandSubcommandBuilder);
           addedSubs.push(subCommand.name);
         });
@@ -112,7 +112,7 @@ export default class SlashModule extends Module {
       });
 
       subCommands.map(subCommand => {
-        if (addedSubs.find(s => s === subCommand.name)) return;
+        if (addedSubs.find(s => s === subCommand.name) || subCommand.hidden) return;
         builder.addSubcommand(this.buildCommand(subCommand, true) as SlashCommandSubcommandBuilder);
         addedSubs.push(subCommand.name);
       });
@@ -121,7 +121,7 @@ export default class SlashModule extends Module {
     });
 
     commandHandler.commands.map(command => {
-      if (addedSubs.find(s => s === command.name)) return;
+      if (addedSubs.find(s => s === command.name) || command.hidden) return;
       commands.push(this.buildCommand(command) as SlashCommandBuilder);
     });
 
