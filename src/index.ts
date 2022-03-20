@@ -30,8 +30,6 @@ const shardingManager = new ShardingManager(path.join(__dirname, 'core/cluster')
       Intents.FLAGS.GUILDS,
       Intents.FLAGS.GUILD_MESSAGES,
       Intents.FLAGS.DIRECT_MESSAGES,
-      Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-      Intents.FLAGS.GUILD_INVITES,
       Intents.FLAGS.GUILD_MEMBERS
     ],
     sweepers: {
