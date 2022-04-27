@@ -70,8 +70,7 @@ export default class ListComponent extends Component {
       embed.setDescription(fullDescription.join('\n'));
     }
 
-    // Components will only be added if the body-element
-    // has a callback.
+    // Components will only be added if the body-element has a callback.
     const buttons = this.state.body
       .filter(c => c.action)
       .map(({ buttonName, name, emoji, action: callback }) => {
